@@ -1,0 +1,59 @@
+Act as an Expert Full-Stack Web Developer. I want to build a comprehensive Business Management and AI Strategy web application called 'Data Insights'. The application functions as a 'Virtual MBA Consultant' combined with an 'Automated Business Tracker'.
+
+Please build this application step-by-step using a robust tech stack (e.g., Python/Flask or Node.js backend, React frontend, SQLite/PostgreSQL database).
+
+Project Architecture: The Two-Pillar Model
+
+Pillar 1: Auto-Tracker (Business Operations & Dashboards)
+This pillar handles daily data entry and automated visual reporting.
+
+User Roles: Implement 'Employer' (Admin) and 'Employee' roles.
+
+Database Models:
+
+Employer Config: Define business Verticals (e.g., Sales, Marketing), Salary Slabs, Incentive Structures (%), and Travel Allowance Caps.
+
+Employee Profile: Mapped to specific Verticals and assigned Monthly/Quarterly Targets (Revenue/Volume).
+
+Daily Tracking: Form for Employees to input End of Day (EOD) metrics: Deals Closed, Revenue Generated, and Expenses (Categorized as Travel, Fuel, etc.).
+
+Automated Calculations: - Achievement % = (Actual Revenue / Target) * 100.
+
+Total Expense = Fixed Salary + Earned Incentive + Travel Expenses.
+
+Dashboards (UI/UX):
+
+Employee Dashboard: Show current 'Target vs Achievement' (Progress Bar) and 'Projected Earnings/Incentives' (Number card).
+
+Employer Dashboard: Show interactive charts (D3.js or Chart.js). Include:
+a) Person-wise Performance (Leaderboard).
+b) Month-wise Revenue Trends (Line Chart).
+c) Vertical-wise Split (Bar Chart).
+d) YoY Growth.
+e) Expense Breakdown (Pie Chart: Salary vs Incentive vs Travel).
+
+Pillar 2: AI Strategy Head (Virtual MBA Professional)
+This pillar acts as the analytical brain, allowing users to chat with their data and upload custom files.
+
+Hybrid AI Chat Interface: Create a chat sidebar where the Employer can ask strategic questions.
+
+Internal Data Sync: The AI must have read-access to the 'Auto-Tracker' database. If the user asks, 'Why is employee X underperforming?', the AI should query the database, analyze the stats, and generate a Performance Improvement Plan.
+
+Lengthy Custom Excel Upload (RAG Implementation):
+
+Users can upload massive Excel/CSV files (historical data, market research) without size crash issues.
+
+Implement Data Chunking and Retrieval-Augmented Generation (RAG). Convert large Excel rows into vector embeddings (using tools like LangChain or LlamaIndex) so the AI can read and analyze lengthy data efficiently without context-window overflow.
+
+Credit System: Data entry is free, but generating AI Strategy insights costs 1 credit per prompt. Add a user profile section showing available credits.
+
+UI & Navigation Requirements:
+
+Brand Colors: Golden, Black, and White. Dark mode aesthetic.
+
+Sidebar menu with options: 'Operations Dashboard', 'AI Strategy Chat', 'Data Upload', 'User Profile/Credits', and 'History' (saving the last 5 dashboard states or chat sessions).
+
+Export Button: Allow exporting dashboard views or AI chat strategies as a PDF.
+
+Execution Command:
+Start by setting up the Database Schema (Users, Targets, Achievements, Expenses) and the basic Authentication/Onboarding flow for Employer and Employee. Do not generate the entire app at once; ask for my approval after completing the database and basic UI structure before moving to the logic and AI integration."

@@ -1,0 +1,67 @@
+Project Update & Feature Request: I need to upgrade my web application with advanced features, better UI/UX, and optimized performance. Please implement the following changes sequentially to ensure code stability and API efficiency:
+
+1. Credit System & Monetization Logic:
+
+Daily Limit: Implement a logic to track user actions. Limit free users to 5 actions per day.
+
+Upgrade Prompt: Once the limit is reached, display a polished, visually appealing modal or message card stating: "Limit Reached. To unlock more credits or premium features, please contact support at sarthakjhalani8@gmail.com."
+
+2. Advanced Dashboard Analytics (KPIs & Charts):
+
+KPIs: Auto-calculate and display 4 Key Performance Indicators (KPIs) relevant to the uploaded dataset at the top of the dashboard.
+
+Visualization: Generate the following charts using a modern library (like Rejcharts, Chart.js, or Plotly) with beautiful styling, tooltips, and responsive design:
+
+General Graph/Area Chart
+
+Bar Chart
+
+Line Chart
+
+Pie Chart (Must include clear legends and percentage markings).
+
+Design: Ensure all charts are distinct, attractive, and have appropriate axes labeling.
+
+3. File Upload & Restrictions:
+
+Allow users to upload Excel Workbooks (.xlsx) with multiple sheets.
+
+Size Limit: Enforce a strict 10 MB limit per file.
+
+Error Handling: If a file exceeds 10 MB, show a friendly error message instructing them to contact the admin (sarthakjhalani8@gmail.com) for enterprise solutions.
+
+4. Data Persistence & User History:
+
+Database Integration: Use a lightweight database (like SQLite or PostgreSQL provided by Replit) to store user sessions.
+
+History Limit: Remember and display the last 5 dashboards/chat sessions for the user. Older sessions can be overwritten or archived.
+
+Upsell: In the history section, add a note: "To save more history, contact admin."
+
+Dashboard Actions: For every saved dashboard, add the following functional buttons:
+
+Share: Native sharing to social platforms.
+
+Copy: Copy dashboard link/data.
+
+Rename: Edit the dashboard title.
+
+Delete: Remove the dashboard permanently.
+
+5. User Profile & Settings:
+
+Create a "User Profile" section (similar to Replit's user menu).
+
+Include standard options: Edit Profile, App Settings, Personalization/Theme Toggles, and Logout.
+
+6. Voice Command Integration (New Feature):
+
+Feasibility Check: If possible, integrate a "Voice-to-Text" feature (using Web Speech API) allowing users to give commands verbally instead of typing.
+
+UI: Add a microphone icon in the chat input area for this.
+
+7. Code & API Optimization (Critical):
+
+Efficiency: Structure the code to avoid unnecessary API calls to Gemini. Cache data where possible to prevent "Usage Overflow."
+
+Context Management: Ensure the chat context doesn't become too large, which consumes excessive tokens. Summarize previous context if needed.
