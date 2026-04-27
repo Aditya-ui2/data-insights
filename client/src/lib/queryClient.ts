@@ -53,10 +53,13 @@ export const getQueryFn: <T>(options: {
       if (path.includes("/api/business/profile")) {
         return { id: "demo-biz-123", name: "Demo Business Ltd", ownerId: "admin-demo-id" } as any;
       }
+      if (path.includes("/api/business/verticals")) return [] as any;
+      if (path.includes("/api/business/members")) return [] as any;
+      if (path.includes("/api/business/tasks")) return [] as any;
       if (path.includes("/api/datasets")) return [] as any;
       if (path.includes("/api/dashboards")) return [] as any;
       if (path.includes("/api/usage")) return { count: 0, limit: 100 } as any;
-      return {} as any;
+      return [] as any; // Default to empty array for lists
     }
 
     const headers: Record<string, string> = {};
