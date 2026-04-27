@@ -51,15 +51,43 @@ export const getQueryFn: <T>(options: {
         return { id: "admin-demo-id", email: "admin@demodatainsights.com", firstName: "Admin", lastName: "User", role: "admin", onboardingComplete: true } as any;
       }
       if (path.includes("/api/business/profile")) {
-        return { id: "demo-biz-123", name: "Demo Business Ltd", ownerId: "admin-demo-id" } as any;
+        return { 
+          id: "demo-biz-123", 
+          name: "NexGen Solutions Pvt Ltd", 
+          ownerId: "admin-demo-id",
+          industry: "Technology & Services",
+          onboardingComplete: true,
+          setupStep: "complete",
+          createdAt: new Date().toISOString()
+        } as any;
       }
-      if (path.includes("/api/business/verticals")) return [] as any;
-      if (path.includes("/api/business/members")) return [] as any;
-      if (path.includes("/api/business/tasks")) return [] as any;
-      if (path.includes("/api/datasets")) return [] as any;
-      if (path.includes("/api/dashboards")) return [] as any;
-      if (path.includes("/api/usage")) return { count: 0, limit: 100 } as any;
-      return [] as any; // Default to empty array for lists
+      if (path.includes("/api/business/verticals")) {
+        return [
+          { id: "v1", name: "Sales & CRM", businessId: "demo-biz-123" },
+          { id: "v2", name: "Operations", businessId: "demo-biz-123" },
+          { id: "v3", name: "Marketing", businessId: "demo-biz-123" }
+        ] as any;
+      }
+      if (path.includes("/api/business/members")) {
+        return [
+          { id: "m1", userId: "admin-demo-id", role: "owner", user: { firstName: "Admin", lastName: "User", email: "admin@demodatainsights.com" } }
+        ] as any;
+      }
+      if (path.includes("/api/datasets")) {
+        return [
+          { id: "d1", name: "Q1 Sales Report.xlsx", source: "excel", createdAt: new Date().toISOString(), status: "processed" },
+          { id: "d2", name: "Marketing_Campaigns_2024", source: "google_sheets", createdAt: new Date().toISOString(), status: "processed" },
+          { id: "d3", name: "Inventory_Master.csv", source: "excel", createdAt: new Date().toISOString(), status: "processed" }
+        ] as any;
+      }
+      if (path.includes("/api/dashboards")) {
+        return [
+          { id: "db1", name: "Executive Performance Summary", isPublic: true, datasetId: "d1", createdAt: new Date().toISOString() },
+          { id: "db2", name: "Operational Efficiency Tracker", isPublic: false, datasetId: "d2", createdAt: new Date().toISOString() }
+        ] as any;
+      }
+      if (path.includes("/api/usage")) return { count: 35, limit: 100 } as any;
+      return [] as any; 
     }
 
     const headers: Record<string, string> = {};
