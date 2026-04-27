@@ -174,13 +174,22 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     const firstName = nameParts[0] || null;
     const lastName = nameParts.slice(1).join(" ") || null;
 
-    const dbUser = await storage.upsertUser({
-      id: decoded.sub,
-      email: decoded.email || null,
-      firstName,
-      lastName,
-      profileImageUrl: decoded.picture || null,
-    });
+    let dbUser;
+    try {
+      dbUser = await storage.upsertUser({
+        id: decoded.sub,
+        email: decoded.email || null,
+        firstName,
+        lastName,
+        profileImageUrl: decoded.picture || null,
+      });
+    } catch (dbError) {
+      console.error("[Firebase Auth] Database upsert failed:", dbError);
+      return res.status(500).json({ 
+        message: "Database error during login. Make sure you have run 'npm run db:push'.",
+        error: process.env.NODE_ENV === 'development' ? dbError : undefined
+      });
+    }
 
     req.user = {
       claims: {
