@@ -89,6 +89,28 @@ export async function signInWithApple() {
   }
 }
 
+let manualUser: FirebaseUser | null = null;
+const authListeners = new Set<(user: FirebaseUser | null) => void>();
+
+export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
+  authListeners.add(callback);
+  
+  // Also keep the real firebase listener
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if (!manualUser) {
+      callback(user);
+    }
+  });
+
+  // Call immediately with current state
+  callback(manualUser || auth.currentUser);
+
+  return () => {
+    authListeners.delete(callback);
+    unsubscribe();
+  };
+}
+
 export async function signInWithFacebook() {
   try {
     const result = await signInWithPopup(auth, facebookProvider);
@@ -103,14 +125,16 @@ export async function signInWithEmail(email: string, password: string) {
   // Demo Bypass
   if (email === "admin@demodatainsights.com" && password === "Demo@1234") {
     console.log("[Auth] Using Demo Bypass credentials");
-    return { 
-      user: { 
-        email: "admin@demodatainsights.com", 
-        uid: "admin-demo-id",
-        getIdToken: async () => "demo-token-123" 
-      } as any, 
-      error: null 
-    };
+    manualUser = { 
+      email: "admin@demodatainsights.com", 
+      uid: "admin-demo-id",
+      getIdToken: async () => "demo-token-123" 
+    } as any;
+    
+    // Notify all listeners
+    authListeners.forEach(cb => cb(manualUser));
+    
+    return { user: manualUser, error: null };
   }
 
   try {
@@ -152,6 +176,7 @@ export async function logOut() {
 }
 
 export async function getIdToken(): Promise<string | null> {
+  if (manualUser) return manualUser.getIdToken();
   const user = auth.currentUser;
   if (!user) return null;
   try {
@@ -159,10 +184,6 @@ export async function getIdToken(): Promise<string | null> {
   } catch {
     return null;
   }
-}
-
-export function onAuthChange(callback: (user: FirebaseUser | null) => void) {
-  return onAuthStateChanged(auth, callback);
 }
 
 export type { FirebaseUser };
