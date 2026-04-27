@@ -166,24 +166,24 @@ function TaskCard({
   onEdit,
   onDelete,
   onStatusChange,
+  onNativeDragStart,
 }: {
   task: BusinessTask;
   members: BusinessMember[];
   onEdit: (t: BusinessTask) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: string) => void;
+  onNativeDragStart?: (e: React.DragEvent, id: string) => void;
 }) {
   const assignee = members.find((m) => m.id === task.assignedToMemberId);
   const due = formatDueDate(task.dueDate);
   const prio = PRIORITY_CONFIG[task.priority ?? "medium"];
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="group relative bg-black border border-white/10 hover:border-amber-500/40 rounded-xl p-4 shadow-lg hover:shadow-amber-500/10 cursor-default transition-all duration-200"
+    <div
+      draggable
+      onDragStart={(e) => onNativeDragStart?.(e, task.id)}
+      className="group relative bg-black border border-white/10 hover:border-amber-500/40 rounded-xl p-4 shadow-lg hover:shadow-amber-500/10 cursor-grab active:cursor-grabbing transition-all duration-200"
     >
       {/* Header row */}
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -289,7 +289,7 @@ function TaskCard({
           </span>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -688,8 +688,14 @@ export default function BusinessTasksPage() {
                 return (
                   <div
                     key={col.id}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const taskId = e.dataTransfer.getData("taskId");
+                      if (taskId) updateMutation.mutate({ id: taskId, data: { status: col.id } });
+                    }}
                     className={cn(
-                      "flex flex-col w-72 shrink-0 rounded-xl border",
+                      "flex flex-col w-72 shrink-0 rounded-xl border transition-colors",
                       col.borderColor,
                       col.bgColor
                     )}
@@ -717,6 +723,10 @@ export default function BusinessTasksPage() {
                             members={members}
                             onEdit={(t) => { setEditingTask(t); setModalOpen(true); }}
                             onDelete={(id) => deleteMutation.mutate(id)}
+                            onNativeDragStart={(e, id) => {
+                              e.dataTransfer.setData("taskId", id);
+                              e.dataTransfer.effectAllowed = "move";
+                            }}
                             onStatusChange={(id, status) =>
                               updateMutation.mutate({ id, data: { status } })
                             }
