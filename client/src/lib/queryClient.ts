@@ -74,6 +74,7 @@ export const getQueryFn: <T>(options: {
 
     // Tracking Templates (Forms)
     if (path.includes("/api/tracking/templates")) {
+      console.log("[Standalone Mode] Returning Rich Tracking Templates");
       return [
         {
           id: "t1",
