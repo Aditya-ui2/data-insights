@@ -846,6 +846,30 @@ export default function Login() {
                       Sign in
                     </Button>
                   </motion.div>
+
+                  <div className="relative py-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white dark:bg-slate-900 px-2 text-muted-foreground">Or bypass for testing</span>
+                    </div>
+                  </div>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 rounded-xl border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 font-medium"
+                    onClick={() => {
+                      setEmail("admin@demodatainsights.com");
+                      setPassword("Demo@1234");
+                      setTimeout(() => {
+                        handleEmailSignIn({ preventDefault: () => {} } as any);
+                      }, 100);
+                    }}
+                  >
+                    Demo Admin Access
+                  </Button>
                 </motion.form>
               ) : (
                 <motion.form

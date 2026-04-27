@@ -100,6 +100,19 @@ export async function signInWithFacebook() {
 }
 
 export async function signInWithEmail(email: string, password: string) {
+  // Demo Bypass
+  if (email === "admin@demodatainsights.com" && password === "Demo@1234") {
+    console.log("[Auth] Using Demo Bypass credentials");
+    return { 
+      user: { 
+        email: "admin@demodatainsights.com", 
+        uid: "admin-demo-id",
+        getIdToken: async () => "demo-token-123" 
+      } as any, 
+      error: null 
+    };
+  }
+
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return { user: result.user, error: null };

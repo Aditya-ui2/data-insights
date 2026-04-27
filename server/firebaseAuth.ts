@@ -164,7 +164,19 @@ export const isAuthenticated: RequestHandler = async (req: any, res, next) => {
     }
 
     const token = authHeader.split(" ")[1];
-    const decoded = await verifyFirebaseToken(token);
+    
+    // Developer Bypass for Demo Login
+    let decoded;
+    if (token === "demo-token-123") {
+      decoded = {
+        sub: "admin-demo-id",
+        email: "admin@demodatainsights.com",
+        name: "Admin User",
+        picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin"
+      };
+    } else {
+      decoded = await verifyFirebaseToken(token);
+    }
 
     if (!decoded) {
       return res.status(401).json({ message: "Invalid or expired token" });
