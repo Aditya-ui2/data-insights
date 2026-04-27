@@ -33,8 +33,14 @@ import EmployeeDailyTrackingPage from "@/pages/employee-daily-tracking";
 
 // Fetches the business profile returning null for 404 (no profile yet),
 // but re-throws on 5xx or network errors so backend issues aren't silently hidden.
-async function fetchBusinessProfileOrNull(): Promise<{ id: string } | null> {
+async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string } | null> {
   const token = await getIdToken();
+  
+  // Demo Mode Bypass
+  if (token === "demo-token-123") {
+    return { id: "demo-biz-123", name: "Demo Business Ltd" };
+  }
+
   const headers: Record<string, string> = {};
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch("/api/business/profile", { credentials: "include", headers });
