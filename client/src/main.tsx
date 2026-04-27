@@ -76,10 +76,36 @@ if (typeof window !== "undefined") {
           ]
         });
       }
+      if (urlString.includes("/business/performance/my")) {
+        return mockResponse({
+          totalRevenue: 450000,
+          totalUnits: 125,
+          totalDeals: 18,
+          totalExpenses: 52000,
+          targetRevenue: 500000,
+          targetUnits: 150,
+          targetDeals: 25,
+          achievementPercent: 90,
+          projectedIncentive: 15000,
+          entryCount: 22,
+          verticalBreakdown: [
+            { verticalId: "v1", verticalName: "Sales & CRM", revenue: 300000, units: 80, deals: 12 },
+            { verticalId: "v2", verticalName: "Operations", revenue: 150000, units: 45, deals: 6 }
+          ]
+        });
+      }
+      if (urlString.includes("/business/eod")) {
+        const today = new Date().toISOString().slice(0, 10);
+        return mockResponse([
+          { id: "e1", entryDate: today, verticalId: "v1", revenueAmount: 25000, unitsSold: 5, dealsClosed: 2, status: "pending", notes: "Good day, closed two big leads." },
+          { id: "e2", entryDate: "2026-04-26", verticalId: "v1", revenueAmount: 18000, unitsSold: 3, dealsClosed: 1, status: "reviewed", managerNote: "Well done!", notes: "Steady progress." },
+          { id: "e3", entryDate: "2026-04-25", verticalId: "v2", revenueAmount: 12000, unitsSold: 10, dealsClosed: 0, status: "reviewed", notes: "Ops maintenance day." }
+        ]);
+      }
       if (urlString.includes("/business/verticals")) {
         return mockResponse([
-          { id: "v1", name: "Sales & CRM", count: 12 },
-          { id: "v2", name: "Operations", count: 8 }
+          { id: "v1", name: "Sales & CRM", metricLabel: "Leads", metricUnit: "Units", expenseCategories: ["Travel", "Client Meet", "Phone"] },
+          { id: "v2", name: "Operations", metricLabel: "Tasks", metricUnit: "Hours", expenseCategories: ["Tools", "Repairs", "Other"] }
         ]);
       }
       if (urlString.includes("/datasets")) return mockResponse([]);
