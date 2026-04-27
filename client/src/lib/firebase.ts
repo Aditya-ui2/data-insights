@@ -168,7 +168,14 @@ export async function resetPassword(email: string) {
 
 export async function logOut() {
   try {
+    manualUser = null;
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("isDemoLoggedIn");
+      localStorage.setItem("isDemoLoggedOut", "true");
+    }
     await signOut(auth);
+    // Notify all listeners of logout
+    authListeners.forEach(cb => cb(null));
     return { error: null };
   } catch (error: any) {
     return { error: error.message };
