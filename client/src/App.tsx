@@ -34,25 +34,12 @@ import EmployeeDailyTrackingPage from "@/pages/employee-daily-tracking";
 // Fetches the business profile returning null for 404 (no profile yet),
 // but re-throws on 5xx or network errors so backend issues aren't silently hidden.
 async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string } | null> {
-  const token = await getIdToken();
-  
-  // Demo Mode Bypass
-  if (token === "demo-token-123") {
-    return { id: "demo-biz-123", name: "Demo Business Ltd" };
-  }
-
-  const headers: Record<string, string> = {};
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  const res = await fetch("/api/business/profile", { credentials: "include", headers });
-  if (res.status === 404) return null;
-  if (res.status === 401 || res.status === 403) return null;
-  if (!res.ok) throw new Error(`Unexpected error fetching business profile: ${res.status}`);
-  return res.json();
+  // Standalone Mock Profile
+  return { id: "demo-biz-123", name: "NexGen Solutions Pvt Ltd" };
 }
 
 // Smart default route: authenticated users with a Business Suite profile go to /business;
 // pure analytics users stay on the Analytics home.
-// Accessing /home always shows Analytics regardless of Business Suite.
 function DefaultHome({ isAuthenticated }: { isAuthenticated: boolean }) {
   const { data: bizProfile, isLoading } = useQuery<{ id: string } | null>({
     queryKey: ["/api/business/profile"],
@@ -61,7 +48,7 @@ function DefaultHome({ isAuthenticated }: { isAuthenticated: boolean }) {
     queryFn: fetchBusinessProfileOrNull,
   });
 
-  if (!isAuthenticated) return <Landing />;
+  if (!isAuthenticated) return <Redirect to="/login" />;
   if (isLoading) return null;
   if (bizProfile?.id) return <Redirect to="/business" />;
   return <Home />;
