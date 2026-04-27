@@ -662,12 +662,19 @@ function FeatureGrid({ title, badge, features }: {
   );
 }
 
-/* ─────────────────── main export ────────────────────────────────────────────── */
+import { logOut } from "@/lib/firebase";
+
 export default function Landing() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: containerRef });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.12], [1, 0.6]);
   const heroScale = useTransform(scrollYProgress, [0, 0.12], [1, 0.97]);
+
+  useEffect(() => {
+    // For demo purposes: Whenever a user hits the landing page, clear any previous session.
+    // This ensures that clicking "Sign In" will always show the Login page instead of skipping to the dashboard.
+    logOut();
+  }, []);
 
   return (
     <div ref={containerRef} className="min-h-screen bg-white relative">
