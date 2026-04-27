@@ -28,12 +28,6 @@ export function useAuthState(): AuthState {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isDemoPersistent, setIsDemoPersistent] = useState(() => {
     if (typeof window !== "undefined") {
-      // Auto-login for Demo: If not explicitly logged out, stay logged in
-      const hasDeniedAutoLogin = localStorage.getItem("isDemoLoggedOut") === "true";
-      if (!hasDeniedAutoLogin) {
-        localStorage.setItem("isDemoLoggedIn", "true");
-        return true;
-      }
       return localStorage.getItem("isDemoLoggedIn") === "true";
     }
     return false;
