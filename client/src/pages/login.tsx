@@ -592,17 +592,10 @@ export default function Login() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950 p-4">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md relative z-10"
         >
-          <button
-            onClick={() => { setShowForgotPassword(false); setForgotSent(false); setInlineError(null); }}
-            className="flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700 mb-6 font-medium"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Sign In
-          </button>
           <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-800/50 p-8">
             <h2 className="text-2xl font-bold text-center mb-2">Reset Password</h2>
             <p className="text-muted-foreground text-center text-sm mb-6">Enter your email to receive a reset link</p>
