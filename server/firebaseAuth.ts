@@ -137,7 +137,7 @@ async function verifyFirebaseToken(idToken: string): Promise<DecodedToken | null
       return null;
     }
 
-    console.log("[Firebase Auth] Token verified successfully for:", payload.email);
+    console.log("[Firebase Auth] Token verified successfully for:", payload.email, "uid:", payload.sub);
     
     return {
       sub: payload.sub,
@@ -146,7 +146,7 @@ async function verifyFirebaseToken(idToken: string): Promise<DecodedToken | null
       picture: payload.picture,
     };
   } catch (error) {
-    console.error("[Firebase Auth] Error verifying token:", error);
+    console.error("[Firebase Auth] Critical error verifying token:", error);
     return null;
   }
 }
