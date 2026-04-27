@@ -29,20 +29,25 @@ if (typeof window !== "undefined") {
       if (urlString.includes("/business/member-profile")) {
         return mockResponse({ businessId: "demo-biz-123", memberId: "m1", memberRole: "admin", businessName: "NexGen Solutions" });
       }
-      if (urlString.includes("/business/members")) {
-        return mockResponse([
-          { id: "m1", userId: "u1", role: "owner", user: { firstName: "Aditya", lastName: "(You)", email: "admin@demodatainsights.com" } },
-          { id: "m2", userId: "u2", role: "runner", user: { firstName: "Rahul", lastName: "Sharma", email: "rahul@demo.com" } },
-          { id: "m3", userId: "u3", role: "employee", user: { firstName: "Priya", lastName: "Verma", email: "priya@demo.com" } }
-        ]);
+      if (urlString.includes("/api/business/members")) {
+        return mockResponse({
+          members: [
+            { id: "m1", userId: "u1", role: "owner", status: "active", name: "Aditya Singh", email: "admin@demodatainsights.com" },
+            { id: "m2", userId: "u2", role: "runner", status: "active", name: "Rahul Sharma", email: "rahul@demo.com" },
+            { id: "m3", userId: "u3", role: "employee", status: "active", name: "Priya Verma", email: "priya@demo.com" }
+          ]
+        });
       }
-      if (urlString.includes("/business/tasks")) {
-        return mockResponse([
-          { id: "t1", title: "Review Q1 Sales Report", status: "todo", priority: "high", createdAt: new Date().toISOString() },
-          { id: "t2", title: "Visit North Hub Site", status: "in_progress", priority: "medium", createdAt: new Date().toISOString() },
-          { id: "t3", title: "Setup Payroll for May", status: "done", priority: "low", createdAt: new Date().toISOString() },
-          { id: "t4", title: "Onboard New Field Runner", status: "todo", priority: "high", createdAt: new Date().toISOString() }
-        ]);
+      if (urlString.includes("/api/tasks")) {
+        return mockResponse({
+          tasks: [
+            { id: "t1", title: "Review Q1 Financials", description: "Audit the expense logs vs revenue", status: "todo", priority: "urgent", assignedToMemberId: "m1", dueDate: new Date().toISOString() },
+            { id: "t2", title: "Site Visit: North Hub", description: "Geofence testing and runner check-in", status: "in_progress", priority: "high", assignedToMemberId: "m2", dueDate: new Date().toISOString() },
+            { id: "t3", title: "Update Inventory Stock", description: "Verify closing stock for month-end", status: "in_review", priority: "medium", assignedToMemberId: "m3", dueDate: new Date().toISOString() },
+            { id: "t4", title: "Client Proposal: NexGen", description: "Negotiate pricing for the next quarter", status: "done", priority: "low", assignedToMemberId: "m1", dueDate: new Date().toISOString() },
+            { id: "t5", title: "Follow-up with Leads", description: "Call potential clients from the CRM", status: "todo", priority: "medium", assignedToMemberId: "m3", dueDate: new Date().toISOString() }
+          ]
+        });
       }
       if (urlString.includes("/tracking/templates")) {
         return mockResponse([
