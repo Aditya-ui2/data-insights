@@ -41,6 +41,27 @@ export const getQueryFn: <T>(options: {
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
     const token = await getIdToken();
+
+    // Global Demo Mode Interceptor
+    if (token === "demo-token-123") {
+      const path = queryKey.join("/");
+      console.log("[Demo Mode] Mocking response for:", path);
+      
+      if (path.includes("/api/business/profile")) {
+        return { id: "demo-biz-123", name: "Demo Business Ltd", ownerId: "admin-demo-id" } as any;
+      }
+      if (path.includes("/api/datasets")) {
+        return [] as any;
+      }
+      if (path.includes("/api/dashboards")) {
+        return [] as any;
+      }
+      if (path.includes("/api/users/me")) {
+        return { id: "admin-demo-id", email: "admin@demodatainsights.com", role: "admin", onboardingComplete: true } as any;
+      }
+      return {} as any;
+    }
+
     const headers: Record<string, string> = {};
     
     if (token) {

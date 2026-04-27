@@ -73,6 +73,9 @@ export function useAuthState(): AuthState {
 
   useEffect(() => {
     if (userError && firebaseUser) {
+      // Ignore backend errors for demo user
+      if (firebaseUser.email === "admin@demodatainsights.com") return;
+
       const msg = (userError as Error).message || "Failed to verify account with server.";
       console.error("[Auth] userError:", msg);
       setAuthError(msg);
