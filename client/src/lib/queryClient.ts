@@ -150,6 +150,46 @@ export const getQueryFn: <T>(options: {
     return [] as any;
   };
 
+// ── GLOBAL FETCH MONKEYPATCH (Full Standalone Mode) ──────────────────────────
+if (typeof window !== "undefined") {
+  const originalFetch = window.fetch;
+  window.fetch = async (url: string | URL | Request, options?: RequestInit) => {
+    const urlString = url.toString();
+    
+    if (urlString.includes("/api/")) {
+      console.log("[Standalone Fetch] Intercepting:", urlString);
+      
+      // Re-use logic from getQueryFn or similar
+      if (urlString.includes("/auth/user") || urlString.includes("/users/me")) {
+        return new Response(JSON.stringify({ id: "admin-demo-id", email: "admin@demodatainsights.com", firstName: "Admin", lastName: "User", role: "admin", onboardingComplete: true }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (urlString.includes("/business/profile")) {
+        return new Response(JSON.stringify({ id: "demo-biz-123", name: "NexGen Solutions Pvt Ltd", ownerId: "admin-demo-id", industry: "Technology", onboardingComplete: true, setupStep: "complete", currencySymbol: "₹" }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (urlString.includes("/business/member-profile")) {
+        return new Response(JSON.stringify({ businessId: "demo-biz-123", memberId: "demo-member-456", memberRole: "runner", businessName: "NexGen Solutions Pvt Ltd" }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (urlString.includes("/tracking/templates")) {
+        return new Response(JSON.stringify([
+          { id: "t1", name: "Daily Sales Report", description: "Sales metrics", fieldsConfig: [{ key: "sales", name: "Sales", type: "number", required: true }] },
+          { id: "t2", name: "Inventory Tracker", description: "Stock metrics", fieldsConfig: [{ key: "stock", name: "Stock", type: "number", required: true }] }
+        ]), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (urlString.includes("/field-tracking/sites")) {
+        return new Response(JSON.stringify({ sites: [{ id: "s1", name: "Main Hub", address: "Mumbai", latitude: "19.1", longitude: "72.8", geofenceRadiusMeters: 100, isActive: true }] }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      if (urlString.includes("/field-tracking/my-today")) {
+        return new Response(JSON.stringify({ logs: [{ id: "l1", actionType: "punch_in", timestamp: new Date().toISOString(), status: "success" }] }), { status: 200, headers: { "Content-Type": "application/json" } });
+      }
+      
+      // Default mock for other /api calls
+      return new Response(JSON.stringify([]), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    
+    return originalFetch(url, options);
+  };
+}
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
