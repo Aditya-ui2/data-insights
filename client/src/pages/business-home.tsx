@@ -157,7 +157,10 @@ export default function BusinessHome() {
     enabled: !!profile && (profile.memberRole === 'owner' || profile.memberRole === 'manager'),
   });
 
-  if (profileLoading) {
+  const isOwnerOrManager = profile && (profile.memberRole === 'owner' || profile.memberRole === 'manager');
+  const isSecondaryLoading = isOwnerOrManager ? (membersLoading || verticalsLoading) : verticalsLoading;
+
+  if (profileLoading || (profile && isSecondaryLoading)) {
     return (
       <div className="min-h-screen bg-background p-6">
         <div className="max-w-5xl mx-auto space-y-4">
@@ -406,7 +409,9 @@ export default function BusinessHome() {
   return (
     <div className="min-h-screen bg-background flex">
       <BusinessSidebar />
-      <QuickWinPopup suite="business" isFirstVisit={showNextSteps} />
+      {profile && !isSecondaryLoading && (
+        <QuickWinPopup suite="business" isFirstVisit={showNextSteps} />
+      )}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
         <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
