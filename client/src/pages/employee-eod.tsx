@@ -109,10 +109,11 @@ function getPeriodLabel(date: Date = new Date()): string {
   return date.toISOString().slice(0, 7);
 }
 
-function formatCurrency(amount: number, symbol: string = "₹"): string {
-  if (amount >= 100000) return `${symbol}${(amount / 100000).toFixed(1)}L`;
-  if (amount >= 1000) return `${symbol}${(amount / 1000).toFixed(1)}K`;
-  return `${symbol}${amount.toLocaleString()}`;
+function formatCurrency(amount: number | undefined | null, symbol: string = "₹"): string {
+  const val = amount || 0;
+  if (val >= 100000) return `${symbol}${(val / 100000).toFixed(1)}L`;
+  if (val >= 1000) return `${symbol}${(val / 1000).toFixed(1)}K`;
+  return `${symbol}${val.toLocaleString()}`;
 }
 
 function AchievementBar({ percent }: { percent: number }) {

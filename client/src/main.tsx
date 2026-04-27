@@ -76,7 +76,9 @@ if (typeof window !== "undefined") {
           ]
         });
       }
-      if (urlString.includes("/business/performance/my")) {
+      // 1. Performance Data
+      if (urlString.includes("performance") && urlString.includes("my")) {
+        console.log("[Global Mock] Matched Performance");
         return mockResponse({
           totalRevenue: 450000,
           totalUnits: 125,
@@ -94,7 +96,10 @@ if (typeof window !== "undefined") {
           ]
         });
       }
+
+      // 2. EOD Entries
       if (urlString.includes("/business/eod")) {
+        console.log("[Global Mock] Matched EOD List");
         const today = new Date().toISOString().slice(0, 10);
         return mockResponse([
           { id: "e1", entryDate: today, verticalId: "v1", revenueAmount: 25000, unitsSold: 5, dealsClosed: 2, status: "pending", notes: "Good day, closed two big leads." },
