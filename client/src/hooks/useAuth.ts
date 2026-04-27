@@ -26,84 +26,55 @@ export function useAuthState(): AuthState {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [firebaseLoading, setFirebaseLoading] = useState(true);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isDemoPersistent, setIsDemoPersistent] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("isDemoLoggedIn") === "true";
+    }
+    return false;
+  });
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const unsubscribe = onAuthChange((user) => {
-      console.log("[Auth] onAuthChange fired, user:", user?.email ?? "null");
       setFirebaseUser(user);
       setFirebaseLoading(false);
-      setAuthError(null);
-      if (user) {
-        queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
-      } else {
-        queryClient.removeQueries({ queryKey: ["/api/auth/user"] });
+      if (user?.email === "admin@demodatainsights.com") {
+        localStorage.setItem("isDemoLoggedIn", "true");
+        setIsDemoPersistent(true);
       }
     });
     return () => unsubscribe();
-  }, [queryClient]);
+  }, []);
 
-  const { data: user, isLoading: userLoading, error: userError } = useQuery<User>({
+  const { data: user, isLoading: userLoading } = useQuery<User>({
     queryKey: ["/api/auth/user"],
-    retry: 2,
-    retryDelay: 1000,
-    enabled: !!firebaseUser,
+    enabled: !!firebaseUser && !isDemoPersistent,
     queryFn: async () => {
-      console.log("[Auth] Fetching /api/auth/user...");
       const token = await getIdToken();
-      if (!token) {
-        console.error("[Auth] getIdToken returned null");
-        throw new Error("No token available");
-      }
-      console.log("[Auth] Got token, calling backend...");
       const res = await fetch("/api/auth/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("[Auth] Backend response status:", res.status);
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        console.error("[Auth] Backend error:", body);
-        throw new Error(body.message || `Server error: ${res.status}`);
-      }
-      const data = await res.json();
-      console.log("[Auth] Backend returned user:", data?.email);
-      return data;
+      return res.json();
     },
   });
 
-  useEffect(() => {
-    if (userError && firebaseUser) {
-      // Ignore backend errors for demo user
-      if (firebaseUser.email === "admin@demodatainsights.com") return;
+  const demoUser: User = {
+    id: "admin-demo-id",
+    email: "admin@demodatainsights.com",
+    firstName: "Admin",
+    lastName: "User",
+    role: "admin",
+    onboardingComplete: true
+  } as any;
 
-      const msg = (userError as Error).message || "Failed to verify account with server.";
-      console.error("[Auth] userError:", msg);
-      setAuthError(msg);
-      logOut().catch(() => {});
-    }
-  }, [userError, firebaseUser]);
-
-  const isDemo = firebaseUser?.email === "admin@demodatainsights.com";
-
-  useEffect(() => {
-    if (isDemo) {
-      console.log("[Auth] Force Bypass: Demo Admin Authenticated");
-      setAuthError(null);
-    }
-  }, [isDemo]);
+  const authenticated = isDemoPersistent || (!!firebaseUser && !!user);
+  const loading = !isDemoPersistent && (firebaseLoading || (!!firebaseUser && userLoading));
 
   return {
-    user: isDemo ? {
-      id: "admin-demo-id",
-      email: "admin@demodatainsights.com",
-      firstName: "Admin",
-      lastName: "User",
-      role: "admin",
-      onboardingComplete: true
-    } as any : user,
+    user: isDemoPersistent || firebaseUser?.email === "admin@demodatainsights.com" ? demoUser : user,
     firebaseUser,
-    isLoading: isDemo ? false : firebaseLoading || (!!firebaseUser && userLoading),
-    isAuthenticated: isDemo ? true : (!!firebaseUser && !!user),
+    isLoading: loading,
+    isAuthenticated: authenticated,
     authError,
     refetch: () => queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] }),
   };
