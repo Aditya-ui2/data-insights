@@ -65,7 +65,7 @@ function Router() {
         </Route>
 
         <Route path="/login">
-          {auth.isAuthenticated ? <Redirect to="/" /> : <Login />}
+          {auth.isAuthenticated ? <DefaultHome isAuthenticated={auth.isAuthenticated} /> : <Login />}
         </Route>
 
         <Route path="/get-started">
@@ -159,9 +159,9 @@ function Router() {
           {auth.isLoading ? null : auth.isAuthenticated ? <DataImportSuitePage /> : <Redirect to="/login" />}
         </Route>
 
-        {/* Default route: redirect business-linked users to /business */}
+        {/* Root route: always show the Landing marketing page */}
         <Route path="/">
-          {auth.isLoading ? <Landing /> : <DefaultHome isAuthenticated={auth.isAuthenticated} />}
+          <Landing />
         </Route>
 
         <Route component={NotFound} />
