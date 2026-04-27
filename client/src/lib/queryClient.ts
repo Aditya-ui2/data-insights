@@ -47,18 +47,15 @@ export const getQueryFn: <T>(options: {
       const path = queryKey.join("/");
       console.log("[Demo Mode] Mocking response for:", path);
       
+      if (path.includes("/api/auth/user") || path.includes("/api/users/me")) {
+        return { id: "admin-demo-id", email: "admin@demodatainsights.com", firstName: "Admin", lastName: "User", role: "admin", onboardingComplete: true } as any;
+      }
       if (path.includes("/api/business/profile")) {
         return { id: "demo-biz-123", name: "Demo Business Ltd", ownerId: "admin-demo-id" } as any;
       }
-      if (path.includes("/api/datasets")) {
-        return [] as any;
-      }
-      if (path.includes("/api/dashboards")) {
-        return [] as any;
-      }
-      if (path.includes("/api/users/me")) {
-        return { id: "admin-demo-id", email: "admin@demodatainsights.com", role: "admin", onboardingComplete: true } as any;
-      }
+      if (path.includes("/api/datasets")) return [] as any;
+      if (path.includes("/api/dashboards")) return [] as any;
+      if (path.includes("/api/usage")) return { count: 0, limit: 100 } as any;
       return {} as any;
     }
 
