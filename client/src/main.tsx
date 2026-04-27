@@ -81,23 +81,22 @@ if (typeof window !== "undefined") {
           ]
         });
       }
-      // 1. Performance Data
-      if (urlString.includes("performance") && urlString.includes("my")) {
-        console.log("[Global Mock] Matched Performance");
+      if (urlString.includes("/business/performance/my") || urlString.includes("/business/performance")) {
+        console.log("[Global Mock] Matched Business Performance");
         return mockResponse({
-          totalRevenue: 450000,
-          totalUnits: 125,
-          totalDeals: 18,
-          totalExpenses: 52000,
-          targetRevenue: 500000,
-          targetUnits: 150,
-          targetDeals: 25,
-          achievementPercent: 90,
-          projectedIncentive: 15000,
-          entryCount: 22,
+          totalRevenue: 850000,
+          totalUnits: 340,
+          totalDeals: 45,
+          totalExpenses: 120000,
+          targetRevenue: 1000000,
+          targetUnits: 400,
+          targetDeals: 60,
+          achievementPercent: 85,
+          projectedIncentive: 25000,
+          entryCount: 64,
           verticalBreakdown: [
-            { verticalId: "v1", verticalName: "Sales & CRM", revenue: 300000, units: 80, deals: 12 },
-            { verticalId: "v2", verticalName: "Operations", revenue: 150000, units: 45, deals: 6 }
+            { verticalId: "v1", verticalName: "Sales & CRM", revenue: 550000, units: 210, deals: 32 },
+            { verticalId: "v2", verticalName: "Operations", revenue: 300000, units: 130, deals: 13 }
           ]
         });
       }
