@@ -3888,7 +3888,8 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
         .where(and(eq(kbDocsTable.id, req.params.id), eq(kbDocsTable.userId, userId)));
 
       // Call Python backend to remove chunks from ChromaDB
-      await fetch("http://127.0.0.1:8000/documents/delete", {
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      await fetch(`${PYTHON_URL}/documents/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ documentId: req.params.id, userId }),
@@ -3912,7 +3913,8 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       }
 
       // Delegate RAG and SQL Agent query to Python FastAPI
-      const pyResponse = await fetch("http://127.0.0.1:8000/chat", {
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const pyResponse = await fetch(`${PYTHON_URL}/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, businessId, userId }),
@@ -3941,7 +3943,8 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       }
 
       // Delegate multi-agent LangGraph analysis to Python FastAPI
-      const pyResponse = await fetch("http://127.0.0.1:8000/agents/analyze", {
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const pyResponse = await fetch(`${PYTHON_URL}/agents/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ businessId, userId, period }),
@@ -4010,7 +4013,8 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       }
 
       // Delegate action execution to Python FastAPI
-      const pyResponse = await fetch("http://127.0.0.1:8000/actions/execute", {
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const pyResponse = await fetch(`${PYTHON_URL}/actions/execute`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ actionId: req.params.id, userId, businessId }),
@@ -4339,7 +4343,8 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       const userId = req.user.claims.sub;
 
       // Delegate integration testing to Python FastAPI
-      const pyResponse = await fetch("http://127.0.0.1:8000/integrations/test", {
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const pyResponse = await fetch(`${PYTHON_URL}/integrations/test`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ integrationId: req.params.id, userId }),
