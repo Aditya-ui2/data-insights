@@ -35,6 +35,8 @@ import BusinessGoalsPage from "@/pages/business-goals";
 import BusinessAlertsPage from "@/pages/business-alerts";
 import OAuthSimulator from "@/pages/oauth-simulator";
 import SheetViewPage from "@/pages/sheet-view";
+import TermsOfService from "@/pages/terms";
+import PrivacyPolicy from "@/pages/privacy";
 
 // Fetches the business profile returning null for 404 (no profile yet),
 // but re-throws on 5xx or network errors so backend issues aren't silently hidden.
@@ -201,6 +203,9 @@ function Router() {
         <Route path="/data-import-suite">
           {auth.isLoading ? null : auth.isAuthenticated ? <DataImportSuitePage /> : <Redirect to="/login" />}
         </Route>
+
+        <Route path="/terms" component={TermsOfService} />
+        <Route path="/privacy" component={PrivacyPolicy} />
 
         {/* Root route: always show the Landing marketing page */}
         <Route path="/">

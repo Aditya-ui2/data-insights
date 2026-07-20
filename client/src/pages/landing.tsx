@@ -757,7 +757,7 @@ export default function Landing() {
             transition={{ duration: 0.6 }}
             className="flex items-center gap-2"
           >
-            <span className="font-sans font-medium text-xl text-primary tracking-wide">DataInsights</span>
+            <span className="font-sans font-medium text-xl text-primary tracking-wide">DigitValues</span>
           </motion.div>
 
           <div className="flex items-center gap-3">
@@ -996,20 +996,23 @@ export default function Landing() {
               <div key={i}>
                 <h4 className="font-sans font-medium text-primary mb-4 text-sm">{col.heading}</h4>
                 <ul className="space-y-2.5">
-                  {col.links.map((link, j) => (
-                    <li key={j}>
-                      <a href="#" className="text-xs text-gray-500 hover:text-accent font-sans transition-colors">{link}</a>
-                    </li>
-                  ))}
+                  {col.links.map((link, j) => {
+                    const href = link === "Privacy Policy" ? "/privacy" : link === "Terms of Service" ? "/terms" : "#";
+                    return (
+                      <li key={j}>
+                        <a href={href} className="text-xs text-gray-500 hover:text-accent font-sans transition-colors">{link}</a>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
           </div>
           <div className="border-t border-gray-205 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2.5">
-              <span className="font-sans font-medium text-lg text-primary tracking-wide">DataInsights</span>
+              <span className="font-sans font-medium text-lg text-primary tracking-wide">DigitValues</span>
             </div>
-            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-sans">© 2024 DataInsights. Built for Indian MSMEs. All rights reserved.</p>
+            <p className="text-[10px] text-gray-400 uppercase tracking-wider font-sans">© 2026 DigitValues. Built for Indian MSMEs. All rights reserved.</p>
           </div>
         </div>
       </footer>
