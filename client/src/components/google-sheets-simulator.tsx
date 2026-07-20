@@ -752,7 +752,7 @@ export default function GoogleSheetsSimulator({ datasetId, onClose, fullHeight =
                         onMouseLeave={() => setIsSubmenuOpen(false)}
                         className="px-3 py-1.5 text-[11px] text-gray-700 hover:bg-gray-50 cursor-pointer flex items-center justify-between relative"
                       >
-                        <span className="font-semibold text-gray-800">Coefficient: Salesforce, HubSpot Data Connector</span>
+                        <span className="font-bold text-gray-800">DigitValues: Salesforce, Shopify Connector</span>
                         <ChevronRight className="w-3 h-3 text-gray-400" />
                         
                         {isSubmenuOpen && (
@@ -1267,7 +1267,7 @@ export default function GoogleSheetsSimulator({ datasetId, onClose, fullHeight =
 
                   {/* Brand Tag */}
                   <div className="text-[9px] text-blue-200 italic font-semibold select-none">
-                    Powered by DataInsights
+                    Powered by DigitValues
                   </div>
                 </div>
               </td>
@@ -1810,7 +1810,7 @@ export default function GoogleSheetsSimulator({ datasetId, onClose, fullHeight =
               {/* Brand Footer */}
               <div className="p-3 border-t border-gray-200 text-center shrink-0 bg-gray-50/50">
                 <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest font-mono">
-                  Coefficient Partner Integration &middot; DataInsights
+                  DigitValues Partner Integration
                 </span>
               </div>
             </div>
@@ -1909,10 +1909,10 @@ export default function GoogleSheetsSimulator({ datasetId, onClose, fullHeight =
           <div className="py-6 space-y-6">
             <div className="flex items-center gap-4 bg-gray-50 p-4 border border-gray-150 rounded-sm">
               <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center text-white font-serif text-xl font-bold shrink-0 shadow-md">
-                DI
+                DV
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">DataInsights: Salesforce, HubSpot, Shopify Connector</h3>
+                <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide">DigitValues: Salesforce, HubSpot, Shopify Connector</h3>
                 <p className="text-[10px] text-gray-500 font-medium mt-1 leading-relaxed">
                   Import, link & sync databases directly inside Google Sheets. Auto-refresh dashboards hourly/daily.
                 </p>
@@ -1929,7 +1929,7 @@ export default function GoogleSheetsSimulator({ datasetId, onClose, fullHeight =
                     setInstallingExtension(false);
                     setIsExtensionInstalled(true);
                     setIsMarketplaceOpen(false);
-                    toast({ title: "Extension Installed", description: "DataInsights is now available under Extensions menu!" });
+                    toast({ title: "Extension Installed", description: "DigitValues is now available under Extensions menu!" });
                   }, 1500);
                 }}
                 disabled={installingExtension || isExtensionInstalled}
