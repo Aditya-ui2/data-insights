@@ -1,12 +1,15 @@
 {
-  "services": {
-    "frontend": {
-      "root": ".",
-      "framework": "vite"
+  "buildCommand": "npm install --include=dev && npm run build",
+  "outputDirectory": "dist/public",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://data-insights-backend-1node.onrender.com/api/$1"
     },
-    "backend": {
-      "root": "backend",
-      "entrypoint": "main:app"
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  }
+  ]
 }
