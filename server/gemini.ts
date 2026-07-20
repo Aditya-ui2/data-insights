@@ -9,158 +9,88 @@ export interface GenerateDashboardParams {
   data: Record<string, any>[];
   spreadsheetName: string;
   sheetName: string;
+  ragContext?: string;
+  compactStats?: Record<string, any>;
 }
 
 export async function generateDashboard(params: GenerateDashboardParams): Promise<DashboardConfig> {
-  const { headers, data, spreadsheetName, sheetName } = params;
-  
-  // Pre-compute comprehensive statistics for accurate dashboard
-  const columnStats: Record<string, any> = {};
-  
-  headers.forEach(header => {
-    const values = data.map(row => row[header]).filter(v => v !== null && v !== undefined && v !== "");
-    const valueCounts: Record<string, number> = {};
-    values.forEach(v => {
-      const key = String(v).trim();
-      valueCounts[key] = (valueCounts[key] || 0) + 1;
+  const { headers, data, spreadsheetName, sheetName, ragContext = "", compactStats } = params;
+
+  // Build compact stats — only top values, no raw data dump
+  const stats = compactStats || (() => {
+    const s: Record<string, any> = {};
+    const sample = data.slice(0, 300);
+    headers.forEach(header => {
+      const values = sample.map(row => row[header]).filter(v => v !== null && v !== undefined && v !== "");
+      const numericValues = values.map(v => parseFloat(String(v))).filter(n => !isNaN(n));
+      const isNumeric = numericValues.length > values.length * 0.5;
+      const valueCounts: Record<string, number> = {};
+      values.forEach(v => {
+        const k = String(v).toLowerCase().trim().slice(0, 40);
+        valueCounts[k] = (valueCounts[k] || 0) + 1;
+      });
+      s[header] = {
+        count: values.length,
+        unique: Object.keys(valueCounts).length,
+        top5: Object.entries(valueCounts).sort((a, b) => b[1] - a[1]).slice(0, 5),
+        ...(isNumeric ? {
+          isNumeric: true,
+          sum: Math.round(numericValues.reduce((a, b) => a + b, 0)),
+          avg: Math.round(numericValues.reduce((a, b) => a + b, 0) / numericValues.length),
+          min: Math.min(...numericValues),
+          max: Math.max(...numericValues)
+        } : { isNumeric: false })
+      };
     });
-    
-    const numericValues = values.map(v => parseFloat(String(v))).filter(n => !isNaN(n));
-    const isNumeric = numericValues.length > values.length * 0.5;
-    
-    columnStats[header] = {
-      totalNonEmpty: values.length,
-      uniqueCount: Object.keys(valueCounts).length,
-      topValues: Object.entries(valueCounts).sort((a, b) => b[1] - a[1]).slice(0, 10),
-      isNumeric,
-      ...(isNumeric && numericValues.length > 0 ? {
-        sum: numericValues.reduce((a, b) => a + b, 0),
-        average: numericValues.reduce((a, b) => a + b, 0) / numericValues.length,
-        min: Math.min(...numericValues),
-        max: Math.max(...numericValues)
-      } : {})
-    };
-  });
-  
-  // Normalize data for case-insensitive analysis
-  const normalizedStats: Record<string, any> = {};
-  headers.forEach(header => {
-    const values = data.map(row => row[header]).filter(v => v !== null && v !== undefined && v !== "");
-    
-    // Case-insensitive value counts (merge "Sales" and "sales")
-    const valueCounts: Record<string, { count: number; displayName: string }> = {};
-    values.forEach(v => {
-      const normalizedKey = String(v).toLowerCase().trim();
-      if (!valueCounts[normalizedKey]) {
-        valueCounts[normalizedKey] = { count: 0, displayName: String(v).trim() };
-      }
-      valueCounts[normalizedKey].count++;
-    });
-    
-    const numericValues = values.map(v => parseFloat(String(v))).filter(n => !isNaN(n));
-    const isNumeric = numericValues.length > values.length * 0.5;
-    
-    normalizedStats[header] = {
-      totalNonEmpty: values.length,
-      uniqueCount: Object.keys(valueCounts).length,
-      topValues: Object.entries(valueCounts)
-        .map(([key, val]) => [val.displayName, val.count])
-        .sort((a, b) => (b[1] as number) - (a[1] as number))
-        .slice(0, 10),
-      isNumeric,
-      ...(isNumeric && numericValues.length > 0 ? {
-        sum: numericValues.reduce((a, b) => a + b, 0),
-        average: numericValues.reduce((a, b) => a + b, 0) / numericValues.length,
-        min: Math.min(...numericValues),
-        max: Math.max(...numericValues)
-      } : {})
-    };
-  });
-  
-  const prompt = `You are an expert business intelligence analyst. Create an ACCURATE, visually appealing dashboard.
+    return s;
+  })();
 
-DATASET: "${spreadsheetName}" - Sheet: "${sheetName}"
-TOTAL RECORDS: ${data.length}
-COLUMNS: ${headers.join(", ")}
+  const prompt = `You are a BI analyst. Generate a dashboard config as JSON.
 
-COLUMN STATISTICS (CASE-INSENSITIVE - "Sales" and "sales" are merged):
-${JSON.stringify(normalizedStats, null, 2)}
+DATASET: "${spreadsheetName}" | Total rows: ${data.length}
+COLUMNS (use EXACT names): ${headers.map(h => `"${h}"`).join(", ")}
 
-SAMPLE DATA:
-${JSON.stringify(data.slice(0, 5), null, 2)}
+${ragContext ? `RAG CONTEXT (key insights from the data):\n${ragContext}\n` : ""}
 
-YOU MUST CREATE EXACTLY:
-1. 4 KPI cards showing key metrics (Total Records, unique counts, rates, averages)
-2. 4 charts - one of EACH type:
-   - 1 "bar" chart (for horizontal bar chart - comparing categories)
-   - 1 "bar" chart (second bar will render as vertical - different data)
-   - 1 "pie" chart (for proportions - max 6-8 categories)
-   - 1 "line" chart (for trends or ordered data)
-3. Brief executive summary with key numbers
+COLUMN STATS (isNumeric=true means numeric column suitable for sum/avg KPIs and chart values):
+${JSON.stringify(stats)}
 
-IMPORTANT RULES:
-1. Use EXACT numbers from statistics - no estimation
-2. Data is case-insensitive: "Sales", "SALES", "sales" count as the same value
-3. dataKey = column to measure/aggregate
-4. labelKey = column for category labels
-5. Each chart MUST use different columns/data for variety
-6. KPI titles should be descriptive: "Total Records", "Unique Persons", "Success Rate"
+SAMPLE (3 rows):
+${JSON.stringify(data.slice(0, 3))}
 
-Respond with valid JSON:
-{
-  "charts": [
-    {"id": "kpi-1", "type": "kpi", "title": "Total Records", "dataKey": "column_name", "insights": "insight with number"},
-    {"id": "kpi-2", "type": "kpi", "title": "Unique Categories", "dataKey": "column_name", "insights": "insight"},
-    {"id": "kpi-3", "type": "kpi", "title": "Some Rate", "dataKey": "column_name", "insights": "insight"},
-    {"id": "kpi-4", "type": "kpi", "title": "Average/Count", "dataKey": "column_name", "insights": "insight"},
-    {"id": "bar-1", "type": "bar", "title": "Chart Title", "dataKey": "column", "labelKey": "category_column", "insights": "insight"},
-    {"id": "bar-2", "type": "bar", "title": "Another Chart", "dataKey": "column", "labelKey": "different_column", "insights": "insight"},
-    {"id": "pie-1", "type": "pie", "title": "Distribution", "dataKey": "column", "labelKey": "category", "insights": "insight"},
-    {"id": "line-1", "type": "line", "title": "Trend", "dataKey": "column", "labelKey": "order_column", "insights": "insight"}
-  ],
-  "summary": "Executive summary with exact numbers from data"
-}`;
+RULES:
+1. dataKey and labelKey MUST be EXACT column names from the COLUMNS list above
+2. For KPI cards: use numeric columns (isNumeric:true) for dataKey to show real sums/totals
+3. For bar/line charts: dataKey = numeric column, labelKey = category/text column
+4. For pie charts: dataKey = numeric column OR category column, labelKey = category column
+5. KPI insights field: write "sum of <column>" or "total records" or "average of <column>"
+6. Do NOT invent column names
+
+Return ONLY valid JSON (no markdown):
+{"charts":[
+  {"id":"kpi-1","type":"kpi","title":"Total Sales","dataKey":"<numeric_col>","insights":"sum of <numeric_col>"},
+  {"id":"kpi-2","type":"kpi","title":"Total Received","dataKey":"<numeric_col>","insights":"sum of <numeric_col>"},
+  {"id":"kpi-3","type":"kpi","title":"Total Records","dataKey":"<any_col>","insights":"total records"},
+  {"id":"kpi-4","type":"kpi","title":"Unique Customers","dataKey":"<category_col>","insights":"unique count"},
+  {"id":"bar-1","type":"bar","title":"...","dataKey":"<numeric_col>","labelKey":"<category_col>","insights":"..."},
+  {"id":"pie-1","type":"pie","title":"...","dataKey":"<numeric_col>","labelKey":"<category_col>","insights":"..."},
+  {"id":"line-1","type":"line","title":"...","dataKey":"<numeric_col>","labelKey":"<date_or_category_col>","insights":"..."}
+],"summary":"..."}`;
 
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: "object",
-          properties: {
-            charts: {
-              type: "array",
-              items: {
-                type: "object",
-                properties: {
-                  id: { type: "string" },
-                  type: { type: "string" },
-                  title: { type: "string" },
-                  dataKey: { type: "string" },
-                  labelKey: { type: "string" },
-                  valueKeys: { type: "array", items: { type: "string" } },
-                  color: { type: "string" },
-                  insights: { type: "string" }
-                },
-                required: ["id", "type", "title", "dataKey"]
-              }
-            },
-            summary: { type: "string" }
-          },
-          required: ["charts", "summary"]
-        }
-      },
+      config: { responseMimeType: "application/json" },
       contents: prompt
     });
 
     const text = response.text;
-    if (!text) {
-      throw new Error("Empty response from Gemini");
-    }
+    if (!text) throw new Error("Empty response from Gemini");
 
-    const config = JSON.parse(text) as { charts: ChartConfig[]; summary: string };
-    
+    // Strip any markdown wrapping just in case
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    const config = JSON.parse(cleaned) as { charts: ChartConfig[]; summary: string };
+
     return {
       charts: config.charts,
       summary: config.summary,
@@ -344,73 +274,23 @@ export async function chatWithData(params: ChatWithDataParams): Promise<string> 
     ? `This is a LARGE dataset with ${totalRecords} records. Provide summarized insights, not raw data listings.`
     : `Dataset has ${totalRecords} records.`;
 
-  const prompt = `You are a world-class data analyst who presents insights in a beautiful, easy-to-understand format. Your responses are clear, organized, and visually structured.
+  const prompt = `You are a data analyst. Answer the question in 1-3 short sentences using exact numbers from the data. No greetings, no formatting, no follow-up questions, no numbered points.
 
-DATASET OVERVIEW:
-- Total Records: ${totalRecords}
-- Columns: ${headers.join(", ")}
+DATASET:
+- ${totalRecords} records, columns: ${headers.join(", ")}
 - ${datasetInfo}
-${idColumns.length > 0 ? `- Unique ID columns available: ${idColumns.join(", ")}` : ''}
-${potentialNameColumns.length > 0 ? `- Name/Person columns: ${potentialNameColumns.join(", ")}` : ''}
-${nameWarning}
 
-COLUMN STATISTICS (CASE-INSENSITIVE - use these for EXACT answers):
+KEY STATS:
 ${JSON.stringify(columnStats, null, 2)}
 
-SAMPLE DATA (first 10 rows):
+SAMPLE ROWS:
 ${JSON.stringify(data.slice(0, 10), null, 2)}
-${ragContext ? `\nSEMANTICALLY RELEVANT CONTEXT (RAG-retrieved):\n${ragContext}\n` : ''}
+${ragContext ? `\nCONTEXT:\n${ragContext}\n` : ''}
 ${conversationContext}
 
 QUESTION: ${question}
 
-RESPONSE FORMAT - CRITICAL RULES:
-
-1. STRUCTURE YOUR RESPONSE BEAUTIFULLY:
-   - Start with a brief 1-2 sentence summary answering the main question
-   - Add a blank line
-   - Present key findings as numbered points with proper spacing
-   - Each point should be on its own line with a blank line between points
-   - End with 2-3 suggested follow-up questions
-
-2. FORMATTING RULES:
-   - Use numbered points: "1." "2." "3." etc.
-   - Add a BLANK LINE between each numbered point for readability
-   - NO asterisks (*), NO bullets (-), NO markdown
-   - NO code blocks or technical formatting
-   - Keep each point concise but insightful
-
-3. ALWAYS END WITH FOLLOW-UP SUGGESTIONS:
-   After your analysis, add:
-   "Would you like to explore:"
-   Then list 2-3 relevant follow-up questions they could ask
-
-4. DATA PRESENTATION:
-   - Use EXACT numbers from the statistics
-   - Present percentages when relevant (e.g., "45 visits (34% of total)")
-   - Compare values to give context (e.g., "highest", "3x more than average")
-   - Highlight interesting patterns or anomalies
-
-EXAMPLE RESPONSE FORMAT:
-
-Based on the data, Vivek Chaturvedi is the most active runner with 86 total visits.
-
-Here are the key insights:
-
-1. Vivek Chaturvedi leads with 86 visits, representing 65% of all runner activity in the dataset.
-
-2. Sunil Tanwar follows with 41 visits, which is less than half of Vivek's activity level.
-
-3. The data shows consistent activity throughout December 2025, with peak days on the 11th and 12th.
-
-Would you like to explore:
-- Which locations did each runner visit most frequently?
-- What project types did Vivek handle compared to Sunil?
-- How does visit frequency correlate with project stages?
-
----
-
-Now answer the question with this beautiful, readable format.`;
+Answer in 1-3 sentences with exact numbers only:`;
 
   try {
     console.log("Sending chat request to Gemini...");
@@ -447,5 +327,200 @@ Now answer the question with this beautiful, readable format.`;
   } catch (error) {
     console.error("Gemini chat error:", error);
     throw new Error("Failed to get AI response");
+  }
+}
+
+function getColumnLetter(colIdx: number): string {
+  let letter = "";
+  let tempIdx = colIdx;
+  while (tempIdx >= 0) {
+    letter = String.fromCharCode((tempIdx % 26) + 65) + letter;
+    tempIdx = Math.floor(tempIdx / 26) - 1;
+  }
+  return letter;
+}
+
+export interface FormulaResponse {
+  formula: string;
+  explanation: string;
+}
+
+export async function generateFormula(
+  promptStr: string,
+  headers: string[],
+  selectedCell?: { rowIdx: number; colKey: string }
+): Promise<FormulaResponse> {
+  const columnMapping = headers.map((h, idx) => `- Column ${getColumnLetter(idx)}: "${h}"`).join("\n");
+  const targetRow = selectedCell ? selectedCell.rowIdx + 1 : 2; // Default to row 2 for formulas if not selected
+
+  const systemPrompt = `You are an Excel and Google Sheets Formula Assistant.
+Generate a valid spreadsheet formula based on the user request and columns list.
+
+COLUMNS LIST:
+${columnMapping}
+
+TARGET ROW FOR FORMULA: Row ${targetRow} (e.g. use references like A${targetRow}, B${targetRow})
+
+RULES:
+1. Return ONLY a JSON object containing:
+   - "formula": The valid formula starting with "=" (e.g., "=C${targetRow}-D${targetRow}" or "=SUM(C2:C${targetRow})")
+   - "explanation": A very brief explanation of what the formula does.
+2. Use EXACT column letters based on the mapping above.
+3. Keep the formula clean. Do NOT write markdown code blocks in the output.
+
+JSON Output:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: { responseMimeType: "application/json" },
+      contents: [
+        { role: "user", parts: [{ text: `${systemPrompt}\n\nUser request: "${promptStr}"` }] }
+      ]
+    });
+
+    const text = response.text?.trim() || "";
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    return JSON.parse(cleaned) as FormulaResponse;
+  } catch (error) {
+    console.error("Gemini formula gen failed, returning fallback:", error);
+    // Rule-based fallback
+    const lowerPrompt = promptStr.toLowerCase();
+    let formula = `=A${targetRow}`;
+    let explanation = "Fallback formula generated due to AI service timeout.";
+
+    const priceColIdx = headers.findIndex(h => /price|amount|total|sales/i.test(h));
+    const costColIdx = headers.findIndex(h => /cost|discount|tax/i.test(h));
+
+    const priceLetter = priceColIdx !== -1 ? getColumnLetter(priceColIdx) : "C";
+    const costLetter = costColIdx !== -1 ? getColumnLetter(costColIdx) : "D";
+
+    if (lowerPrompt.includes("profit") || lowerPrompt.includes("margin") || lowerPrompt.includes("net")) {
+      formula = `=${priceLetter}${targetRow}-${costLetter}${targetRow}`;
+      explanation = `Subtracted Cost (${costLetter}${targetRow}) from Total (${priceLetter}${targetRow}) to calculate profit.`;
+    } else if (lowerPrompt.includes("sum") || lowerPrompt.includes("total")) {
+      formula = `=SUM(${priceLetter}2:${priceLetter}${targetRow})`;
+      explanation = `Sum of column ${headers[priceColIdx] || 'C'} from row 2 to ${targetRow}.`;
+    } else if (lowerPrompt.includes("growth") || lowerPrompt.includes("percent") || lowerPrompt.includes("%")) {
+      formula = `=(${priceLetter}${targetRow}-${costLetter}${targetRow})/${costLetter}${targetRow}`;
+      explanation = `Percentage change formula: (${priceLetter}${targetRow} - ${costLetter}${targetRow}) / ${costLetter}${targetRow}.`;
+    }
+
+    return { formula, explanation };
+  }
+}
+
+export interface ChartResponse {
+  type: "bar" | "line" | "pie" | "area" | "scatter";
+  xAxis: string;
+  yAxis: string;
+  title: string;
+  explanation: string;
+}
+
+export async function generateChart(
+  promptStr: string,
+  headers: string[]
+): Promise<ChartResponse> {
+  const systemPrompt = `You are a BI Chart Assistant. Automatically choose the best chart config (bar, line, pie, area, scatter) based on the columns list and user prompt.
+
+COLUMNS LIST:
+${headers.map(h => `"${h}"`).join(", ")}
+
+RULES:
+1. Return ONLY a JSON object containing:
+   - "type": "bar", "line", "pie", "area", or "scatter"
+   - "xAxis": The EXACT column name for the X axis (categorical or time column)
+   - "yAxis": The EXACT column name for the Y axis (numeric column suitable for values)
+   - "title": A descriptive title for the chart
+   - "explanation": Brief reasoning for this chart configuration.
+2. Choose xAxis and yAxis strictly from the COLUMNS LIST.
+3. Keep the JSON clean. Do NOT write markdown wrapping.
+
+JSON Output:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: { responseMimeType: "application/json" },
+      contents: [
+        { role: "user", parts: [{ text: `${systemPrompt}\n\nUser request: "${promptStr}"` }] }
+      ]
+    });
+
+    const text = response.text?.trim() || "";
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    return JSON.parse(cleaned) as ChartResponse;
+  } catch (error) {
+    console.error("Gemini chart gen failed, returning fallback:", error);
+    // Rule-based fallback
+    const numericCol = headers.find(h => /price|amount|total|sales|quantity/i.test(h)) || headers[0];
+    const catCol = headers.find(h => /date|month|year|category|name|status|product/i.test(h)) || headers[0];
+    const type = /date|month|trend/i.test(promptStr) ? "line" : "bar";
+
+    return {
+      type,
+      xAxis: catCol,
+      yAxis: numericCol,
+      title: `${numericCol} by ${catCol}`,
+      explanation: `Analyzed dataset and configured a ${type} chart of ${numericCol} over ${catCol}.`
+    };
+  }
+}
+
+export interface PivotResponse {
+  rows: string[];
+  columns: string[];
+  values: {
+    column: string;
+    aggregator: "sum" | "count" | "avg";
+  }[];
+  explanation: string;
+}
+
+export async function generatePivot(
+  promptStr: string,
+  headers: string[]
+): Promise<PivotResponse> {
+  const systemPrompt = `You are a Pivot Table Assistant. Generate a valid pivot configuration from the user request.
+
+COLUMNS LIST:
+${headers.map(h => `"${h}"`).join(", ")}
+
+RULES:
+1. Return ONLY a JSON object containing:
+   - "rows": Array of column names to group as rows (e.g. ["product", "status"])
+   - "columns": Array of column names to group as columns (can be empty)
+   - "values": Array of objects: {"column": "colName", "aggregator": "sum" | "count" | "avg"}
+   - "explanation": Brief explanation of the pivot structure.
+2. Select all column names strictly from the COLUMNS LIST.
+3. Keep the JSON clean. Do NOT write markdown wrapping.
+
+JSON Output:`;
+
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      config: { responseMimeType: "application/json" },
+      contents: [
+        { role: "user", parts: [{ text: `${systemPrompt}\n\nUser request: "${promptStr}"` }] }
+      ]
+    });
+
+    const text = response.text?.trim() || "";
+    const cleaned = text.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+    return JSON.parse(cleaned) as PivotResponse;
+  } catch (error) {
+    console.error("Gemini pivot gen failed, returning fallback:", error);
+    // Rule-based fallback
+    const numericCol = headers.find(h => /price|amount|total|sales|quantity/i.test(h)) || headers[0];
+    const catCol = headers.find(h => /category|name|status|product/i.test(h)) || headers[0];
+    
+    return {
+      rows: [catCol],
+      columns: [],
+      values: [{ column: numericCol, aggregator: "sum" }],
+      explanation: `Grouped records by ${catCol} and summed up ${numericCol} values.`
+    };
   }
 }

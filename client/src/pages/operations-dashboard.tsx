@@ -384,7 +384,7 @@ export default function OperationsDashboard() {
 
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-background p-6">
+      <div className="min-h-screen bg-[#fbfaf7] p-6">
         <div className="max-w-6xl mx-auto space-y-4">
           <Skeleton className="h-10 w-64" />
           <div className="grid grid-cols-4 gap-4">
@@ -402,18 +402,24 @@ export default function OperationsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-[#fbfaf7] flex">
       <BusinessSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-      <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/business")} className="text-muted-foreground hover:text-foreground" data-testid="button-back-business">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/business")}
+              className="text-muted-foreground hover:text-primary rounded-none"
+              data-testid="button-back-business"
+            >
               <ArrowLeft className="w-5 h-5" />
-            </button>
+            </Button>
             <div>
-              <h1 className="font-bold text-lg">Team View</h1>
-              <p className="text-xs text-muted-foreground">{profile?.name}</p>
+              <h1 className="font-sans font-bold text-lg text-primary uppercase tracking-wider">Team View</h1>
+              <p className="text-xs text-muted-foreground">{profile?.name || "Business Suite"} · Operations Overview</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -463,19 +469,19 @@ export default function OperationsDashboard() {
 
       <main className="max-w-6xl mx-auto px-6 py-8 space-y-8">
         {/* What to do here — UX data journey explainer */}
-        <div className="bg-muted/30 border border-border rounded-xl p-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">How Team View works</p>
+        <div className="bg-gray-50 border border-gray-200 rounded-none p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-2">How Team View works</p>
           <div className="flex flex-col sm:flex-row gap-3 text-xs text-muted-foreground">
             <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">1.</span>
+              <span className="text-accent font-bold mt-0.5">1.</span>
               <span><span className="font-medium text-foreground">Employees log EODs</span> — revenue, deals, units, and expenses submitted daily via "Log My Day".</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">2.</span>
+              <span className="text-accent font-bold mt-0.5">2.</span>
               <span><span className="font-medium text-foreground">Entries appear here</span> — you review them, leave notes, and track achievement vs. targets in real time.</span>
             </div>
             <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">3.</span>
+              <span className="text-accent font-bold mt-0.5">3.</span>
               <span><span className="font-medium text-foreground">AI learns &amp; forecasts</span> — the Business Advisor uses this data to generate revenue forecasts and strategy insights.</span>
             </div>
           </div>
@@ -489,7 +495,7 @@ export default function OperationsDashboard() {
           const fy = getCurrentFY();
           const label = daysAway === 0 ? "Today!" : daysAway === 1 ? "Tomorrow" : `${daysAway} days away`;
           return (
-            <div className="border border-amber-500/30 bg-amber-500/5 rounded-xl px-5 py-3 flex items-center justify-between gap-4">
+            <div className="border border-amber-500/30 bg-amber-500/5 rounded-none px-5 py-3.5 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{festival.emoji}</span>
                 <div>
@@ -506,60 +512,70 @@ export default function OperationsDashboard() {
 
         {/* Aggregate KPIs */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-amber-500 mb-1">
-              <DollarSign className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Team Revenue</span>
+          <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between text-primary mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Team Revenue</span>
+              <DollarSign className="w-4 h-4 text-accent" />
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(totalRevenue, sym)}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{period}</p>
+            <div>
+              <p className="text-2xl font-sans font-bold text-primary leading-none">{formatCurrency(totalRevenue, sym)}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{period}</p>
+            </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-green-500 mb-1">
-              <Handshake className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Total Deals</span>
+          <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between text-primary mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Total Deals</span>
+              <Handshake className="w-4 h-4 text-accent" />
             </div>
-            <p className="text-2xl font-bold">{totalDeals}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">{teamPerformance.length} members</p>
+            <div>
+              <p className="text-2xl font-sans font-bold text-primary leading-none">{totalDeals}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">{teamPerformance.length} members</p>
+            </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-blue-500 mb-1">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Avg Achievement</span>
+          <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between text-primary mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Avg Achievement</span>
+              <TrendingUp className="w-4 h-4 text-accent" />
             </div>
-            <p className="text-2xl font-bold">{avgAchievement}%</p>
-            <p className={`text-xs mt-0.5 ${avgAchievement >= 80 ? 'text-green-500' : avgAchievement >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
-              {avgAchievement >= 80 ? 'On Track' : avgAchievement >= 50 ? 'Needs Focus' : 'Below Target'}
-            </p>
+            <div>
+              <p className="text-2xl font-sans font-bold text-primary leading-none">{avgAchievement}%</p>
+              <p className={`text-[10px] font-semibold mt-1 ${avgAchievement >= 80 ? 'text-green-600' : avgAchievement >= 50 ? 'text-amber-600' : 'text-red-600'}`}>
+                {avgAchievement >= 80 ? 'On Track' : avgAchievement >= 50 ? 'Needs Focus' : 'Below Target'}
+              </p>
+            </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-purple-500 mb-1">
-              <Receipt className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">Total Expenses</span>
+          <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between text-primary mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">Total Expenses</span>
+              <Receipt className="w-4 h-4 text-accent" />
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(totalExpenses, sym)}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Team expenses</p>
+            <div>
+              <p className="text-2xl font-sans font-bold text-primary leading-none">{formatCurrency(totalExpenses, sym)}</p>
+              <p className="text-[10px] text-muted-foreground mt-1">Team expenses</p>
+            </div>
           </Card>
-          <Card className="p-4">
-            <div className="flex items-center gap-2 text-orange-500 mb-1">
-              <TrendingUp className="w-4 h-4" />
-              <span className="text-xs font-medium uppercase tracking-wide">YoY Revenue</span>
+          <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm flex flex-col justify-between">
+            <div className="flex items-center justify-between text-primary mb-2">
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/80">YoY Revenue</span>
+              <TrendingUp className="w-4 h-4 text-accent" />
             </div>
-            {lastYearTeamQuery.isLoading ? (
-              <div className="h-8 flex items-center"><span className="text-muted-foreground text-sm">Loading…</span></div>
-            ) : yoyDelta !== null ? (
-              <>
-                <p className={`text-2xl font-bold ${yoyDelta >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {yoyDelta >= 0 ? '+' : ''}{yoyDelta}%
-                </p>
-                <p className="text-xs text-muted-foreground mt-0.5">vs {lastYearPeriod}</p>
-              </>
-            ) : (
-              <>
-                <p className="text-2xl font-bold text-muted-foreground">–</p>
-                <p className="text-xs text-muted-foreground mt-0.5">No prior year data</p>
-              </>
-            )}
+            <div>
+              {lastYearTeamQuery.isLoading ? (
+                <div className="h-8 flex items-center"><span className="text-muted-foreground text-sm">Loading…</span></div>
+              ) : yoyDelta !== null ? (
+                <>
+                  <p className={`text-2xl font-sans font-bold leading-none ${yoyDelta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {yoyDelta >= 0 ? '+' : ''}{yoyDelta}%
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-1">vs {lastYearPeriod}</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-2xl font-sans font-bold text-muted-foreground leading-none">–</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">No prior year data</p>
+                </>
+              )}
+            </div>
           </Card>
         </motion.div>
 

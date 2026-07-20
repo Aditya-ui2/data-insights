@@ -160,7 +160,7 @@ function AnimatedDonutChart() {
         );
       })}
       {/* Center circle for donut effect */}
-      <circle cx="50" cy="50" r="20" fill="#f97316" />
+      <circle cx="50" cy="50" r="20" fill="#13322b" />
       <motion.text
         x="50"
         y="54"
@@ -182,7 +182,7 @@ function AnimatedDonutChart() {
 function FloatingStatsCard({ value, label, delay }: { value: string; label: string; delay: number }) {
   return (
     <motion.div
-      className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20"
+      className="bg-white/10 backdrop-blur-md rounded-none p-3 border border-white/10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
@@ -233,11 +233,11 @@ function AnimatedBackground() {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {/* Base gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[#13322b] via-[#1a473d] to-[#0d221e]" />
       
       {/* Animated gradient overlay */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-tr from-red-500/30 via-transparent to-yellow-400/20"
+        className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-[#c59b43]/10"
         animate={{
           opacity: [0.5, 0.8, 0.5],
         }}
@@ -341,7 +341,7 @@ function AnimatedBackground() {
 
       {/* Large floating orb 1 */}
       <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-br from-yellow-400/30 to-orange-300/10 blur-3xl"
+        className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[#c59b43]/20 to-[#13322b]/10 blur-3xl"
         animate={{
           x: [0, 80, 40, 0],
           y: [0, -40, 80, 0],
@@ -357,7 +357,7 @@ function AnimatedBackground() {
 
       {/* Large floating orb 2 */}
       <motion.div
-        className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-orange-600/40 to-red-500/20 blur-3xl"
+        className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-[#13322b]/40 to-black/20 blur-3xl"
         animate={{
           x: [0, -60, 30, 0],
           y: [0, 60, -30, 0],
@@ -457,9 +457,9 @@ function SocialIconButton({ onClick, disabled, loading, icon: Icon, label }: {
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      whileHover={{ scale: 1.1, y: -2 }}
-      whileTap={{ scale: 0.95 }}
-      className="w-14 h-14 rounded-full border border-border/60 bg-background/50 hover:bg-accent/80 flex items-center justify-center transition-all duration-200 hover:shadow-xl hover:shadow-amber-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+      whileHover={{ scale: 1.05, y: -1 }}
+      whileTap={{ scale: 0.98 }}
+      className="w-14 h-14 rounded-none border border-border bg-white hover:bg-gray-50 flex items-center justify-center transition-all duration-200 hover:shadow-md hover:shadow-accent/5 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
@@ -580,8 +580,8 @@ export default function Login() {
   // Loading / verifying state
   if (verifying) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950 gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-amber-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#faf9f6] gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-accent" />
         <p className="text-muted-foreground text-sm">Signing you in…</p>
       </div>
     );
@@ -590,23 +590,23 @@ export default function Login() {
   // Forgot password view
   if (showForgotPassword) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#faf9f6] p-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-md relative z-10"
         >
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 dark:border-slate-800/50 p-8">
-            <h2 className="text-2xl font-bold text-center mb-2">Reset Password</h2>
+          <div className="bg-white rounded-none shadow-xl border border-gray-200 p-8">
+            <h2 className="text-2xl font-sans font-medium text-primary text-center mb-2">Reset Password</h2>
             <p className="text-muted-foreground text-center text-sm mb-6">Enter your email to receive a reset link</p>
             {forgotSent ? (
               <div className="flex flex-col items-center gap-3 py-4 text-center">
-                <CheckCircle2 className="w-12 h-12 text-green-500" />
-                <p className="font-medium">Reset email sent!</p>
+                <CheckCircle2 className="w-12 h-12 text-[#13322b]" />
+                <p className="font-medium text-primary">Reset email sent!</p>
                 <p className="text-sm text-muted-foreground">Check your inbox for a password reset link.</p>
                 <Button
                   variant="outline"
-                  className="mt-2 rounded-xl"
+                  className="mt-2 rounded-none border-gray-200 hover:bg-gray-50 text-primary"
                   onClick={() => { setShowForgotPassword(false); setForgotSent(false); }}
                 >
                   Back to Sign In
@@ -621,19 +621,19 @@ export default function Login() {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="forgot-email" className="text-sm font-medium">Email</Label>
+                  <Label htmlFor="forgot-email" className="text-sm font-medium text-primary">Email</Label>
                   <Input
                     id="forgot-email"
                     type="email"
                     placeholder="you@example.com"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
-                    className="h-12 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700"
+                    className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary"
                   />
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold"
+                  className="w-full h-12 rounded-none bg-primary hover:bg-primary/95 text-primary-foreground font-semibold uppercase tracking-wider shadow-none"
                   disabled={forgotLoading}
                 >
                   {forgotLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -649,9 +649,9 @@ export default function Login() {
 
   // Main login/signup view
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-950 dark:via-amber-950/20 dark:to-slate-950">
+    <div className="min-h-screen flex bg-[#faf9f6]">
       {/* Left decorative panel - hidden on mobile */}
-      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] relative overflow-hidden border-r border-gray-200">
         <AnimatedBackground />
         <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
           <Link href="/">
@@ -670,17 +670,17 @@ export default function Login() {
                 transition={{ duration: 0.4 }}
               >
                 <motion.h1
-                  className="text-5xl font-bold leading-tight"
+                  className="text-5xl font-sans font-normal leading-[1.1] tracking-[-0.03em]"
                 >
                   {activeTab === "signin" ? (
                     <>
                       Welcome Back<br />
-                      <span className="text-yellow-200">to Data Insights</span>
+                      <span className="text-accent">to Data Insights</span>
                     </>
                   ) : (
                     <>
                       Hello, Welcome<br />
-                      <span className="text-yellow-200">to Data Insights</span>
+                      <span className="text-accent">to Data Insights</span>
                     </>
                   )}
                 </motion.h1>
@@ -725,15 +725,15 @@ export default function Login() {
         >
           {/* Mobile back button */}
           <Link href="/">
-            <button className="flex lg:hidden items-center gap-2 text-amber-600 hover:text-amber-700 mb-6 text-sm font-medium">
+            <button className="flex lg:hidden items-center gap-2 text-accent hover:text-accent/80 mb-6 text-sm font-medium">
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
           </Link>
 
           <motion.div 
-            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 dark:border-slate-800/50 p-10 sm:p-12"
-            initial={{ opacity: 0, scale: 0.95 }}
+            className="bg-white rounded-none shadow-xl border border-gray-200 p-10 sm:p-12"
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
           >
@@ -747,11 +747,17 @@ export default function Login() {
                 className="text-center mb-10"
               >
                 <motion.div
-                  initial={{ scale: 0.9 }}
+                  initial={{ scale: 0.98 }}
                   animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <h2 className="text-4xl font-bold bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 bg-clip-text text-transparent">
+                  <div className="flex flex-col items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-accent">
+                      {activeTab === "signin" ? "Returning Client" : "New Account"}
+                    </span>
+                    <div className="w-12 h-[1px] bg-accent" />
+                  </div>
+                  <h2 className="text-4xl font-sans font-normal text-primary tracking-tight">
                     {activeTab === "signin" ? "Welcome Back" : "Get Started"}
                   </h2>
                 </motion.div>
@@ -793,35 +799,35 @@ export default function Login() {
                   className="space-y-6"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="signin-email" className="text-sm font-medium">Email</Label>
+                    <Label htmlFor="signin-email" className="text-sm font-medium text-primary">Email</Label>
                     <Input
                       id="signin-email"
                       type="email"
                       placeholder="you@example.com"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); clearError(); }}
-                      className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base"
+                      className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signin-password" className="text-sm font-medium">Password</Label>
+                    <Label htmlFor="signin-password" className="text-sm font-medium text-primary">Password</Label>
                     <Input
                       id="signin-password"
                       type="password"
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); clearError(); }}
-                      className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base"
+                      className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base"
                     />
                   </div>
-
+ 
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Checkbox
                         id="remember"
                         checked={rememberMe}
                         onCheckedChange={(v) => setRememberMe(v as boolean)}
-                        className="border-slate-300 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                        className="border-gray-300 rounded-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                       />
                       <Label htmlFor="remember" className="text-xs text-muted-foreground cursor-pointer">
                         Remember me
@@ -829,17 +835,17 @@ export default function Login() {
                     </div>
                     <button
                       type="button"
-                      className="text-xs text-amber-600 hover:text-amber-700 font-medium hover:underline underline-offset-2"
+                      className="text-xs text-accent hover:text-accent/80 font-medium hover:underline underline-offset-2"
                       onClick={() => { setShowForgotPassword(true); setForgotEmail(email); setInlineError(null); }}
                     >
                       Forgot password?
                     </button>
                   </div>
-
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+ 
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                     <Button
                       type="submit"
-                      className="w-full h-14 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold text-base shadow-lg shadow-amber-500/25 transition-all hover:shadow-amber-500/40 hover:shadow-xl"
+                      className="w-full h-12 rounded-none bg-primary hover:bg-primary/95 text-primary-foreground font-semibold text-base tracking-wider uppercase shadow-none"
                       disabled={isLoading || loadingProvider !== null}
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
@@ -852,14 +858,14 @@ export default function Login() {
                       <span className="w-full border-t border-slate-200 dark:border-slate-800" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white dark:bg-slate-900 px-2 text-muted-foreground">Or bypass for testing</span>
+                      <span className="bg-white px-2 text-muted-foreground">Or bypass for testing</span>
                     </div>
                   </div>
 
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full h-12 rounded-xl border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 font-medium"
+                    className="w-full h-12 rounded-none border-primary/20 text-primary hover:bg-sidebar font-semibold text-sm uppercase tracking-wider shadow-none"
                     onClick={() => {
                       setEmail("admin@demodatainsights.com");
                       setPassword("Demo@1234");
@@ -882,49 +888,49 @@ export default function Login() {
                   className="space-y-6"
                 >
                   <div className="space-y-2">
-                    <Label htmlFor="signup-name" className="text-sm font-medium">Full Name</Label>
+                    <Label htmlFor="signup-name" className="text-sm font-medium text-primary">Full Name</Label>
                     <Input
                       id="signup-name"
                       type="text"
                       placeholder="Enter Full Name"
                       value={fullName}
                       onChange={(e) => { setFullName(e.target.value); clearError(); }}
-                      className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base"
+                      className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-sm font-medium">Email</Label>
+                    <Label htmlFor="signup-email" className="text-sm font-medium text-primary">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="Enter Email"
                       value={email}
                       onChange={(e) => { setEmail(e.target.value); clearError(); }}
-                      className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base"
+                      className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-sm font-medium">Password</Label>
+                    <Label htmlFor="signup-password" className="text-sm font-medium text-primary">Password</Label>
                     <Input
                       id="signup-password"
                       type="password"
                       placeholder="At least 6 characters"
                       value={password}
                       onChange={(e) => { setPassword(e.target.value); clearError(); }}
-                      className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base"
+                      className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base"
                     />
                   </div>
-
+ 
                   <div className="space-y-2">
-                    <Label htmlFor="signup-industry" className="text-sm font-medium flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-amber-500" />
+                    <Label htmlFor="signup-industry" className="text-sm font-medium flex items-center gap-2 text-primary">
+                      <Building2 className="w-4 h-4 text-accent" />
                       What's your business type?
                     </Label>
                     <Select value={industry} onValueChange={setIndustry}>
-                      <SelectTrigger className="h-14 rounded-xl bg-slate-50/50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 focus:border-amber-500 focus:ring-amber-500/20 text-base">
+                      <SelectTrigger className="h-12 rounded-none bg-white border-gray-200 focus-visible:ring-0 focus-visible:border-primary text-base">
                         <SelectValue placeholder="Choose your industry..." />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl">
+                      <SelectContent className="rounded-none">
                         {INDUSTRY_OPTIONS.map((option) => (
                           <SelectItem 
                             key={option.value} 
@@ -937,24 +943,24 @@ export default function Login() {
                       </SelectContent>
                     </Select>
                   </div>
-
+ 
                   <div className="flex items-center gap-2">
                     <Checkbox
                       id="agree-terms"
                       checked={agreeTerms}
                       onCheckedChange={(v) => setAgreeTerms(v as boolean)}
-                      className="border-slate-300 data-[state=checked]:bg-amber-500 data-[state=checked]:border-amber-500"
+                      className="border-gray-300 rounded-none data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                     />
                     <Label htmlFor="agree-terms" className="text-xs text-muted-foreground cursor-pointer">
                       I agree to the processing of{" "}
-                      <span className="text-amber-600 font-medium">Personal data</span>
+                      <span className="text-accent font-medium">Personal data</span>
                     </Label>
                   </div>
-
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+ 
+                  <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                     <Button
                       type="submit"
-                      className="w-full h-14 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold text-base shadow-lg shadow-amber-500/25 transition-all hover:shadow-amber-500/40 hover:shadow-xl gap-2"
+                      className="w-full h-12 rounded-none bg-primary hover:bg-primary/95 text-primary-foreground font-semibold text-base tracking-wider uppercase shadow-none gap-2"
                       disabled={isLoading || loadingProvider !== null}
                     >
                       {isLoading ? (
@@ -976,7 +982,7 @@ export default function Login() {
                   <span className="w-full border-t border-slate-200 dark:border-slate-700" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="bg-white dark:bg-slate-900 px-4 text-muted-foreground">
+                  <span className="bg-white px-4 text-muted-foreground">
                     {activeTab === "signin" ? "Sign in with" : "Sign up with"}
                   </span>
                 </div>
@@ -1007,14 +1013,14 @@ export default function Login() {
             </div>
 
             {/* Toggle between sign in / sign up */}
-            <p className="text-center text-muted-foreground mt-8">
+            <p className="text-center text-muted-foreground mt-8 text-sm">
               {activeTab === "signin" ? (
                 <>
                   Don't have an account?{" "}
                   <button
                     type="button"
                     onClick={() => { setActiveTab("signup"); clearError(); }}
-                    className="text-amber-600 font-semibold hover:underline underline-offset-2"
+                    className="text-accent font-semibold hover:underline underline-offset-2"
                   >
                     Sign up
                   </button>
@@ -1025,7 +1031,7 @@ export default function Login() {
                   <button
                     type="button"
                     onClick={() => { setActiveTab("signin"); clearError(); }}
-                    className="text-amber-600 font-semibold hover:underline underline-offset-2"
+                    className="text-accent font-semibold hover:underline underline-offset-2"
                   >
                     Sign in
                   </button>

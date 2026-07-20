@@ -134,18 +134,46 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    if (!userData.id) {
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      return newUser;
+    }
+
+    // First check if user exists
+    const existingUser = await this.getUser(userData.id);
+    
+    if (existingUser) {
+      // Merge existing user with new data, preserving fields not provided in userData
+      const [updatedUser] = await db
+        .update(users)
+        .set({ 
+          // Only update fields that are actually provided in userData
+          ...(userData.email !== undefined ? { email: userData.email } : {}),
+          ...(userData.firstName !== undefined ? { firstName: userData.firstName } : {}),
+          ...(userData.lastName !== undefined ? { lastName: userData.lastName } : {}),
+          ...(userData.profileImageUrl !== undefined ? { profileImageUrl: userData.profileImageUrl } : {}),
+          ...(userData.role !== undefined ? { role: userData.role } : {}),
+          ...(userData.goals !== undefined ? { goals: userData.goals } : {}),
+          ...(userData.googleAccessToken !== undefined ? { googleAccessToken: userData.googleAccessToken } : {}),
+          ...(userData.googleRefreshToken !== undefined ? { googleRefreshToken: userData.googleRefreshToken } : {}),
+          ...(userData.googleTokenExpiry !== undefined ? { googleTokenExpiry: userData.googleTokenExpiry } : {}),
+          ...(userData.onboardingComplete !== undefined ? { onboardingComplete: userData.onboardingComplete } : {}),
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userData.id))
+        .returning();
+      return updatedUser;
+    } else {
+      // Insert new user with defaults
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      return newUser;
+    }
   }
 
   async updateUser(id: string, data: Partial<UpsertUser>): Promise<User | undefined> {

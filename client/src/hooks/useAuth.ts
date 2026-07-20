@@ -68,7 +68,12 @@ export function useAuthState(): AuthState {
   } as any;
 
   const authenticated = isDemoPersistent || (!!firebaseUser && !!user);
-  const loading = !isDemoPersistent && (firebaseLoading || (!!firebaseUser && userLoading));
+  // Keep loading true until Firebase has resolved AND (if there's a firebase user) the user API call is also done.
+  // This prevents a flash of isAuthenticated=false before Firebase resolves, which would cause a redirect to /login on refresh.
+  const loading = !isDemoPersistent && (
+    firebaseLoading || 
+    (!!firebaseUser && (userLoading || !user))
+  );
 
   return {
     user: isDemoPersistent || firebaseUser?.email === "admin@demodatainsights.com" ? demoUser : user,

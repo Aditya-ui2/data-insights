@@ -7,3 +7,6 @@ vite.config.ts.*
 .env
 .local
 *.log
+backend/venv/
+backend/data/
+scratch/

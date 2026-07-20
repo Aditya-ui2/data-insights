@@ -78,7 +78,7 @@ export default function SharedDashboard({ shareToken }: SharedDashboardProps) {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <Lock className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h1 className="font-serif text-2xl font-bold mb-2">Dashboard Not Found</h1>
+            <h1 className="font-sans text-2xl font-bold mb-2">Dashboard Not Found</h1>
             <p className="text-muted-foreground">
               This dashboard may have been deleted or the link is invalid.
             </p>
@@ -102,7 +102,7 @@ export default function SharedDashboard({ shareToken }: SharedDashboardProps) {
             <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
               <BarChart3 className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h1 className="font-serif text-2xl font-bold mb-2">No Charts Configured</h1>
+            <h1 className="font-sans text-2xl font-bold mb-2">No Charts Configured</h1>
             <p className="text-muted-foreground">
               This dashboard doesn't have any charts configured yet.
             </p>
@@ -125,7 +125,7 @@ export default function SharedDashboard({ shareToken }: SharedDashboardProps) {
               <div className="w-8 h-8 rounded-md bg-primary flex items-center justify-center">
                 <BarChart3 className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-serif text-lg font-bold">DataInsights</span>
+              <span className="font-sans text-lg font-bold">DataInsights</span>
             </div>
             <ThemeToggle />
           </div>
@@ -135,7 +135,7 @@ export default function SharedDashboard({ shareToken }: SharedDashboardProps) {
         <main className="max-w-7xl mx-auto p-6 space-y-6">
           {/* Title */}
           <div>
-            <h1 className="font-serif text-2xl font-bold">{dashboard.title}</h1>
+            <h1 className="font-sans text-2xl font-bold">{dashboard.title}</h1>
             {dashboard.description && (
               <p className="text-muted-foreground mt-1">{dashboard.description}</p>
             )}
@@ -186,10 +186,8 @@ function SharedKPICard({ config, data, index }: { config: ChartConfig; data: any
   const displayValue = config.insights?.includes("average") ? average : total;
   const formattedValue = displayValue.toLocaleString(undefined, { maximumFractionDigits: 2 });
 
-  const midpoint = Math.floor(values.length / 2);
-  const firstHalf = values.slice(0, midpoint).reduce((a, b) => a + b, 0) / midpoint || 0;
-  const secondHalf = values.slice(midpoint).reduce((a, b) => a + b, 0) / (values.length - midpoint) || 0;
-  const trend = firstHalf > 0 ? ((secondHalf - firstHalf) / firstHalf) * 100 : 0;
+  // Only display trend if explicitly calculated and provided by the backend config
+  const trend = config.changePct ?? config.trend ?? 0;
 
   return (
     <motion.div
@@ -202,7 +200,7 @@ function SharedKPICard({ config, data, index }: { config: ChartConfig; data: any
         <p className="text-2xl font-bold" style={{ color: CHART_COLORS[index % CHART_COLORS.length] }}>
           {formattedValue}
         </p>
-        {values.length > 1 && (
+        {trend !== 0 && values.length > 1 && (
           <div className={`flex items-center gap-1 mt-2 text-xs ${
             trend > 0 ? "text-green-500" : trend < 0 ? "text-red-500" : "text-muted-foreground"
           }`}>
@@ -222,6 +220,18 @@ function SharedChartCard({ config, data, index }: { config: ChartConfig; data: a
     name: row[config.labelKey || Object.keys(row)[0]] || "Unknown",
     value: parseFloat(row[config.dataKey]) || 0,
   }));
+
+  const formatTooltipValue = (value: any, name: string) => {
+    const n = String(name).toLowerCase();
+    if (n.includes("mobile") || n.includes("phone") || n.includes("contact") || n.includes("id") || n.includes("time") || n.includes("date")) {
+      return String(value);
+    }
+    const valNum = parseFloat(String(value));
+    if (!isNaN(valNum)) {
+      return valNum.toLocaleString();
+    }
+    return String(value);
+  };
 
   return (
     <motion.div
@@ -244,6 +254,7 @@ function SharedChartCard({ config, data, index }: { config: ChartConfig; data: a
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "6px",
                   }} 
+                  formatter={(value: any, name: string) => [formatTooltipValue(value, config.dataKey || "Value"), config.dataKey || "Value"]}
                 />
                 <Bar dataKey="value" fill={CHART_COLORS[index % CHART_COLORS.length]} radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -258,6 +269,7 @@ function SharedChartCard({ config, data, index }: { config: ChartConfig; data: a
                     border: "1px solid hsl(var(--border))",
                     borderRadius: "6px",
                   }} 
+                  formatter={(value: any, name: string) => [formatTooltipValue(value, config.dataKey || "Value"), config.dataKey || "Value"]}
                 />
                 <Line 
                   type="monotone" 
@@ -281,7 +293,7 @@ function SharedChartCard({ config, data, index }: { config: ChartConfig; data: a
                     <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip formatter={(value: any, name: string) => [formatTooltipValue(value, name), name]} />
               </PieChart>
             ) : (
               <div className="h-full overflow-auto">

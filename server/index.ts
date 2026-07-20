@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { startScheduler } from "./scheduler";
 import { serveStatic } from "./static";
 
 const app = express();
@@ -63,6 +64,7 @@ export default app;
 if (process.env.NODE_ENV !== "production" || !process.env.VERCEL) {
   (async () => {
     const httpServer = await registerRoutes(app);
+    startScheduler();
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;

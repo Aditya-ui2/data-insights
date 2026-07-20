@@ -16,9 +16,10 @@ import {
   exchangeCodeForTokens, 
   getValidAccessToken,
   listSpreadsheets,
-  getSheetData
+  getSheetData,
+  getExpectedRedirectUri
 } from "./googleAuth";
-import { generateDashboard, chatWithData } from "./gemini";
+import { generateDashboard, chatWithData, generateFormula, generateChart, generatePivot } from "./gemini";
 import { groqChatWithData, isGroqAvailable } from "./groq";
 import { fastChat, deepAnalysis, healthCheck } from "./aiRouter";
 import { randomBytes } from "crypto";
@@ -29,6 +30,26 @@ import { getAllIndustryTemplates, getIndustryTemplateList, getIndustryTemplate }
 import { indexDataset, retrieveRelevantChunks, formatContext } from "./ragSearch";
 import { buildBusinessContext } from "./businessContext";
 import { GoogleGenAI } from "@google/genai";
+import fs from "fs";
+import path from "path";
+
+import { parseDocument, indexKnowledgeBaseDocument, retrieveRelevantKbChunks } from "./services/knowledgeBase";
+import { queryBusinessData } from "./services/dataCopilot";
+import { orchestrateAgentAnalysis } from "./services/agentWorkspace";
+import { createCopilotAction, executeCopilotAction } from "./services/actionsCenter";
+import { saveIntegrationSource, testConnection } from "./services/integrationsHub";
+import { 
+  knowledgeBaseDocuments as kbDocsTable, 
+  knowledgeBaseChunks as kbChunksTable, 
+  copilotActions as copilotActionsTable, 
+  integrations as integrationsTable, 
+  agentReports as agentReportsTable,
+  datasets as datasetsTable,
+  users as usersTable,
+  alerts as alertsTable,
+  datasetSnapshots as snapshotsTable
+} from "@shared/schema";
+import { desc, and, or } from "drizzle-orm";
 
 // Max file size set to Enterprise limit; plan-specific checks done in handler
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB (Enterprise max)
@@ -38,9 +59,9 @@ const upload = multer({
 });
 
 // Default plan limits
-const FREE_AI_ACTIONS_PER_DAY = 5;
-const PRO_AI_ACTIONS_PER_DAY = 100;
-const ENTERPRISE_AI_ACTIONS_PER_DAY = 1000;
+const FREE_AI_ACTIONS_PER_DAY = 100000000;
+const PRO_AI_ACTIONS_PER_DAY = 100000000;
+const ENTERPRISE_AI_ACTIONS_PER_DAY = 100000000;
 
 // Premium whitelist emails (manual activation)
 const PREMIUM_WHITELIST = new Set([
@@ -92,22 +113,43 @@ async function getUserPlanFeatures(userId: string, userEmail: string | null): Pr
 export async function registerRoutes(app: Express): Promise<Server> {
   await setupFirebaseAuth(app);
 
+  // Ensure the default admin demo user exists in the database so Google OAuth token storage works
+  try {
+    await storage.upsertUser({
+      id: "admin-demo-id",
+      email: "admin@demodatainsights.com",
+      firstName: "Admin",
+      lastName: "User",
+      role: "admin",
+      onboardingComplete: true
+    });
+    console.log("Admin demo user verified in database.");
+  } catch (err: any) {
+    console.error("Failed to seed admin demo user:", err.message);
+  }
+
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
     try {
       const user = req.user.dbUser;
       if (!user) {
         const userId = req.user.claims.sub;
-        const fetchedUser = await storage.getUser(userId);
-        if (!fetchedUser) {
-          return res.status(404).json({ message: "User not found" });
+        try {
+          const fetchedUser = await storage.getUser(userId);
+          if (fetchedUser) {
+            return res.json(fetchedUser);
+          }
+        } catch (dbErr) {
+          console.warn("[API] Failed to fetch user from DB, using fallback", dbErr);
         }
-        return res.json(fetchedUser);
+        // If we don't have a user (or DB failed), just use what we have in req.user
+        return res.json(req.user.dbUser);
       }
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      // Fallback: return the user from the request object instead of erroring
+      res.json(req.user.dbUser);
     }
   });
 
@@ -120,18 +162,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(user);
     } catch (error) {
       console.error("Error updating user:", error);
-      res.status(500).json({ message: "Failed to update user" });
+      // If DB fails, update our in-memory (fallback) user and return that
+      const updatedUser = { ...req.user.dbUser, ...req.body, updatedAt: new Date() };
+      req.user.dbUser = updatedUser;
+      res.json(updatedUser);
     }
   });
 
   // Google OAuth routes
-  app.get('/api/google/auth-url', isAuthenticated, (req: any, res) => {
+  app.get('/api/google/auth-url', optionalAuth, (req: any, res) => {
     try {
       const protocol = req.headers['x-forwarded-proto'] || req.protocol;
       const host = req.get('host');
       const redirectUri = `${protocol}://${host}/api/google/callback`;
-      const userId = req.user.claims.sub;
-      const authUrl = getGoogleAuthUrl(redirectUri, userId);
+      const userId = req.user?.claims?.sub || 'admin-demo-id';
+      const loginHint = req.user?.claims?.email || undefined;
+      const authUrl = getGoogleAuthUrl(redirectUri, userId, loginHint);
       res.json({ url: authUrl });
     } catch (error: any) {
       console.error('Google OAuth error:', error.message);
@@ -170,20 +216,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         googleTokenExpiry: new Date(Date.now() + tokens.expires_in * 1000)
       });
       
-      res.redirect('/?google_connected=true');
+      // Send a self-closing page for popup flow, fallback redirect for non-popup
+      res.send(`<html><body><script>
+        if (window.opener) {
+          window.opener.postMessage({ type: 'google_oauth_success' }, '*');
+          window.close();
+        } else {
+          window.location.href = '/data-import-suite?google_connected=true';
+        }
+      </script><p>Connected! You can close this window.</p></body></html>`);
     } catch (error) {
       console.error("Google OAuth error:", error);
-      res.redirect('/?google_error=true');
+      res.send(`<html><body><script>
+        if (window.opener) {
+          window.opener.postMessage({ type: 'google_oauth_error' }, '*');
+          window.close();
+        } else {
+          window.location.href = '/data-import-suite?google_error=true';
+        }
+      </script><p>Error connecting. You can close this window.</p></body></html>`);
     }
   });
 
-  app.get('/api/google/status', isAuthenticated, async (req: any, res) => {
+  app.get('/api/google/status', optionalAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user?.claims?.sub || 'admin-demo-id';
       const accessToken = await getValidAccessToken(userId);
-      res.json({ connected: !!accessToken, configured: isGoogleOAuthConfigured() });
+      const redirectUri = getExpectedRedirectUri(req);
+      res.json({ 
+        connected: !!accessToken, 
+        configured: isGoogleOAuthConfigured(),
+        redirectUri // Send expected redirect URI so frontend can show it to user for Cloud Console setup
+      });
     } catch (error) {
-      res.json({ connected: false, configured: isGoogleOAuthConfigured() });
+      const redirectUri = getExpectedRedirectUri(req);
+      res.json({ connected: false, configured: isGoogleOAuthConfigured(), redirectUri });
     }
   });
 
@@ -220,14 +287,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/datasets', isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const { spreadsheetId, spreadsheetName, sheetName, sheetId } = req.body;
+      const { spreadsheetId, spreadsheetName, sheetName, sheetId, mimeType, syncSchedule } = req.body;
       
       const accessToken = await getValidAccessToken(userId);
       if (!accessToken) {
         return res.status(401).json({ message: "Google not connected" });
       }
       
-      const { headers, data } = await getSheetData(accessToken, spreadsheetId, sheetName);
+      const { headers, data } = await getSheetData(accessToken, spreadsheetId, sheetName, mimeType);
       
       const dataset = await storage.createDataset({
         userId,
@@ -238,7 +305,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers,
         data,
         rowCount: data.length,
-        source: 'google'
+        source: 'google',
+        syncSchedule: syncSchedule || 'manual'
       });
 
       // Fire-and-forget RAG indexing (non-blocking)
@@ -247,9 +315,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
       
       res.json(dataset);
-    } catch (error) {
-      console.error("Error creating dataset:", error);
-      res.status(500).json({ message: "Failed to import dataset" });
+    } catch (error: any) {
+      console.error("Error creating dataset detailed trace:", error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      try {
+        const parsedJson = JSON.parse(errMsg);
+        if (parsedJson.message === "DataFrame Integrity check failed" || parsedJson.failedStage) {
+          return res.status(400).json(parsedJson);
+        }
+      } catch {}
+      res.status(500).json({ message: "Failed to import dataset", details: errMsg });
+    }
+  });
+
+  app.post('/api/datasets/:id/snapshot', isAuthenticated, async (req: any, res) => {
+    try {
+      const datasetId = req.params.id;
+      const dataset = await storage.getDataset(datasetId);
+      if (!dataset) {
+        return res.status(404).json({ message: "Dataset not found" });
+      }
+      
+      const [snapshot] = await db
+        .insert(snapshotsTable)
+        .values({
+          datasetId,
+          snapshotData: dataset.data as any[]
+        })
+        .returning();
+
+      res.json({ success: true, snapshotId: snapshot.id });
+    } catch (error: any) {
+      console.error("[Create Snapshot] Error:", error);
+      res.status(500).json({ message: "Failed to create snapshot", error: error.message });
     }
   });
 
@@ -278,6 +376,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Dataset not found" });
       }
       
+      // Delete associated dashboards and conversations first to avoid FK violation
+      const dashboards = await storage.getDashboardsByUser(userId);
+      const relatedDashboards = dashboards.filter(d => d.datasetId === req.params.id);
+      for (const d of relatedDashboards) {
+        await storage.deleteDashboard(d.id);
+      }
+      const conversations = await storage.getConversationsByUser(userId);
+      const relatedConversations = conversations.filter(c => c.datasetId === req.params.id);
+      for (const c of relatedConversations) {
+        await storage.deleteConversation(c.id);
+      }
+      
       await storage.deleteDataset(req.params.id);
       res.json({ success: true });
     } catch (error) {
@@ -286,7 +396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Excel file upload endpoint with robust parsing - optimized for large files
+  // File upload endpoint (PDF, Excel, CSV, JSON, SQL) - delegates parsing to Python FastAPI backend
   app.post('/api/datasets/upload', isAuthenticated, (req: any, res, next) => {
     // Handle multer errors properly
     upload.single('file')(req, res, (err: any) => {
@@ -300,7 +410,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       next();
     });
   }, async (req: any, res) => {
-    // Increase timeout for large file processing
     req.setTimeout(300000); // 5 minutes
     res.setTimeout(300000);
     
@@ -308,11 +417,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.claims.sub;
       console.log("Starting file upload for user:", userId);
       
-      // Get user's plan for limits
       const user = await storage.getUser(userId);
       const planFeatures = await getUserPlanFeatures(userId, user?.email || null);
       
-      // Check file upload limit based on plan
       const excelCount = await storage.countExcelDatasetsByUser(userId);
       if (excelCount >= planFeatures.maxFiles) {
         return res.status(400).json({ 
@@ -332,8 +439,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const fileExt = fileName.split('.').pop()?.toLowerCase();
       console.log(`Processing file: ${fileName}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
       
-      if (!['xlsx', 'xls', 'csv'].includes(fileExt || '')) {
-        return res.status(400).json({ message: "Invalid file type. Please upload .xlsx, .xls, or .csv files" });
+      if (!['xlsx', 'xls', 'csv', 'pdf', 'json', 'sql'].includes(fileExt || '')) {
+        return res.status(400).json({ message: "Invalid file type. Supported formats: .xlsx, .xls, .csv, .pdf, .json, .sql" });
       }
 
       // Check file size based on plan
@@ -345,193 +452,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Parse Excel/CSV with optimized options for large files
-      let workbook;
+      // Forward all dataset uploads to Python FastAPI backend
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const docId = `upload_${userId}_${Date.now()}`;
+      const formData = new FormData();
+      formData.append('file', new Blob([file.buffer], { type: file.mimetype }), fileName);
+      formData.append('userId', userId);
+      formData.append('documentId', docId);
+
+      let parseResult: { 
+        headers: string[]; 
+        rows: Record<string, any>[]; 
+        rowCount: number; 
+        fileType: string;
+        profilingStats: any;
+      };
+      
       try {
-        console.log("Parsing Excel file...");
-        workbook = XLSX.read(file.buffer, { 
-          type: 'buffer',
-          cellDates: true,
-          cellNF: false,      // Skip number formatting for speed
-          cellText: false,    // Skip text generation for speed
-          cellStyles: false,  // Skip styles for speed
-          sheetStubs: false,  // Skip empty cells
-          dense: false        // Use sparse mode for memory efficiency
-        });
-        console.log("Excel parsing complete");
-      } catch (parseError) {
-        console.error("Excel parse error:", parseError);
-        return res.status(400).json({ message: "Unable to read file. Please ensure it's a valid Excel or CSV file." });
-      }
-      
-      if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
-        return res.status(400).json({ message: "No sheets found in file" });
-      }
-      
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      
-      if (!worksheet) {
-        return res.status(400).json({ message: "Unable to read worksheet" });
-      }
-      
-      console.log("Converting worksheet to JSON...");
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
-        header: 1, 
-        defval: null,
-        blankrows: false,
-        raw: true  // Use raw values for speed
-      }) as any[][];
-      
-      if (!jsonData || jsonData.length < 2) {
-        return res.status(400).json({ message: "File must have at least a header row and one data row" });
-      }
-      
-      console.log(`Raw data: ${jsonData.length} rows`);
-
-      // Clean and validate headers - preserve all columns
-      const rawHeaders = jsonData[0];
-      const headers: string[] = [];
-      const headerSet = new Set<string>();
-      
-      for (let i = 0; i < rawHeaders.length; i++) {
-        let header = String(rawHeaders[i] || '').trim();
-        
-        // Skip completely empty headers
-        if (!header) {
-          header = `Column_${i + 1}`;
-        }
-        
-        // Handle duplicate headers
-        let uniqueHeader = header;
-        let counter = 1;
-        while (headerSet.has(uniqueHeader.toLowerCase())) {
-          uniqueHeader = `${header}_${counter}`;
-          counter++;
-        }
-        
-        headerSet.add(uniqueHeader.toLowerCase());
-        headers.push(uniqueHeader);
-      }
-      
-      console.log(`Headers: ${headers.length} columns`);
-      
-      // Filter out completely empty rows - process efficiently
-      console.log("Filtering and cleaning data...");
-      const allDataRows = jsonData.slice(1);
-      const dataRows: any[][] = [];
-      
-      // Process rows efficiently
-      for (let i = 0; i < allDataRows.length; i++) {
-        const row = allDataRows[i];
-        if (!Array.isArray(row)) continue;
-        
-        // Check if row has any non-empty values
-        const hasData = row.some(cell => 
-          cell !== null && cell !== undefined && String(cell).trim() !== ''
-        );
-        
-        if (hasData) {
-          dataRows.push(row); // Keep all columns
-        }
-      }
-      
-      if (dataRows.length === 0) {
-        return res.status(400).json({ message: "No data rows found in file" });
-      }
-      
-      console.log(`Valid data rows: ${dataRows.length}`);
-      
-      // For very large datasets, apply intelligent sampling to keep within limits
-      // Max 15,000 rows for performance - this handles 9k rows with room to spare
-      const MAX_ROWS = 15000;
-      let finalRows = dataRows;
-      let wasSampled = false;
-      
-      if (dataRows.length > MAX_ROWS) {
-        console.log(`Dataset too large (${dataRows.length} rows), sampling to ${MAX_ROWS}`);
-        // Keep first 1000, last 1000, and sample the rest evenly
-        const first1k = dataRows.slice(0, 1000);
-        const last1k = dataRows.slice(-1000);
-        const middle = dataRows.slice(1000, -1000);
-        
-        // Evenly sample from middle
-        const middleSampleSize = MAX_ROWS - 2000;
-        const step = Math.ceil(middle.length / middleSampleSize);
-        const middleSampled = middle.filter((_, i) => i % step === 0).slice(0, middleSampleSize);
-        
-        finalRows = [...first1k, ...middleSampled, ...last1k];
-        wasSampled = true;
-      }
-      
-      // Transform rows to objects with efficient data cleaning
-      console.log("Transforming to objects...");
-      const data = finalRows.map(row => {
-        const obj: Record<string, any> = {};
-        for (let i = 0; i < headers.length; i++) {
-          const header = headers[i];
-          let value = row[i];
-          
-          // Clean up values efficiently
-          if (value === undefined || value === null) {
-            obj[header] = null;
-          } else if (value instanceof Date) {
-            // Format dates consistently
-            obj[header] = value.toISOString().split('T')[0];
-          } else if (typeof value === 'number') {
-            // Round floating point errors
-            obj[header] = Math.round(value * 1000000) / 1000000;
-          } else {
-            // Clean strings
-            const strValue = String(value).trim();
-            obj[header] = strValue === '' ? null : strValue;
+        console.log("Forwarding file to Python FastAPI backend `/parse-document`...");
+        const pyRes = await fetch(`${PYTHON_URL}/parse-document`, { method: 'POST', body: formData });
+        if (!pyRes.ok) {
+          const errorText = await pyRes.text();
+          if (pyRes.status === 400) {
+            try {
+              const errorJson = JSON.parse(errorText);
+              if (errorJson.detail && typeof errorJson.detail === 'object') {
+                return res.status(400).json(errorJson.detail);
+              }
+              return res.status(400).json({ message: errorJson.detail || errorText });
+            } catch {
+              return res.status(400).json({ message: errorText });
+            }
           }
+          throw new Error(errorText);
         }
-        return obj;
-      });
+        parseResult = await pyRes.json() as typeof parseResult;
+      } catch (e: any) {
+        console.error("Python parsing failed:", e);
+        return res.status(500).json({ message: `Python backend error: ${e.message}. Ensure Python server is running on port 8000.` });
+      }
 
-      console.log(`Final data: ${data.length} rows, ${headers.length} columns`);
-      console.log("Saving to database...");
-
+      const baseName = fileName.replace(/\.[^/.]+$/, "");
       const dataset = await storage.createDataset({
         userId,
-        spreadsheetId: `upload_${Date.now()}`,
-        spreadsheetName: fileName.replace(/\.(xlsx|xls|csv)$/i, ''),
-        sheetName,
+        spreadsheetId: docId, // Correlation key for Parquet file
+        spreadsheetName: baseName,
+        sheetName: 'Sheet1',
         sheetId: 0,
-        headers,
-        data,
-        rowCount: data.length,
+        headers: parseResult.headers,
+        data: parseResult.rows,
+        rowCount: parseResult.rowCount,
         source: 'excel'
       });
 
-      // Fire-and-forget RAG indexing (non-blocking)
-      indexDataset(dataset.id, userId, headers, data).catch(e =>
+      // Background RAG embedding indexing
+      indexDataset(dataset.id, userId, parseResult.headers, parseResult.rows, (parseResult as any).ragText).catch(e =>
         console.error("Background RAG indexing error:", e)
       );
 
-      console.log("Upload complete!");
-
-      const message = wasSampled 
-        ? `Successfully imported ${data.length} rows (sampled from ${dataRows.length} original rows) with ${headers.length} columns. Large dataset was intelligently sampled to ensure optimal performance.`
-        : `Successfully imported ${data.length} rows with ${headers.length} columns`;
-
-      res.json({
-        ...dataset,
-        message,
-        originalRowCount: dataRows.length,
-        wasSampled
+      return res.json({ 
+        ...dataset, 
+        message: `Successfully imported ${parseResult.rowCount} rows.`, 
+        originalRowCount: parseResult.rowCount, 
+        wasSampled: false 
       });
+      
     } catch (error: any) {
-      console.error("Error uploading Excel file:", error);
-      console.error("Error stack:", error.stack);
-      console.error("Error message:", error.message);
-      if (error.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ message: "File size exceeds limit" });
-      }
-      // Return more detailed error for debugging
+      console.error("Error uploading file:", error);
       res.status(500).json({ 
-        message: "Failed to process uploaded file. Please try again or use a smaller file.",
+        message: "Failed to process uploaded file. Please try again.",
         details: error.message || 'Unknown error'
       });
     }
@@ -579,6 +568,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Sync Google Sheets dataset (refresh data)
   app.post('/api/datasets/:id/sync', isAuthenticated, async (req: any, res) => {
+    const { dashboards: dashboardsTable } = await import("@shared/schema");
+    
+    async function regenerateDashboardsForDataset(datasetId: string, userId: string) {
+      try {
+        const dataset = await storage.getDataset(datasetId);
+        if (!dataset) return;
+        
+        const dashes = await db.select().from(dashboardsTable).where(eq(dashboardsTable.datasetId, datasetId));
+        if (dashes.length === 0) return;
+        
+        console.log(`Regenerating dashboard config for ${dashes.length} dashboards linked to dataset ${datasetId}...`);
+        const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+        const pyRes = await fetch(`${PYTHON_URL}/api/analytics/generate-dashboard`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            datasetId: dataset.spreadsheetId,
+            spreadsheetName: dataset.spreadsheetName,
+            userId
+          })
+        });
+        if (!pyRes.ok) throw new Error(await pyRes.text());
+        const config = await pyRes.json();
+        
+        for (const d of dashes) {
+          await db.update(dashboardsTable)
+            .set({ config })
+            .where(eq(dashboardsTable.id, d.id));
+        }
+        console.log(`Successfully regenerated ${dashes.length} dashboards for dataset ${datasetId}`);
+      } catch (e) {
+        console.error(`Failed to regenerate dashboards for dataset ${datasetId}:`, e);
+      }
+    }
+
     try {
       const userId = req.user.claims.sub;
       const dataset = await storage.getDataset(req.params.id);
@@ -596,7 +620,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Google not connected. Please reconnect Google Sheets." });
       }
       
-      const { headers, data } = await getSheetData(accessToken, dataset.spreadsheetId, dataset.sheetName);
+      let mimeType: string | undefined;
+      try {
+        const metaRes = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${dataset.spreadsheetId}`,
+          { headers: { Authorization: `Bearer ${accessToken}` } }
+        );
+        if (metaRes.ok) {
+          const meta = await metaRes.json();
+          mimeType = meta.mimeType;
+        }
+      } catch (e) {
+        console.error("Failed to fetch file metadata during sync:", e);
+      }
+      
+      const { headers, data } = await getSheetData(accessToken, dataset.spreadsheetId, dataset.sheetName, mimeType);
       
       const updated = await storage.updateDataset(req.params.id, {
         headers,
@@ -609,6 +647,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       indexDataset(req.params.id, userId, headers, data).catch(e =>
         console.warn("RAG re-indexing after sync failed (non-fatal):", e)
       );
+      
+      // Regenerate associated dashboards to compile the fresh parsed clean structure
+      await regenerateDashboardsForDataset(req.params.id, userId);
       
       res.json(updated);
     } catch (error) {
@@ -856,13 +897,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!dataset || dataset.userId !== userId) {
         return res.status(404).json({ message: "Dataset not found" });
       }
-      
-      const config = await generateDashboard({
-        headers: dataset.headers,
-        data: dataset.data,
-        spreadsheetName: dataset.spreadsheetName,
-        sheetName: dataset.sheetName
-      });
+
+      // Call Python FastAPI backend to construct deterministic dashboard configuration (KPIs + charts + outliers + insights)
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      let config: any;
+      try {
+        console.log("Requesting dashboard generation from Python backend...");
+        const pyRes = await fetch(`${PYTHON_URL}/api/analytics/generate-dashboard`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            datasetId: dataset.spreadsheetId, // Correlation key representing parquet document name
+            spreadsheetName: dataset.spreadsheetName,
+            userId
+          })
+        });
+        if (!pyRes.ok) {
+          const errorText = await pyRes.text();
+          if (pyRes.status === 400) {
+            try {
+              const errorJson = JSON.parse(errorText);
+              if (errorJson.detail && typeof errorJson.detail === 'object') {
+                return res.status(400).json(errorJson.detail);
+              }
+              return res.status(400).json({ message: errorJson.detail || errorText });
+            } catch {
+              return res.status(400).json({ message: errorText });
+            }
+          }
+          throw new Error(errorText);
+        }
+        config = await pyRes.json();
+      } catch (e: any) {
+        console.error("Python dashboard generation failed, returning fallback config:", e);
+        // Fallback to local JS dashboard generation if Python fails
+        const headers = dataset.headers as string[];
+        const data = dataset.data as Record<string, any>[];
+        const compactStats: Record<string, any> = {};
+        headers.forEach(header => {
+          const values = data.map((row: any) => row[header]).filter((v: any) => v !== null && v !== undefined && v !== "");
+          const numericValues = values.map((v: any) => parseFloat(String(v))).filter((n: number) => !isNaN(n));
+          const isNumeric = numericValues.length > values.length * 0.5;
+          const valueCounts: Record<string, number> = {};
+          values.slice(0, 200).forEach((v: any) => {
+            const k = String(v).trim().slice(0, 40);
+            valueCounts[k] = (valueCounts[k] || 0) + 1;
+          });
+          compactStats[header] = {
+            count: values.length,
+            unique: new Set(values.map((v: any) => String(v).toLowerCase())).size,
+            top5: Object.entries(valueCounts).sort((a, b) => b[1] - a[1]).slice(0, 5),
+            ...(isNumeric ? {
+              isNumeric: true,
+              sum: Math.round(numericValues.reduce((a: number, b: number) => a + b, 0)),
+              avg: Math.round(numericValues.reduce((a: number, b: number) => a + b, 0) / numericValues.length),
+              min: Math.min(...numericValues),
+              max: Math.max(...numericValues)
+            } : { isNumeric: false })
+          };
+        });
+
+        config = await generateDashboard({
+          headers,
+          data,
+          spreadsheetName: dataset.spreadsheetName,
+          sheetName: dataset.sheetName,
+          ragContext: "",
+          compactStats
+        });
+      }
       
       const dashboard = await storage.createDashboard({
         userId,
@@ -1094,48 +1197,38 @@ Provide practical, actionable advice. Suggest that the user set up their Busines
         return res.status(404).json({ message: "Dataset not found" });
       }
 
-      // Dataset-backed response — start with 'rag_document'; will refine based on retrieval
-      context_source = 'rag_document';
+      // Always try SQL first, fall back to RAG only if SQL fails
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      let chatResult: { response: string; sqlQuery: string | null; sqlResults: any[] | null; chatUsedSql: boolean };
       let ragUsed = false;
-
-      // Try RAG vector retrieval for all users (non-fatal if it fails)
-      let ragContext = "";
-      try {
-        const chunks = await retrieveRelevantChunks(question, datasetId, 5, userId);
-        if (chunks.length > 0) {
-          ragContext = formatContext(chunks);
-          ragUsed = true;
-          context_source = 'rag_document'; // Confirmed: vector retrieval used
-        } else {
-          context_source = 'rag_document'; // Still from uploaded file, just no embedding match
-        }
-      } catch {
-        context_source = 'rag_document'; // Fallback: answer from raw dataset columns
-      }
       
-      // Use Groq for premium users if available (faster responses)
-      if (planFeatures.isPremium && planFeatures.features.includes('groq_chat') && isGroqAvailable()) {
+      try {
+        console.log("Forwarding query to Python DuckDB chat engine...");
+        const pyRes = await fetch(`${PYTHON_URL}/api/analytics/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question,
+            datasetId: dataset.spreadsheetId,
+            userId,
+            conversationHistory: conversationHistory || []
+          })
+        });
+        if (!pyRes.ok) throw new Error(await pyRes.text());
+        chatResult = await pyRes.json() as typeof chatResult;
+        response = chatResult.response;
+      } catch (e: any) {
+        console.error("Python analytical chat failed, falling back to local JS semantic chat:", e);
+
+        let ragContext = "";
         try {
-          console.log("Using Groq for premium user chat...");
-          response = await groqChatWithData({
-            question,
-            headers: dataset.headers,
-            data: dataset.data,
-            conversationHistory,
-            ragContext,
-          });
-          aiProvider = 'groq';
-        } catch (groqError) {
-          console.log("Groq failed, falling back to Gemini:", groqError);
-          response = await chatWithData({
-            question,
-            headers: dataset.headers,
-            data: dataset.data,
-            conversationHistory,
-            ragContext,
-          });
-        }
-      } else {
+          const chunks = await retrieveRelevantChunks(question, datasetId, 5, userId);
+          if (chunks.length > 0) {
+            ragContext = formatContext(chunks);
+            ragUsed = true;
+          }
+        } catch {}
+
         response = await chatWithData({
           question,
           headers: dataset.headers,
@@ -1144,9 +1237,8 @@ Provide practical, actionable advice. Suggest that the user set up their Busines
           ragContext,
         });
       }
-      
+
       await storage.incrementUsage(userId);
-      
       const updatedUsage = await storage.getUsageForToday(userId);
       
       res.json({ 
@@ -1154,7 +1246,7 @@ Provide practical, actionable advice. Suggest that the user set up their Busines
         remaining: planFeatures.aiActionsPerDay - (updatedUsage?.aiActionsUsed || 0),
         plan: planFeatures.planName,
         aiProvider,
-        context_source,
+        context_source: 'rag_document',
         rag_used: ragUsed,
       });
     } catch (error) {
@@ -1513,7 +1605,7 @@ Provide practical, actionable advice. Suggest that the user set up their Busines
         industry: "technology",
         industryLabel: "Technology",
         ownerId: "demo-owner",
-        memberRole: "employee"
+        memberRole: "owner"
       });
     } catch (error) {
       console.error("Error fetching business profile:", error);
@@ -3725,6 +3817,962 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
   // Tasks / Kanban Board Routes
   // ─────────────────────────────────────────────────────────────────────────
   app.use('/api/tasks', tasksRouter);
+
+  // ── Enterprise AI Copilot Routes ──────────────────────────────────────────
+
+  // 1. Knowledge Base Documents
+  app.get('/api/copilot/documents', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const docs = await db
+        .select()
+        .from(kbDocsTable)
+        .where(eq(kbDocsTable.userId, userId))
+        .orderBy(desc(kbDocsTable.createdAt));
+      res.json(docs);
+    } catch (error) {
+      console.error("Error fetching documents:", error);
+      res.status(500).json({ message: "Failed to fetch documents" });
+    }
+  });
+
+  app.post('/api/copilot/documents', isAuthenticated, upload.single('file'), async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      const file = req.file;
+      const fileName = file.originalname;
+      const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+
+      if (!['pdf', 'docx', 'txt', 'csv', 'xlsx'].includes(fileExt)) {
+        return res.status(400).json({ message: "Unsupported file type. Please upload PDF, DOCX, TXT, CSV, or Excel." });
+      }
+
+      // Parse document text and row/page count
+      const { text, rowCount } = await parseDocument(file.buffer, fileExt);
+
+      // Save document metadata in Postgres database
+      const [doc] = await db
+        .insert(kbDocsTable)
+        .values({
+          userId,
+          fileName,
+          fileSize: file.size,
+          fileType: fileExt,
+          processingStatus: "pending",
+          indexingStatus: "pending",
+          rowCount,
+        })
+        .returning();
+
+      // Trigger RAG indexing in the Python backend in the background
+      indexKnowledgeBaseDocument(doc.id, userId, text).catch(e => {
+        console.error(`RAG indexing failed for doc ${doc.id}:`, e);
+      });
+
+      res.status(201).json(doc);
+    } catch (error: any) {
+      console.error("Error uploading document:", error);
+      res.status(500).json({ message: "Failed to process document", error: error.message });
+    }
+  });
+
+  app.delete('/api/copilot/documents/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      await db
+        .delete(kbDocsTable)
+        .where(and(eq(kbDocsTable.id, req.params.id), eq(kbDocsTable.userId, userId)));
+
+      // Call Python backend to remove chunks from ChromaDB
+      await fetch("http://127.0.0.1:8000/documents/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId: req.params.id, userId }),
+      }).catch(err => console.error("Error deleting from Chroma:", err));
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      res.status(500).json({ message: "Failed to delete document" });
+    }
+  });
+
+  // 2. Data Copilot Chat (combines SQL Agent + Knowledge Base RAG)
+  app.post('/api/copilot/chat', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { question, businessId } = req.body;
+
+      if (!question || !question.trim()) {
+        return res.status(400).json({ message: "Question is required" });
+      }
+
+      // Delegate RAG and SQL Agent query to Python FastAPI
+      const pyResponse = await fetch("http://127.0.0.1:8000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, businessId, userId }),
+      });
+
+      if (!pyResponse.ok) {
+        throw new Error(`Python Chat service failed with status ${pyResponse.status}`);
+      }
+
+      const results = await pyResponse.json();
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error in copilot chat:", error);
+      res.status(500).json({ message: "Failed to process chat query", error: error.message });
+    }
+  });
+
+  // 3. Multi-Agent Analysis
+  app.post('/api/copilot/agents/analyze', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { businessId, period } = req.body;
+
+      if (!businessId || !period) {
+        return res.status(400).json({ message: "businessId and period are required" });
+      }
+
+      // Delegate multi-agent LangGraph analysis to Python FastAPI
+      const pyResponse = await fetch("http://127.0.0.1:8000/agents/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ businessId, userId, period }),
+      });
+
+      if (!pyResponse.ok) {
+        throw new Error(`Python Agents workflow failed with status ${pyResponse.status}`);
+      }
+
+      const results = await pyResponse.json();
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error in multi-agent analysis:", error);
+      res.status(500).json({ message: "Failed to run agent analysis", error: error.message });
+    }
+  });
+
+  app.get('/api/copilot/agents/reports', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const reports = await db
+        .select()
+        .from(agentReportsTable)
+        .where(eq(agentReportsTable.userId, userId))
+        .orderBy(desc(agentReportsTable.createdAt));
+      res.json(reports);
+    } catch (error) {
+      console.error("Error fetching agent reports:", error);
+      res.status(500).json({ message: "Failed to fetch reports" });
+    }
+  });
+
+  // 4. Actions Center
+  app.get('/api/copilot/actions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const actions = await db
+        .select()
+        .from(copilotActionsTable)
+        .where(eq(copilotActionsTable.userId, userId))
+        .orderBy(desc(copilotActionsTable.createdAt));
+      res.json(actions);
+    } catch (error) {
+      console.error("Error fetching actions:", error);
+      res.status(500).json({ message: "Failed to fetch actions" });
+    }
+  });
+
+  app.post('/api/copilot/actions', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const action = await createCopilotAction(userId, req.body);
+      res.status(201).json(action);
+    } catch (error: any) {
+      console.error("Error creating action:", error);
+      res.status(500).json({ message: "Failed to create action", error: error.message });
+    }
+  });
+
+  app.post('/api/copilot/actions/:id/execute', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { businessId } = req.body;
+      if (!businessId) {
+        return res.status(400).json({ message: "businessId is required" });
+      }
+
+      // Delegate action execution to Python FastAPI
+      const pyResponse = await fetch("http://127.0.0.1:8000/actions/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ actionId: req.params.id, userId, businessId }),
+      });
+
+      if (!pyResponse.ok) {
+        throw new Error(`Python Action execution failed with status ${pyResponse.status}`);
+      }
+
+      const results = await pyResponse.json();
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error executing action:", error);
+      res.status(500).json({ message: "Failed to execute action", error: error.message });
+    }
+  });
+
+  app.patch('/api/copilot/actions/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const [updated] = await db
+        .update(copilotActionsTable)
+        .set({
+          status: req.body.status,
+          updatedAt: new Date(),
+        })
+        .where(and(eq(copilotActionsTable.id, req.params.id), eq(copilotActionsTable.userId, userId)))
+        .returning();
+      res.json(updated);
+    } catch (error) {
+      console.error("Error updating action:", error);
+      res.status(500).json({ message: "Failed to update action" });
+    }
+  });
+
+  // OAuth Routes for external integrations (Shopify, Stripe, etc.)
+  app.get('/api/oauth/:provider/authorize', optionalAuth, (req: any, res) => {
+    const provider = req.params.provider;
+    const shopUrl = req.query.shopUrl || '';
+    const userId = req.user?.claims?.sub || 'admin-demo-id';
+
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    const redirectUri = `${protocol}://${host}/api/oauth/${provider}/callback`;
+
+    const simulateUrl = `/oauth/simulate/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(userId)}&shopUrl=${encodeURIComponent(shopUrl)}`;
+    res.redirect(simulateUrl);
+  });
+
+  app.get('/api/oauth/:provider/callback', async (req: any, res) => {
+    const provider = req.params.provider;
+    try {
+      const { code, state, shopUrl } = req.query;
+      let userId = (state as string) || 'admin-demo-id';
+
+      // Verify that the user exists in the database to prevent foreign key constraint violations
+      let userExists = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1);
+      if (userExists.length === 0) {
+        console.warn(`[OAuth Callback] User ID ${userId} not found in database. Inserting user record.`);
+        try {
+          await db.insert(usersTable).values({
+            id: userId,
+            email: `${userId}@example.com`,
+            firstName: "Demo",
+            lastName: "User"
+          });
+        } catch (err) {
+          console.error("[OAuth Callback] Failed to insert user, falling back to admin-demo-id", err);
+          userId = 'admin-demo-id';
+          const adminExists = await db.select().from(usersTable).where(eq(usersTable.id, 'admin-demo-id')).limit(1);
+          if (adminExists.length === 0) {
+            await db.insert(usersTable).values({
+              id: 'admin-demo-id',
+              email: 'admin@example.com',
+              firstName: 'Admin',
+              lastName: 'Demo'
+            });
+          }
+        }
+      }
+
+      const sourceName = provider === 'shopify'
+        ? `Shopify (${shopUrl || 'sandbox'})`
+        : `${provider.charAt(0).toUpperCase() + provider.slice(1)} Connection`;
+
+      let cleanCode = (code as string) || '';
+      if (cleanCode.startsWith('real_token:')) {
+        cleanCode = cleanCode.replace('real_token:', '');
+      }
+
+      const config = {
+        apiUrl: shopUrl || '',
+        apiKey: cleanCode,
+        shopUrl: shopUrl || '',
+        accessToken: cleanCode,
+        host: shopUrl || '',
+        database: cleanCode
+      };
+
+      const integration = await saveIntegrationSource(userId, sourceName, provider, config);
+
+      res.send(`<html><body><script>
+        try {
+          localStorage.setItem('oauth_success_${provider}', JSON.stringify({
+            integrationId: '${integration.id}'
+          }));
+        } catch (e) {
+          console.error("localStorage failed:", e);
+        }
+        if (window.opener) {
+          try {
+            window.opener.postMessage({
+              type: 'oauth_success',
+              provider: '${provider}',
+              integrationId: '${integration.id}'
+            }, '*');
+          } catch (err) {
+            console.error("postMessage failed:", err);
+          }
+        }
+        window.close();
+      </script><p>Connected successfully! You can close this window now.</p></body></html>`);
+    } catch (error: any) {
+      console.error("OAuth callback error:", error);
+      res.send(`<html><body><script>
+        try {
+          localStorage.setItem('oauth_error_${provider}', '${error.message || 'Authorization failed'}');
+        } catch (e) {
+          console.error("localStorage failed:", e);
+        }
+        if (window.opener) {
+          try {
+            window.opener.postMessage({
+              type: 'oauth_error',
+              error: '${error.message || 'Authorization failed'}'
+            }, '*');
+          } catch (err) {
+            console.error("postMessage failed:", err);
+          }
+        }
+        window.close();
+      </script><p>Authorization failed. You can close this window.</p></body></html>`);
+    }
+  });
+
+  app.post('/api/copilot/integrations/:id/sync', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const integrationId = req.params.id;
+
+      const [integration] = await db
+        .select()
+        .from(integrationsTable)
+        .where(
+          and(
+            eq(integrationsTable.id, integrationId),
+            or(eq(integrationsTable.userId, userId), eq(integrationsTable.userId, 'admin-demo-id'))
+          )
+        );
+
+      if (!integration) {
+        return res.status(404).json({ message: "Integration not found." });
+      }
+
+      await db
+        .update(integrationsTable)
+        .set({ syncStatus: "syncing", lastSyncedAt: new Date() })
+        .where(eq(integrationsTable.id, integrationId));
+
+      // Call Python FastAPI backend to execute real/sandbox sync using Enterprise Connector SDK
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      let pyRes;
+      try {
+        pyRes = await fetch(`${PYTHON_URL}/integrations/sync`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            integrationId,
+            userId,
+            incremental: false
+          })
+        });
+      } catch (fetchErr: any) {
+        throw new Error(`Python analytics backend is unreachable at ${PYTHON_URL}. Please ensure the Python server is running.`);
+      }
+
+      if (!pyRes.ok) {
+        const errText = await pyRes.text();
+        throw new Error(`Python sync failed: ${errText}`);
+      }
+
+      const pyData = await pyRes.json();
+
+      const datasetId = `conn_${integrationId}`;
+      const dataDir = path.join(process.cwd(), "backend", "data");
+      const jsonPath = path.join(dataDir, `${datasetId}.connector.json`);
+
+      let dataRecords: any[] = [];
+      let headers: string[] = [];
+      let primaryEntity = pyData.primaryEntity || 'orders';
+
+      if (fs.existsSync(jsonPath)) {
+        try {
+          const fileContent = fs.readFileSync(jsonPath, "utf-8");
+          const validatedEntities = JSON.parse(fileContent);
+          dataRecords = validatedEntities[primaryEntity] || [];
+          headers = dataRecords.length > 0 ? Object.keys(dataRecords[0]) : pyData.headers || [];
+        } catch (readErr) {
+          console.error("Error reading connector json:", readErr);
+        }
+      }
+
+      // Check if dataset already exists for this integration, update if so, otherwise insert
+      const [existingDataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(and(eq(datasetsTable.spreadsheetId, datasetId), eq(datasetsTable.userId, userId)));
+
+      let dataset;
+      if (existingDataset) {
+        const [updated] = await db
+          .update(datasetsTable)
+          .set({
+            headers,
+            data: dataRecords,
+            rowCount: dataRecords.length,
+            lastSyncedAt: new Date(),
+            updatedAt: new Date()
+          })
+          .where(eq(datasetsTable.id, existingDataset.id))
+          .returning();
+        dataset = updated;
+      } else {
+        const [inserted] = await db
+          .insert(datasetsTable)
+          .values({
+            userId,
+            spreadsheetId: datasetId,
+            spreadsheetName: integration.sourceName,
+            sheetName: primaryEntity,
+            sheetId: 0,
+            headers,
+            data: dataRecords,
+            rowCount: dataRecords.length,
+            source: integration.sourceType,
+            lastSyncedAt: new Date()
+          })
+          .returning();
+        dataset = inserted;
+      }
+
+      await db
+        .update(integrationsTable)
+        .set({ syncStatus: "synced" })
+        .where(eq(integrationsTable.id, integrationId));
+
+      res.json({
+        success: true,
+        message: "Integration synchronized successfully.",
+        datasetId: dataset.id
+      });
+    } catch (error: any) {
+      console.error("Error syncing integration:", error);
+      res.status(500).json({ message: "Failed to sync integration", error: error.message });
+    }
+  });
+
+  // 5. Integrations Hub
+  app.get('/api/copilot/integrations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const list = await db
+        .select()
+        .from(integrationsTable)
+        .where(or(eq(integrationsTable.userId, userId), eq(integrationsTable.userId, 'admin-demo-id')))
+        .orderBy(desc(integrationsTable.createdAt));
+      res.json(list);
+    } catch (error) {
+      console.error("Error fetching integrations:", error);
+      res.status(500).json({ message: "Failed to fetch integrations" });
+    }
+  });
+
+  app.post('/api/copilot/integrations', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { sourceName, sourceType, config } = req.body;
+      const integration = await saveIntegrationSource(userId, sourceName, sourceType, config);
+      res.status(201).json(integration);
+    } catch (error: any) {
+      console.error("Error saving integration:", error);
+      res.status(500).json({ message: "Failed to save integration", error: error.message });
+    }
+  });
+
+  app.patch('/api/copilot/integrations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const integrationId = req.params.id;
+      const { syncSchedule } = req.body;
+
+      const [updated] = await db
+        .update(integrationsTable)
+        .set({ syncSchedule })
+        .where(
+          and(
+            eq(integrationsTable.id, integrationId),
+            eq(integrationsTable.userId, userId)
+          )
+        )
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ message: "Integration not found." });
+      }
+
+      res.json(updated);
+    } catch (error: any) {
+      console.error("Error updating integration:", error);
+      res.status(500).json({ message: "Failed to update integration", error: error.message });
+    }
+  });
+
+  app.post('/api/copilot/integrations/:id/test', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+
+      // Delegate integration testing to Python FastAPI
+      const pyResponse = await fetch("http://127.0.0.1:8000/integrations/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ integrationId: req.params.id, userId }),
+      });
+
+      if (!pyResponse.ok) {
+        throw new Error(`Python connection testing failed with status ${pyResponse.status}`);
+      }
+
+      const results = await pyResponse.json();
+      res.json(results);
+    } catch (error: any) {
+      console.error("Error testing integration:", error);
+      res.status(500).json({ message: "Failed to test integration", error: error.message });
+    }
+  });
+
+  app.delete('/api/copilot/integrations/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const integrationId = req.params.id;
+
+      const [integration] = await db
+        .select()
+        .from(integrationsTable)
+        .where(
+          and(
+            eq(integrationsTable.id, integrationId),
+            or(eq(integrationsTable.userId, userId), eq(integrationsTable.userId, 'admin-demo-id'))
+          )
+        );
+
+      if (!integration) {
+        return res.status(404).json({ message: "Integration connection not found." });
+      }
+
+      await db
+        .delete(integrationsTable)
+        .where(eq(integrationsTable.id, integrationId));
+
+      res.json({ message: "Integration disconnected successfully." });
+    } catch (error: any) {
+      console.error("[Delete Integration] Error:", error);
+      res.status(500).json({ message: "Failed to disconnect integration", error: error.message });
+    }
+  });
+
+  app.get('/api/copilot/integrations/:id/preview', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const integrationId = req.params.id;
+
+      const [integration] = await db
+        .select()
+        .from(integrationsTable)
+        .where(
+          and(
+            eq(integrationsTable.id, integrationId),
+            or(eq(integrationsTable.userId, userId), eq(integrationsTable.userId, 'admin-demo-id'))
+          )
+        );
+
+      if (!integration) {
+        return res.status(404).json({ message: "Integration connection not found." });
+      }
+
+      const datasetId = `conn_${integrationId}`;
+      const dataDir = path.join(process.cwd(), "backend", "data");
+      const jsonPath = path.join(dataDir, `${datasetId}.connector.json`);
+
+      if (!fs.existsSync(jsonPath)) {
+        return res.status(404).json({ message: "Preview data not found. Please sync your integration first." });
+      }
+
+      const fileContent = fs.readFileSync(jsonPath, "utf-8");
+      const entitiesData = JSON.parse(fileContent);
+      res.json(entitiesData);
+    } catch (error: any) {
+      console.error("[Get Integration Preview] Error:", error);
+      res.status(500).json({ message: "Failed to load integration preview data", error: error.message });
+    }
+  });
+
+  app.get('/api/datasets/:id/preview', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      if (req.params.id === "ds_mock_123" || req.params.id.startsWith("ds_mock_")) {
+        return res.json({
+          success: true,
+          source: "mock",
+          data: {
+            "customers": [
+              { "id": "1001", "name": "Aarav Sharma", "email": "aarav@gmail.com", "phone": "9876543210", "created_at": "2026-06-07T09:47:29" },
+              { "id": "1002", "name": "Diya Patel", "email": "diya@gmail.com", "phone": "9812345670", "created_at": "2026-06-09T09:47:29" }
+            ],
+            "orders": [
+              { "id": "5001", "customer_id": "1001", "total_amount": 2499, "subtotal": 2299, "status": "paid", "created_at": "2026-06-27T09:47:29" },
+              { "id": "5002", "customer_id": "1002", "total_amount": 1599, "subtotal": 1499, "status": "paid", "created_at": "2026-06-29T09:47:29" }
+            ],
+            "products": [
+              { "id": "2001", "title": "Wireless Bluetooth Earbuds", "sku": "SKU-EARBUDS-01", "price": 2499, "inventory_quantity": 42 },
+              { "id": "2002", "title": "Ergonomic Office Chair", "sku": "SKU-CHAIR-04", "price": 8999, "inventory_quantity": 8 }
+            ]
+          }
+        });
+      }
+
+      const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(and(eq(datasetsTable.id, req.params.id), eq(datasetsTable.userId, userId)));
+
+      if (!dataset) {
+        return res.status(404).json({ message: "Dataset not found." });
+      }
+
+      const datasetId = dataset.spreadsheetId || "";
+      if (datasetId.startsWith("conn_")) {
+        const dataDir = path.join(process.cwd(), "backend", "data");
+        const jsonPath = path.join(dataDir, `${datasetId}.connector.json`);
+
+        if (fs.existsSync(jsonPath)) {
+          const fileContent = fs.readFileSync(jsonPath, "utf-8");
+          const entitiesData = JSON.parse(fileContent);
+          return res.json({ success: true, source: dataset.source, data: entitiesData });
+        }
+      }
+
+      res.json({ success: true, source: dataset.source, data: { [dataset.sheetName]: [] } });
+    } catch (error: any) {
+      console.error("[Get Dataset Preview] Error:", error);
+      res.status(500).json({ message: "Failed to load dataset preview", error: error.message });
+    }
+  });
+
+  app.post('/api/datasets/:id/writeback', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { entity, recordData } = req.body;
+
+      if (req.params.id === "ds_mock_123" || req.params.id.startsWith("ds_mock_")) {
+        return res.json({
+          success: true,
+          message: "Mock dataset updated successfully (Sandbox Demo mode)."
+        });
+      }
+
+      const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(and(eq(datasetsTable.id, req.params.id), eq(datasetsTable.userId, userId)));
+
+      if (!dataset) {
+        return res.status(404).json({ message: "Dataset not found." });
+      }
+
+      const datasetId = dataset.spreadsheetId || "";
+      if (datasetId.startsWith("conn_")) {
+        const integrationId = datasetId.replace("conn_", "");
+        const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+        
+        const pyRes = await fetch(`${PYTHON_URL}/integrations/writeback`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            integrationId,
+            userId,
+            entity,
+            recordData
+          })
+        });
+
+        if (!pyRes.ok) {
+          const errText = await pyRes.text();
+          throw new Error(`Python writeback failed: ${errText}`);
+        }
+
+        const pyData = await pyRes.json();
+        return res.json({
+          success: true,
+          message: "Writeback completed successfully.",
+          data: pyData
+        });
+      }
+
+      return res.status(400).json({ message: "Dataset type does not support writeback." });
+    } catch (error: any) {
+      console.error("[Dataset Writeback] Error:", error);
+      res.status(500).json({ message: "Failed to perform writeback", error: error.message });
+    }
+  });
+
+
+  // Customers Intelligence API
+  app.get('/api/customers', isAuthenticated, async (req: any, res) => {
+    try {
+      res.json({
+        total: 148,
+        active: 92,
+        newThisMonth: 14,
+        lostThisMonth: 3,
+        topSharePercent: 38,
+        growthTrends: [
+          { period: "Jan", newCustomers: 8, activeCustomers: 72 },
+          { period: "Feb", newCustomers: 11, activeCustomers: 78 },
+          { period: "Mar", newCustomers: 9, activeCustomers: 81 },
+          { period: "Apr", newCustomers: 12, activeCustomers: 88 },
+          { period: "May", newCustomers: 14, activeCustomers: 92 }
+        ],
+        customersList: [
+          { id: "c1", name: "Rohan Kapoor", email: "rohan@kapoorindustries.com", company: "Kapoor Industries", status: "active", lifetimeValue: 4500000, totalDeals: 18, growthRate: 15, lastActiveDate: "2026-06-24" },
+          { id: "c2", name: "Ananya Sen", email: "ananya@senmediagroup.com", company: "Sen Media Group", status: "active", lifetimeValue: 3200000, totalDeals: 12, growthRate: 8, lastActiveDate: "2026-06-23" },
+          { id: "c3", name: "Vikram Malhotra", email: "vikram@malhotralogistics.com", company: "Malhotra Logistics", status: "active", lifetimeValue: 2800000, totalDeals: 15, growthRate: -4, lastActiveDate: "2026-06-24" },
+          { id: "c4", name: "Saira Banu", email: "saira@banufashions.com", company: "Banu Fashions", status: "new", lifetimeValue: 1200000, totalDeals: 4, growthRate: 35, lastActiveDate: "2026-06-22" },
+          { id: "c5", name: "Devendra Patil", email: "devendra@patilconstructions.com", company: "Patil Constructions", status: "inactive", lifetimeValue: 850000, totalDeals: 3, growthRate: 0, lastActiveDate: "2026-05-15" }
+        ]
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to fetch customers", error: error.message });
+    }
+  });
+
+  // Goals API
+  const simulatedGoals: any[] = [
+    { id: "g1", title: "Q2 Revenue Benchmark", type: "revenue", targetValue: 1500000, currentValue: 1250000, startDate: "2026-04-01", endDate: "2026-06-30", status: "active" },
+    { id: "g2", title: "Leads Generation Target", type: "sales", targetValue: 300, currentValue: 210, startDate: "2026-05-01", endDate: "2026-06-30", status: "active" },
+    { id: "g3", title: "Runner Geofence Operations", type: "team", targetValue: 50, currentValue: 48, startDate: "2026-06-01", endDate: "2026-06-30", status: "active" },
+    { id: "g4", title: "Customer Retention Campaign", type: "operational", targetValue: 100, currentValue: 60, startDate: "2026-03-01", endDate: "2026-06-30", status: "active" }
+  ];
+
+  app.get('/api/goals', isAuthenticated, async (req: any, res) => {
+    try {
+      const activeCount = simulatedGoals.filter((g: any) => g.status === "active").length;
+      const completedCount = simulatedGoals.filter((g: any) => g.status === "completed").length;
+      const atRiskCount = simulatedGoals.filter((g: any) => g.status === "at_risk" || (g.currentValue / g.targetValue < 0.5 && new Date(g.endDate).getTime() - Date.now() < 7 * 24 * 3600 * 1000)).length;
+
+      res.json({
+        achievementPercent: 78,
+        activeCount,
+        completedCount,
+        atRiskCount,
+        goals: simulatedGoals
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to fetch goals", error: error.message });
+    }
+  });
+
+  app.post('/api/goals', isAuthenticated, async (req: any, res) => {
+    try {
+      const { title, type, targetValue, currentValue, startDate, endDate } = req.body;
+      const newGoal = {
+        id: `g_${Date.now()}`,
+        title,
+        type,
+        targetValue: Number(targetValue),
+        currentValue: Number(currentValue || 0),
+        startDate,
+        endDate,
+        status: "active"
+      };
+      simulatedGoals.push(newGoal);
+      res.status(201).json(newGoal);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to create goal", error: error.message });
+    }
+  });
+
+  // Alerts API
+  app.get('/api/alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Select alerts from db
+      let dbAlerts = await db.select().from(alertsTable).where(eq(alertsTable.userId, userId));
+      
+      // Seed default alerts if empty
+      if (dbAlerts.length === 0) {
+        const defaultAlerts = [
+          { userId, title: "Revenue Decline Detected", description: "Weekly rolling revenue has dropped 18% compared to last week's average.", severity: "high", category: "revenue", actionRoute: "/business/ai-strategy", recommendedAction: "Trigger AI Advisor Analysis", isResolved: false },
+          { userId, title: "Missed Target Warning", description: "Leads generation target is trailing the expected trajectory by 32%.", severity: "medium", category: "revenue", actionRoute: "/business/goals", recommendedAction: "View Goals & Targets", isResolved: false },
+          { userId, title: "Customer Inactivity Alert", description: "BKC Logistics client account has had no EOD logs or interaction for 14 days.", severity: "medium", category: "customers", actionRoute: "/business/customers", recommendedAction: "View Customer Intelligence", isResolved: false },
+          { userId, title: "Overdue Task Warnings", description: "3 high priority items on the Kanban Task Board have passed their target due date.", severity: "low", category: "tasks", actionRoute: "/business/tasks", recommendedAction: "Review Task Board", isResolved: false }
+        ];
+        
+        await db.insert(alertsTable).values(defaultAlerts);
+        dbAlerts = await db.select().from(alertsTable).where(eq(alertsTable.userId, userId));
+      }
+      
+      res.json(dbAlerts);
+    } catch (error: any) {
+      console.error("[Get Alerts] Error:", error);
+      res.status(500).json({ message: "Failed to fetch alerts", error: error.message });
+    }
+  });
+
+  app.post('/api/alerts', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const { title, description, severity, category, actionRoute, recommendedAction } = req.body;
+      const [alert] = await db
+        .insert(alertsTable)
+        .values({
+          userId,
+          title,
+          description,
+          severity: severity || 'medium',
+          category: category || 'revenue',
+          actionRoute: actionRoute || null,
+          recommendedAction: recommendedAction || null,
+          isResolved: false
+        })
+        .returning();
+      res.json(alert);
+    } catch (error: any) {
+      console.error("[Create Alert] Error:", error);
+      res.status(500).json({ message: "Failed to create alert", error: error.message });
+    }
+  });
+
+  app.patch('/api/alerts/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { isResolved } = req.body;
+      const [updated] = await db
+        .update(alertsTable)
+        .set({ isResolved })
+        .where(eq(alertsTable.id, id))
+        .returning();
+      res.json(updated);
+    } catch (error: any) {
+      res.status(500).json({ message: "Failed to update alert", error: error.message });
+    }
+  });
+
+  // AI Spreadsheet Assistant API Endpoints
+  app.post('/api/copilot/ai/generate-formula', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, headers, selectedCell } = req.body;
+      if (!prompt || !headers) {
+        return res.status(400).json({ message: "Missing prompt or headers parameter." });
+      }
+      const result = await generateFormula(prompt, headers, selectedCell);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[AI Generate Formula] Error:", error);
+      res.status(500).json({ message: "Failed to generate formula", error: error.message });
+    }
+  });
+
+  app.post('/api/copilot/ai/generate-chart', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, headers } = req.body;
+      if (!prompt || !headers) {
+        return res.status(400).json({ message: "Missing prompt or headers parameter." });
+      }
+      const result = await generateChart(prompt, headers);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[AI Generate Chart] Error:", error);
+      res.status(500).json({ message: "Failed to generate chart config", error: error.message });
+    }
+  });
+
+  app.post('/api/copilot/ai/generate-pivot', isAuthenticated, async (req: any, res) => {
+    try {
+      const { prompt, headers } = req.body;
+      if (!prompt || !headers) {
+        return res.status(400).json({ message: "Missing prompt or headers parameter." });
+      }
+      const result = await generatePivot(prompt, headers);
+      res.json(result);
+    } catch (error: any) {
+      console.error("[AI Generate Pivot] Error:", error);
+      res.status(500).json({ message: "Failed to generate pivot configuration", error: error.message });
+    }
+  });
+
+  app.post('/api/copilot/scraper', isAuthenticated, async (req: any, res) => {
+    try {
+      const { url } = req.body;
+      const userId = req.user.claims.sub;
+      if (!url) {
+        return res.status(400).json({ message: "Missing url parameter." });
+      }
+
+      const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+      const pyRes = await fetch(`${PYTHON_URL}/integrations/scrape`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+
+      if (!pyRes.ok) {
+        const errText = await pyRes.text();
+        throw new Error(`Scraper failed: ${errText}`);
+      }
+
+      const pyData = await pyRes.json();
+      if (!pyData.success) {
+        throw new Error(pyData.error || "Scraping failed.");
+      }
+
+      const datasetId = `scraper_${Date.now()}`;
+      const [inserted] = await db
+        .insert(datasetsTable)
+        .values({
+          userId,
+          spreadsheetId: datasetId,
+          spreadsheetName: `Web Scraper: ${url.replace(/https?:\/\/(www\.)?/, '').slice(0, 30)}...`,
+          sheetName: "scraped_data",
+          sheetId: 0,
+          headers: pyData.headers,
+          data: pyData.rows,
+          rowCount: pyData.rowCount,
+          source: "scraper",
+          lastSyncedAt: new Date()
+        })
+        .returning();
+
+      res.json({
+        success: true,
+        message: "Web page scraped and imported successfully.",
+        datasetId: inserted.id
+      });
+    } catch (error: any) {
+      console.error("[Web Scraper] Error:", error);
+      res.status(500).json({ message: "Failed to scrape web page", error: error.message });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

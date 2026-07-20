@@ -1,5 +1,6 @@
 // Google OAuth for Sheets access
 import { storage } from "./storage";
+import * as XLSX from "xlsx";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -12,21 +13,35 @@ export function isGoogleOAuthConfigured(): boolean {
   return !!(GOOGLE_CLIENT_ID && GOOGLE_CLIENT_SECRET);
 }
 
-export function getGoogleAuthUrl(redirectUri: string, userId: string): string {
+// Returns the expected redirect URI for the current port - useful for debugging
+export function getExpectedRedirectUri(req?: { headers: any; protocol: string; get: (h: string) => string | undefined }): string {
+  if (req) {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.get('host');
+    return `${protocol}://${host}/api/google/callback`;
+  }
+  const port = process.env.PORT || '5002';
+  return `http://localhost:${port}/api/google/callback`;
+}
+
+export function getGoogleAuthUrl(redirectUri: string, userId: string, loginHint?: string): string {
   if (!isGoogleOAuthConfigured()) {
     throw new Error('Google OAuth is not configured. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
   }
   const state = Buffer.from(JSON.stringify({ userId })).toString('base64');
-  const params = new URLSearchParams({
+  const params: Record<string, string> = {
     client_id: GOOGLE_CLIENT_ID!,
     redirect_uri: redirectUri,
     response_type: 'code',
     scope: SCOPES.join(' '),
     access_type: 'offline',
-    prompt: 'consent',
     state
-  });
-  return `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+  };
+  if (loginHint) {
+    params.login_hint = loginHint;
+  }
+  const searchParams = new URLSearchParams(params);
+  return `https://accounts.google.com/o/oauth2/v2/auth?${searchParams.toString()}`;
 }
 
 export function parseOAuthState(state: string): { userId: string } | null {
@@ -114,14 +129,26 @@ export interface GoogleSpreadsheet {
   id: string;
   name: string;
   sheets: { sheetId: number; title: string }[];
+  fileType?: 'sheet' | 'excel' | 'csv' | 'pdf';
+  mimeType?: string;
 }
 
 export async function listSpreadsheets(accessToken: string): Promise<GoogleSpreadsheet[]> {
+  // Fetch all supported file types in one query
+  const mimeTypes = [
+    "mimeType='application/vnd.google-apps.spreadsheet'",
+    "mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'", // .xlsx
+    "mimeType='application/vnd.ms-excel'",                                           // .xls
+    "mimeType='text/csv'",                                                            // .csv
+    "mimeType='application/pdf'",                                                     // .pdf
+  ].join(' or ');
+
   const response = await fetch(
     'https://www.googleapis.com/drive/v3/files?' + new URLSearchParams({
-      q: "mimeType='application/vnd.google-apps.spreadsheet'",
-      fields: 'files(id,name)',
-      pageSize: '50'
+      q: `(${mimeTypes}) and trashed=false`,
+      fields: 'files(id,name,mimeType)',
+      pageSize: '100',
+      orderBy: 'modifiedTime desc'
     }),
     { headers: { Authorization: `Bearer ${accessToken}` } }
   );
@@ -134,20 +161,51 @@ export async function listSpreadsheets(accessToken: string): Promise<GoogleSprea
   const spreadsheets: GoogleSpreadsheet[] = [];
 
   for (const file of data.files || []) {
-    const sheetsResponse = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${file.id}?fields=sheets.properties`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
+    const mime: string = file.mimeType || '';
 
-    if (sheetsResponse.ok) {
-      const sheetsData = await sheetsResponse.json();
+    if (mime === 'application/vnd.google-apps.spreadsheet') {
+      // Google Sheet — fetch individual sheet tabs
+      const sheetsResponse = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${file.id}?fields=sheets.properties`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      if (sheetsResponse.ok) {
+        const sheetsData = await sheetsResponse.json();
+        spreadsheets.push({
+          id: file.id,
+          name: file.name,
+          fileType: 'sheet',
+          mimeType: mime,
+          sheets: (sheetsData.sheets || []).map((s: any) => ({
+            sheetId: s.properties.sheetId,
+            title: s.properties.title
+          }))
+        });
+      }
+    } else if (mime === 'application/pdf') {
       spreadsheets.push({
         id: file.id,
         name: file.name,
-        sheets: (sheetsData.sheets || []).map((s: any) => ({
-          sheetId: s.properties.sheetId,
-          title: s.properties.title
-        }))
+        fileType: 'pdf',
+        mimeType: mime,
+        sheets: [{ sheetId: 0, title: 'PDF Data' }]
+      });
+    } else if (mime === 'text/csv') {
+      spreadsheets.push({
+        id: file.id,
+        name: file.name,
+        fileType: 'csv',
+        mimeType: mime,
+        sheets: [{ sheetId: 0, title: 'Sheet1' }]
+      });
+    } else {
+      // Excel .xlsx / .xls
+      spreadsheets.push({
+        id: file.id,
+        name: file.name,
+        fileType: 'excel',
+        mimeType: mime,
+        sheets: [{ sheetId: 0, title: 'Sheet1' }]
       });
     }
   }
@@ -158,8 +216,56 @@ export async function listSpreadsheets(accessToken: string): Promise<GoogleSprea
 export async function getSheetData(
   accessToken: string,
   spreadsheetId: string,
-  sheetName: string
+  sheetName: string,
+  mimeType?: string
 ): Promise<{ headers: string[]; data: Record<string, any>[] }> {
+
+  // Handle non-Google-Sheet files: download from Drive and parse via Python backend
+  if (mimeType && mimeType !== 'application/vnd.google-apps.spreadsheet') {
+    const downloadRes = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${spreadsheetId}?alt=media`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (!downloadRes.ok) {
+      throw new Error('Failed to download file from Drive');
+    }
+    const buffer = Buffer.from(await downloadRes.arrayBuffer());
+    const fileName = `file.${mimeType === 'application/pdf' ? 'pdf' : mimeType.includes('csv') ? 'csv' : 'xlsx'}`;
+
+    // Call Python backend to parse + RAG index
+    const docId = spreadsheetId;
+    const formData = new FormData();
+    formData.append('file', new Blob([buffer]), fileName);
+    formData.append('userId', 'system');
+    formData.append('documentId', docId);
+
+    const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+    const parseRes = await fetch(`${PYTHON_URL}/parse-document`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!parseRes.ok) {
+      const errorText = await parseRes.text();
+      let errorMsg = "Python backend failed to parse file";
+      try {
+        const errorJson = JSON.parse(errorText);
+        if (errorJson.detail) {
+          errorMsg = typeof errorJson.detail === 'object' ? JSON.stringify(errorJson.detail) : errorJson.detail;
+        } else if (errorJson.message) {
+          errorMsg = errorJson.message;
+        }
+      } catch {
+        if (errorText) errorMsg = errorText;
+      }
+      throw new Error(errorMsg);
+    }
+
+    const parsed = await parseRes.json() as { headers: string[]; rows: Record<string, any>[] };
+    return { headers: parsed.headers, data: parsed.rows };
+  }
+
+  // Default: Google Sheets API
   const response = await fetch(
     `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(sheetName)}`,
     { headers: { Authorization: `Bearer ${accessToken}` } }
@@ -176,14 +282,23 @@ export async function getSheetData(
     return { headers: [], data: [] };
   }
 
-  const headers = rows[0] as string[];
-  const data = rows.slice(1).map((row: any[]) => {
-    const obj: Record<string, any> = {};
-    headers.forEach((header, index) => {
-      obj[header] = row[index] ?? null;
-    });
-    return obj;
+  // Forward the 2D grid values to the Python backend to apply layout detection & cleaning
+  const PYTHON_URL = process.env.PYTHON_BACKEND_URL || 'http://127.0.0.1:8000';
+  const parseRes = await fetch(`${PYTHON_URL}/parse-sheet-data`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sheetName,
+      grid: rows,
+      documentId: spreadsheetId
+    })
   });
 
-  return { headers, data };
+  if (!parseRes.ok) {
+    const errorText = await parseRes.text();
+    throw new Error(`Python backend failed to parse sheet: ${errorText}`);
+  }
+
+  const parsed = await parseRes.json() as { headers: string[]; rows: Record<string, any>[] };
+  return { headers: parsed.headers, data: parsed.rows };
 }

@@ -1,0 +1,7 @@
+- [x] Build Google Sheets Simulator frontend workspace (`client/src/components/google-sheets-simulator.tsx`)
+- [x] Create Backend AI helper endpoints in `server/routes.ts`
+- [x] Create `ai-assistant-panel.tsx` sidebar component
+- [/] Integrate AI Toolbar and sidebar in `google-sheets-simulator.tsx`)
+- [x] Connect Google Sheets Simulator inside `client/src/pages/home.tsx` (replace old `SpreadsheetWorkspace`)
+- [x] Update sidebar navigation items to read "My Sheets (Coefficient)" in `client/src/pages/home.tsx` and `client/src/pages/data-import.tsx`
+- [x] Compile and verify client build with `npm run build`

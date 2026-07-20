@@ -105,7 +105,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                     <BarChart3 className="w-8 h-8 text-amber-500" />
                   </div>
-                  <h1 className="font-serif text-2xl font-bold mb-2">Welcome to DataInsights!</h1>
+                  <h1 className="font-sans text-2xl font-bold mb-2">Welcome to DataInsights!</h1>
                   <p className="text-muted-foreground">Let's personalize your experience. What best describes you?</p>
                 </div>
 
@@ -139,7 +139,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               <Card className="p-8">
                 <div className="text-center mb-8">
-                  <h1 className="font-serif text-2xl font-bold mb-2">What are your goals?</h1>
+                  <h1 className="font-sans text-2xl font-bold mb-2">What are your goals?</h1>
                   <p className="text-muted-foreground">This helps us customize your dashboard experience.</p>
                 </div>
 
@@ -185,7 +185,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center mx-auto mb-6">
                   <BarChart3 className="w-10 h-10 text-white" />
                 </div>
-                <h1 className="font-serif text-2xl font-bold mb-2">You're all set!</h1>
+                <h1 className="font-sans text-2xl font-bold mb-2">You're all set!</h1>
                 <p className="text-muted-foreground mb-6">
                   Ready to transform your spreadsheets into powerful dashboards. Let's connect your Google Sheets and get started.
                 </p>

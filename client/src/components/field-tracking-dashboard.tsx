@@ -295,10 +295,10 @@ export default function AdminFieldTracking({
           : location.actionType;
 
         marker.bindPopup(
-          `<div style="font-family: system-ui; min-width: 140px;">
-            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">${location.memberName}</div>
-            <div style="color: #f59e0b; font-size: 12px; margin-bottom: 2px;">${actionLabel}</div>
-            <div style="color: #888; font-size: 11px;">🕐 ${new Date(location.lastUpdated).toLocaleTimeString()}</div>
+          `<div style="font-family: Georgia, serif; min-width: 140px; color: #13322b; padding: 4px;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 4px; border-b: 1px solid #eee; padding-bottom: 2px;">${location.memberName}</div>
+            <div style="color: #c59b43; font-family: system-ui, sans-serif; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">${actionLabel}</div>
+            <div style="color: #666; font-family: system-ui, sans-serif; font-size: 10px;">🕐 ${new Date(location.lastUpdated).toLocaleTimeString()}</div>
           </div>`
         );
 
@@ -417,10 +417,10 @@ export default function AdminFieldTracking({
         }).addTo((map.current as any)!);
 
         marker.bindPopup(
-          `<div class="text-sm font-semibold">
-            ${site.name}<br/>
-            <small>${site.address}</small><br/>
-            <small>Radius: ${site.geofenceRadiusMeters}m</small>
+          `<div style="font-family: Georgia, serif; color: #13322b;">
+            <div style="font-weight: 600; font-size: 13px; margin-bottom: 2px;">${site.name}</div>
+            <div style="font-family: system-ui, sans-serif; font-size: 11px; color: #666; margin-bottom: 2px;">${site.address}</div>
+            <div style="font-family: system-ui, sans-serif; font-size: 10px; color: #c59b43; font-weight: bold; text-transform: uppercase;">Radius: ${site.geofenceRadiusMeters}m</div>
           </div>`
         );
 
@@ -493,80 +493,73 @@ export default function AdminFieldTracking({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="w-full space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <MapIcon className="w-8 h-8 text-amber-400" />
-          <div>
-            <h1 className="text-3xl font-bold text-white">Field Tracking</h1>
-            <p className="text-amber-500/70 text-sm">Real-time runner tracking & analytics</p>
-          </div>
+    <div className="w-full space-y-6 bg-transparent p-6">
+      {/* View Tabs & Actions */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-gray-200 pb-2">
+        <div className="flex flex-wrap gap-2">
+          {[
+            { id: "map", label: "Live Map", icon: MapIcon },
+            { id: "timeline", label: "Timeline", icon: TrendingUp },
+            { id: "expenses", label: "Expenses", icon: DollarSign },
+          ].map(({ id, label, icon: Icon }) => (
+            <button
+              key={id}
+              onClick={() => setView(id as any)}
+              className={`flex items-center gap-2 px-4 py-2 text-xs uppercase tracking-wider font-semibold transition-all rounded-none border ${
+                view === id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-white border-gray-200 text-muted-foreground hover:bg-gray-50 hover:text-primary"
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5 text-accent" />
+              {label}
+            </button>
+          ))}
         </div>
         <Button
           onClick={handleRefresh}
           disabled={isLoading}
-          className="bg-amber-500 hover:bg-amber-400 text-black font-semibold"
+          variant="outline"
+          className="border-gray-200 text-muted-foreground hover:bg-gray-50 text-xs uppercase tracking-wider font-semibold rounded-none h-9 px-4 shadow-none"
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+          <RefreshCw className={`w-3.5 h-3.5 mr-2 ${isLoading ? "animate-spin" : ""}`} />
           Refresh
         </Button>
       </div>
 
-      {/* View Tabs */}
-      <div className="flex gap-2">
-        {[
-          { id: "map", label: "Live Map", icon: MapIcon },
-          { id: "timeline", label: "Timeline", icon: TrendingUp },
-          { id: "expenses", label: "Expenses", icon: DollarSign },
-        ].map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => setView(id as any)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all ${
-              view === id
-                ? "bg-amber-500 text-black"
-                : "bg-white/5 border border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <Icon className="w-4 h-4" />
-            {label}
-          </button>
-        ))}
-      </div>
-
       {/* Map View */}
       {view === "map" && (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {/* Map Container */}
-          <Card className="bg-black border border-amber-500/20">
-            <CardContent className="p-0">
+          <Card className="bg-white border border-gray-250 rounded-none shadow-sm overflow-hidden">
+            <CardContent className="p-0 rounded-none">
               <div
                 ref={mapContainer}
                 style={{ height: "500px", width: "100%" }}
-                className="rounded-lg overflow-hidden"
+                className="rounded-none overflow-hidden"
               />
             </CardContent>
           </Card>
 
           {/* Active Runners Card */}
-          <Card className="bg-black border border-amber-500/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-amber-400">
-                <Users className="w-5 h-5" />
+          <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+            <CardHeader className="pb-3 border-b border-gray-100">
+              <CardTitle className="flex items-center gap-2 font-sans font-normal text-primary text-xl">
+                <Users className="w-5 h-5 text-accent" />
                 Active Runners ({runnerLocations.length})
-                {isLoading && <RefreshCw className="w-3 h-3 ml-auto animate-spin text-amber-500/50" />}
+                {isLoading && <RefreshCw className="w-3.5 h-3.5 ml-auto animate-spin text-accent" />}
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="pt-4">
               {runnerLocations.length === 0 ? (
-                <div className="text-center py-8 text-white/30">
-                  <Users className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">No runners are currently in the field</p>
-                  <p className="text-xs mt-1 text-white/20">Locations appear here once a runner punches in</p>
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="w-10 h-10 mx-auto mb-3 opacity-30 text-accent" />
+                  <p className="text-sm font-semibold">No runners are currently in the field</p>
+                  <p className="text-xs mt-1 text-muted-foreground">Locations appear here once a runner punches in</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {runnerLocations.map((runner) => {
                     // Status badge styling based on action type
                     const isMoving = runner.actionType === "location_update";
@@ -575,39 +568,39 @@ export default function AdminFieldTracking({
                       : runner.actionType === "check_in" ? "At Site"
                       : runner.actionType === "check_out" ? "In Transit"
                       : runner.actionType.replace(/_/g, " ");
-                    const statusColor = isMoving ? "bg-green-500/20 text-green-400 border-green-500/30" 
-                      : runner.actionType === "check_in" ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                      : "bg-amber-500/20 text-amber-300 border-amber-500/30";
+                    const statusColor = isMoving ? "bg-green-500/5 text-green-700 border-green-500/20" 
+                      : runner.actionType === "check_in" ? "bg-blue-500/5 text-blue-700 border-blue-500/20"
+                      : "bg-accent/5 text-accent border-accent/20";
 
                     return (
                       <motion.div
                         key={runner.memberId}
-                        className="bg-amber-500/5 rounded-lg p-4 border border-amber-500/20 hover:border-amber-500/40 transition-colors cursor-pointer"
+                        className="bg-white hover:bg-gray-50 rounded-none p-4 border border-gray-250 hover:border-accent transition-colors cursor-pointer relative group/runner"
                         whileHover={{ scale: 1.01 }}
                         onClick={() => focusRunner(runner)}
                       >
-                        <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="font-semibold text-white truncate">{runner.memberName}</p>
-                            <p className="text-xs text-amber-500/70 mt-1 flex items-center gap-1">
-                              <MapPin className="w-3 h-3 shrink-0" />
+                            <p className="font-sans font-normal text-base text-primary truncate">{runner.memberName}</p>
+                            <p className="text-xs text-accent mt-1 flex items-center gap-1">
+                              <MapPin className="w-3.5 h-3.5 shrink-0" />
                               {runner.latitude.toFixed(5)}, {runner.longitude.toFixed(5)}
                             </p>
-                            <p className="text-xs text-white/30 mt-1">
+                            <p className="text-xs text-muted-foreground mt-1">
                               Last seen: {new Date(runner.lastUpdated).toLocaleTimeString()}
                             </p>
                           </div>
-                          <div className="flex flex-col items-end gap-1">
-                            <span className={`shrink-0 px-2 py-1 text-xs rounded-full capitalize border flex items-center gap-1.5 ${statusColor}`}>
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className={`shrink-0 px-2 py-0.5 text-[10px] uppercase font-semibold tracking-wider rounded-none border flex items-center gap-1.5 ${statusColor}`}>
                               {isMoving && (
                                 <span className="relative flex h-2 w-2">
                                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                  <span className="relative inline-flex rounded-none h-2 w-2 bg-green-500"></span>
                                 </span>
                               )}
                               {statusLabel}
                             </span>
-                            <span className="text-xs text-amber-400/50">Tap to locate ↑</span>
+                            <span className="text-[10px] uppercase tracking-wider font-semibold text-accent/70 font-sans">Locate ↑</span>
                           </div>
                         </div>
                       </motion.div>
@@ -619,17 +612,18 @@ export default function AdminFieldTracking({
           </Card>
 
           {/* Sites Management */}
-          <Card className="bg-black border border-amber-500/20">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="flex items-center gap-2 text-white">
-                <MapPin className="w-5 h-5 text-amber-400" />
+          <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+            <CardHeader className="flex flex-row items-center justify-between pb-3 border-b border-gray-100">
+              <CardTitle className="flex items-center gap-2 font-sans font-normal text-primary text-xl">
+                <MapPin className="w-5 h-5 text-accent" />
                 Client Sites ({clientSites.length})
               </CardTitle>
               {isManager && (
                 <Button
                   onClick={() => setShowSiteForm(!showSiteForm)}
                   size="sm"
-                  className="bg-amber-500 hover:bg-amber-400 text-black font-semibold"
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground border border-accent rounded-none text-xs uppercase tracking-wider font-semibold shadow-none px-3 py-1.5"
                 >
                   <Plus className="w-4 h-4 mr-1" />
                   Add Site
@@ -637,10 +631,10 @@ export default function AdminFieldTracking({
               )}
             </CardHeader>
 
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-4 pt-4">
               {showSiteForm && (
                 <motion.div
-                  className="bg-amber-500/5 p-4 rounded-lg space-y-3 border border-amber-500/30"
+                  className="bg-gray-50 p-5 rounded-none space-y-4 border border-gray-200"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
@@ -648,13 +642,13 @@ export default function AdminFieldTracking({
                     placeholder="Site Name"
                     value={newSite.name}
                     onChange={(e) => setNewSite({ ...newSite, name: e.target.value })}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                    className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none"
                   />
                   <Input
                     placeholder="Address"
                     value={newSite.address}
                     onChange={(e) => setNewSite({ ...newSite, address: e.target.value })}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                    className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none"
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <Input
@@ -663,7 +657,7 @@ export default function AdminFieldTracking({
                       step="0.0001"
                       value={newSite.latitude}
                       onChange={(e) => setNewSite({ ...newSite, latitude: e.target.value })}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none"
                     />
                     <Input
                       placeholder="Longitude"
@@ -671,21 +665,21 @@ export default function AdminFieldTracking({
                       step="0.0001"
                       value={newSite.longitude}
                       onChange={(e) => setNewSite({ ...newSite, longitude: e.target.value })}
-                      className="bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                      className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none"
                     />
                   </div>
                   <div className="flex gap-2">
                     <Button
                       onClick={handleAddSite}
                       disabled={isLoading}
-                      className="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-semibold"
+                      className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground border border-primary px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none h-10"
                     >
                       {isLoading ? "Adding..." : "Add Site"}
                     </Button>
                     <Button
                       onClick={() => setShowSiteForm(false)}
                       variant="outline"
-                      className="flex-1 border-white/20 text-white/60 hover:text-white hover:bg-white/5"
+                      className="flex-1 border-gray-250 text-muted-foreground hover:bg-gray-50 rounded-none h-10"
                     >
                       Cancel
                     </Button>
@@ -694,22 +688,24 @@ export default function AdminFieldTracking({
               )}
 
               {clientSites.length === 0 && !showSiteForm && (
-                <div className="text-center py-6 text-white/30">
-                  <MapPin className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No client sites added yet</p>
+                <div className="text-center py-8 text-muted-foreground">
+                  <MapPin className="w-8 h-8 mx-auto mb-3 opacity-30 text-accent" />
+                  <p className="text-sm font-semibold">No client sites added yet</p>
                 </div>
               )}
 
               {clientSites.map((site) => (
                 <div
                   key={site.id}
-                  className="bg-white/3 p-3 rounded-lg border border-white/10 hover:border-amber-500/30 transition-colors"
+                  className="bg-white hover:bg-gray-50 p-4 rounded-none border border-gray-250 hover:border-accent transition-colors flex flex-col gap-1.5"
                 >
-                  <p className="font-semibold text-white">{site.name}</p>
-                  <p className="text-sm text-white/50 mt-1">{site.address}</p>
-                  <p className="text-xs text-amber-500/50 mt-2">
-                    Geofence radius: {site.geofenceRadiusMeters}m
-                  </p>
+                  <p className="font-sans font-normal text-base text-primary">{site.name}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{site.address}</p>
+                  <div className="mt-1">
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-accent border border-accent/25 px-2 py-0.5 bg-accent/5 rounded-none shrink-0">
+                      Geofence radius: {site.geofenceRadiusMeters}m
+                    </span>
+                  </div>
                 </div>
               ))}
             </CardContent>
@@ -719,27 +715,28 @@ export default function AdminFieldTracking({
 
       {/* Timeline View */}
       {view === "timeline" && (
-        <div className="space-y-4">
-          <Card className="bg-black border border-amber-500/20">
-            <CardHeader>
-              <CardTitle className="text-white">Visit Timeline</CardTitle>
+        <div className="space-y-6">
+          <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+            <CardHeader className="pb-3 border-b border-gray-100">
+              <CardTitle className="font-sans font-normal text-primary text-xl">Visit Timeline</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <CardContent className="space-y-4 pt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Input
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none"
                 />
                 <select
                   value={selectedRunner}
                   onChange={(e) => setSelectedRunner(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white rounded-lg px-3 py-2"
+                  className="bg-white border border-gray-200 text-primary rounded-none px-3 py-2 text-sm shadow-none focus:outline-none"
                 >
-                  <option value="">Select Runner...</option>
+                  <option value="" className="text-muted-foreground">Select Runner...</option>
                   {runnerLocations.map((runner) => (
-                    <option key={runner.memberId} value={runner.memberId}>
+                    <option key={runner.memberId} value={runner.memberId} className="text-primary">
                       {runner.memberName}
                     </option>
                   ))}
@@ -748,7 +745,7 @@ export default function AdminFieldTracking({
               <Button
                 onClick={loadVisitTimeline}
                 disabled={!selectedRunner || isLoading}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground border border-primary px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none h-12 transition-all shadow-none"
               >
                 Load Timeline
               </Button>
@@ -757,35 +754,36 @@ export default function AdminFieldTracking({
 
           {/* Timeline Events */}
           {visitLogs.length > 0 && (
-            <Card className="bg-black border border-amber-500/20">
-              <CardHeader>
-                <CardTitle className="text-white">{selectedDate} — {visitLogs.length} Events</CardTitle>
+            <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+              <CardHeader className="pb-3 border-b border-gray-100">
+                <CardTitle className="font-sans font-normal text-primary text-xl">{selectedDate} — {visitLogs.length} Events</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-96 overflow-y-auto">
+              <CardContent className="pt-4">
+                <div className="space-y-3 max-h-96 overflow-y-auto pr-1">
                   {visitLogs.map((log, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 p-3 bg-amber-500/5 rounded-lg border-l-4 border-amber-400 border border-amber-500/20"
+                      className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-none border-l-4 border-l-accent"
                     >
                       <div className="flex-1">
-                        <p className="font-semibold text-white capitalize">
+                        <p className="font-sans font-normal text-base text-primary capitalize">
                           {log.actionType.replace(/_/g, " ")}
                         </p>
-                        <p className="text-xs text-white/40 mt-1">
+                        <p className="text-[10px] text-muted-foreground font-sans mt-0.5">
                           {new Date(log.timestamp).toLocaleTimeString()}
                         </p>
                         {log.distanceFromSite && (
-                          <p className="text-xs text-amber-500/50">
+                          <p className="text-[10px] text-accent/80 font-sans mt-1">
                             Distance: {log.distanceFromSite}m
                           </p>
                         )}
                       </div>
                       <span
-                        className={`px-2 py-1 rounded text-xs font-semibold ${
+                        className={`px-2 py-0.5 border text-[10px] uppercase tracking-wider font-semibold rounded-none ${
                           log.status === "success"
-                            ? "bg-green-500/20 text-green-300"
-                            : "bg-red-500/20 text-red-300"
+                            ? "bg-green-500/5 border-green-500/20 text-green-700"
+                            : "bg-red-500/5 border-red-500/20 text-red-700"
                         }`}
                       >
                         {log.status}
@@ -801,21 +799,22 @@ export default function AdminFieldTracking({
 
       {/* Expenses View */}
       {view === "expenses" && (
-        <Card className="bg-black border border-amber-500/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-white">
-              <DollarSign className="w-5 h-5 text-amber-400" />
+        <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+          <CardHeader className="pb-3 border-b border-gray-100">
+            <CardTitle className="flex items-center gap-2 font-sans font-normal text-primary text-xl">
+              <DollarSign className="w-5 h-5 text-accent" />
               Travel Expense Calculator
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-white/50 text-sm mb-4">
+          <CardContent className="pt-4">
+            <p className="text-muted-foreground text-sm mb-4 font-sans leading-relaxed">
               Automatically calculates daily travel expenses based on visit locations and configured rates.
             </p>
-            <div className="bg-amber-500/5 p-6 rounded-lg text-center border border-dashed border-amber-500/20">
-              <TrendingUp className="w-8 h-8 text-amber-400/30 mx-auto mb-2" />
-              <p className="text-white/40">Feature coming soon</p>
-              <p className="text-sm text-white/20 mt-2">
+            <div className="bg-gray-50 p-8 rounded-none text-center border border-dashed border-gray-200">
+              <TrendingUp className="w-8 h-8 text-accent/30 mx-auto mb-2" />
+              <p className="text-primary font-sans font-normal text-base">Feature coming soon</p>
+              <p className="text-xs text-muted-foreground mt-1 font-sans">
                 Expense reports will be generated from visit timelines
               </p>
             </div>

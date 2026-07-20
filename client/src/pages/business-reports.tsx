@@ -42,6 +42,7 @@ import BusinessSidebar from "@/components/business-sidebar";
 import { getCurrentFY, getFYDateRange } from "@/lib/festivalCalendar";
 import { getIdToken } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, LineChart, Line, ReferenceLine,
 } from "recharts";
@@ -578,32 +579,38 @@ export default function BusinessReports() {
 
   return (
     <>
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-[#fbfaf7] flex">
       <BusinessSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+        <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate("/business")} className="text-muted-foreground hover:text-foreground" data-testid="button-back-business">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/business")}
+                className="text-muted-foreground hover:text-primary rounded-none"
+                data-testid="button-back-business"
+              >
                 <ArrowLeft className="w-5 h-5" />
-              </button>
+              </Button>
               <div>
-                <h1 className="font-bold text-lg leading-tight flex items-center gap-2">
-                  <FileBarChart2 className="w-5 h-5 text-amber-500" /> Reports
+                <h1 className="font-sans font-bold text-lg text-primary uppercase tracking-wider flex items-center gap-2">
+                  <FileBarChart2 className="w-5 h-5 text-accent" /> Business Performance Reports
                 </h1>
-                <p className="text-xs text-muted-foreground">{profile.name} · {fy.label} · Month {fy.monthInFY}/12</p>
+                <p className="text-xs text-muted-foreground">{profile.name} · {fy.label} · Indian Fiscal Year Analytics</p>
               </div>
             </div>
             <div className="flex items-center gap-2 print:hidden">
-              <Button variant="ghost" size="sm" onClick={() => setShareDialogOpen(true)} data-testid="button-share-report">
+              <Button variant="ghost" size="sm" onClick={() => setShareDialogOpen(true)} className="rounded-none hover:text-accent font-sans font-semibold tracking-wider uppercase text-xs shadow-none" data-testid="button-share-report">
                 <Share2 className="w-4 h-4 mr-1" /> Share
               </Button>
               {canExportPDF ? (
-                <Button variant="outline" size="sm" onClick={exportPDF} data-testid="button-export-pdf">
+                <Button variant="outline" size="sm" onClick={exportPDF} className="rounded-none border-gray-200 text-muted-foreground hover:bg-gray-50 text-[10px] font-sans font-bold uppercase tracking-wider h-8 px-3" data-testid="button-export-pdf">
                   <Download className="w-4 h-4 mr-1" /> Export PDF
                 </Button>
               ) : (
-                <Button variant="outline" size="sm" onClick={printReport} data-testid="button-print-report">
+                <Button variant="outline" size="sm" onClick={printReport} className="rounded-none border-gray-200 text-muted-foreground hover:bg-gray-50 text-[10px] font-sans font-bold uppercase tracking-wider h-8 px-3" data-testid="button-print-report">
                   <Printer className="w-4 h-4 mr-1" /> Print / Save PDF
                 </Button>
               )}
@@ -614,42 +621,45 @@ export default function BusinessReports() {
         <main className="max-w-5xl mx-auto px-6 py-8 space-y-8 w-full print:space-y-4">
           {/* Shared report banner */}
           {sharedToken && sharedReportMeta && (
-            <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-3 flex items-center gap-3 print:hidden">
-              <Share2 className="w-4 h-4 text-blue-500 shrink-0" />
-              <p className="text-sm text-muted-foreground">
-                You're viewing a <span className="font-medium text-foreground">shared report</span> — {REPORT_TYPES.find(r => r.id === sharedReportMeta.reportType)?.label ?? sharedReportMeta.reportType}. The report type and period have been pre-selected.
+            <div className="bg-sidebar border border-sidebar-border rounded-none px-4 py-3 flex items-center gap-3 print:hidden">
+              <Share2 className="w-4 h-4 text-accent shrink-0" />
+              <p className="text-xs text-muted-foreground font-sans">
+                You're viewing a <span className="font-semibold text-primary">shared report</span> — {REPORT_TYPES.find(r => r.id === sharedReportMeta.reportType)?.label ?? sharedReportMeta.reportType}. The report type and period have been pre-selected.
               </p>
             </div>
           )}
 
           {/* What to do here — UX explainer (hidden on shared views) */}
           {!sharedToken && (
-            <div className="bg-muted/30 border border-border rounded-xl p-4 print:hidden">
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">What you can do here</p>
-              <p className="text-sm text-muted-foreground">
-                Choose a report type below to view your team's performance data. Use <span className="font-medium text-foreground">Export CSV</span> to download data to a spreadsheet, or <span className="font-medium text-foreground">Print / PDF</span> to save a formatted report. Reports use your Indian fiscal year (April–March) as the default period.
+            <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm print:hidden">
+              <p className="text-[10px] font-sans font-bold text-accent uppercase tracking-[0.2em] mb-1.5">Console Guide</p>
+              <p className="text-xs text-muted-foreground leading-relaxed font-sans">
+                Select a reporting interval below to audit team performance and financial indicators. You can export verified raw records via <span className="font-bold text-primary font-sans">Export CSV</span>, compile presentation dossiers with <span className="font-bold text-primary font-sans">Export PDF</span>, or publish access using secure tokens with <span className="font-bold text-primary font-sans">Share</span>. Calculations automatically align with the standard Indian Fiscal Year (April–March).
               </p>
             </div>
           )}
 
           {/* Report Type Selector */}
           <div>
-            <p className="text-sm text-muted-foreground mb-3">Select a report type</p>
+            <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">Report Interval</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
               {REPORT_TYPES.map(rt => (
                 <button
                   key={rt.id}
                   onClick={() => setActiveReport(rt.id)}
                   data-testid={`button-report-type-${rt.id}`}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={cn(
+                    "p-4 rounded-none border text-left transition-all relative flex flex-col justify-between h-28 bg-white shadow-xs hover:shadow-sm duration-200",
                     activeReport === rt.id
-                      ? "border-amber-500/50 bg-amber-500/10 text-amber-500"
-                      : "border-border hover:border-border/80 hover:bg-muted/40"
-                  }`}
+                      ? "border-primary border-t-2 border-t-accent shadow-sm"
+                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-muted-foreground"
+                  )}
                 >
-                  <rt.icon className="w-4 h-4 mb-1.5" />
-                  <p className="text-xs font-medium leading-tight">{rt.label}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-tight">{rt.desc}</p>
+                  <rt.icon className={cn("w-4.5 h-4.5 mb-1.5", activeReport === rt.id ? "text-accent" : "text-muted-foreground")} />
+                  <div>
+                    <p className={cn("text-xs font-sans font-bold uppercase tracking-wider leading-tight", activeReport === rt.id ? "text-primary" : "text-muted-foreground")}>{rt.label}</p>
+                    <p className="text-[9px] text-muted-foreground mt-1 leading-normal font-sans">{rt.desc}</p>
+                  </div>
                 </button>
               ))}
             </div>
@@ -658,30 +668,34 @@ export default function BusinessReports() {
           {/* ── Weekly Recap ──────────────────────────────────────── */}
           {activeReport === "weekly" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <Label className="text-sm text-muted-foreground">Week starting:</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">Week starting:</Label>
                   <Input
                     type="date"
                     value={weekStart}
                     onChange={e => setWeekStart(e.target.value)}
                     max={new Date().toISOString().slice(0, 10)}
-                    className="w-40"
+                    className="w-40 rounded-none border-gray-200 bg-white focus-visible:ring-0 focus-visible:border-accent text-xs h-8"
                     data-testid="input-week-start"
                   />
-                  <span className="text-xs text-muted-foreground">→ {weekEnd}</span>
+                  <span className="text-xs text-muted-foreground font-sans">→ {weekEnd}</span>
                 </div>
-                <Button onClick={exportWeeklyCSV} variant="outline" size="sm" data-testid="button-export-weekly">
+                <Button
+                  onClick={exportWeeklyCSV}
+                  className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                  data-testid="button-export-weekly"
+                >
                   <Download className="w-4 h-4 mr-1" /> Export CSV
                 </Button>
               </div>
               {weeklyLoading ? (
                 <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>
               ) : weeklyEntries.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <Calendar className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">No entries for this week</p>
-                  <p className="text-sm text-muted-foreground">No EOD reports were submitted for {weekStart} to {weekEnd}.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No entries for this week</p>
+                  <p className="text-xs text-muted-foreground mt-1">No EOD reports were submitted for {weekStart} to {weekEnd}.</p>
                 </Card>
               ) : (() => {
                 const totalRevenue = weeklyEntries.reduce((s, e) => s + e.revenueAmount, 0);
@@ -692,31 +706,36 @@ export default function BusinessReports() {
                   <>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {[
-                        { label: "Week Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign, color: "text-amber-500" },
-                        { label: "Total Deals", value: totalDeals, icon: Handshake, color: "text-green-500" },
-                        { label: "Total Units", value: totalUnits, icon: Package, color: "text-blue-500" },
-                        { label: "Total Expenses", value: formatCurrency(totalExpenses, sym), icon: TrendingUp, color: "text-purple-500" },
+                        { label: "Week Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign, color: "text-primary" },
+                        { label: "Total Deals", value: totalDeals, icon: Handshake, color: "text-accent" },
+                        { label: "Total Units", value: totalUnits, icon: Package, color: "text-gray-800" },
+                        { label: "Total Expenses", value: formatCurrency(totalExpenses, sym), icon: TrendingUp, color: "text-red-600" },
                       ].map(({ label, value, icon: Icon, color }) => (
-                        <Card key={label} className="p-4">
-                          <div className={`flex items-center gap-2 mb-1 ${color}`}>
-                            <Icon className="w-4 h-4" />
-                            <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+                        <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300" key={label}>
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+                              <p className="text-2xl font-sans font-bold text-primary tracking-tight mt-1">{value}</p>
+                            </div>
+                            <div className="w-8 h-8 border border-gray-200 bg-gray-50 flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shrink-0">
+                              <Icon className="w-4 h-4" />
+                            </div>
                           </div>
-                          <p className="text-xl font-bold">{value}</p>
-                        </Card>
+                        </div>
                       ))}
                     </div>
-                    <Card>
+                    <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
                       <div className="overflow-x-auto">
-                        <table className="w-full text-sm" data-testid="table-weekly-report">
+                        <table className="w-full text-sm font-sans" data-testid="table-weekly-report">
                           <thead>
-                            <tr className="border-b border-border text-xs text-muted-foreground uppercase tracking-wide">
-                              <th className="px-4 py-2 text-left">Date</th>
-                              <th className="px-4 py-2 text-left">Member</th>
-                              <th className="px-4 py-2 text-right">Revenue</th>
-                              <th className="px-4 py-2 text-right">Deals</th>
-                              <th className="px-4 py-2 text-right">Units</th>
-                              <th className="px-4 py-2 text-center">Status</th>
+                            <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
+                              <th className="px-4 py-3 text-left">Date</th>
+                              <th className="px-4 py-3 text-left">Member</th>
+                              <th className="px-4 py-3 text-right">Revenue</th>
+                              <th className="px-4 py-3 text-right">Deals</th>
+                              <th className="px-4 py-3 text-right">Units</th>
+                              <th className="px-4 py-3 text-center">Status</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -724,17 +743,17 @@ export default function BusinessReports() {
                               const member = members.find(m => m.id === e.memberId);
                               const vertical = verticals.find(v => v.id === e.verticalId);
                               return (
-                                <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted/20" data-testid={`row-weekly-${e.id}`}>
-                                  <td className="px-4 py-2">{new Date(e.entryDate + 'T00:00:00').toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' })}</td>
-                                  <td className="px-4 py-2">
-                                    <span className="font-medium">{member?.name || member?.email || "—"}</span>
-                                    {vertical && <Badge variant="outline" className="text-xs ml-1">{vertical.name}</Badge>}
+                                <tr key={e.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50/50 transition-colors" data-testid={`row-weekly-${e.id}`}>
+                                  <td className="px-4 py-3">{new Date(e.entryDate + 'T00:00:00').toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' })}</td>
+                                  <td className="px-4 py-3">
+                                    <span className="font-semibold text-primary">{member?.name || member?.email || "—"}</span>
+                                    {vertical && <Badge className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/5 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5 ml-2">{vertical.name}</Badge>}
                                   </td>
-                                  <td className="px-4 py-2 text-right text-amber-500 font-medium">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
-                                  <td className="px-4 py-2 text-right text-green-500">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
-                                  <td className="px-4 py-2 text-right text-blue-500">{e.unitsSold > 0 ? e.unitsSold : "—"}</td>
-                                  <td className="px-4 py-2 text-center">
-                                    <Badge variant="secondary" className={`text-xs ${e.status === "reviewed" ? "text-green-500" : ""}`}>{e.status}</Badge>
+                                  <td className="px-4 py-3 text-right text-primary font-semibold">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
+                                  <td className="px-4 py-3 text-right text-accent font-semibold">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
+                                  <td className="px-4 py-3 text-right text-gray-800 font-semibold">{e.unitsSold > 0 ? e.unitsSold : "—"}</td>
+                                  <td className="px-4 py-3 text-center">
+                                    <Badge className={cn("text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5", e.status === "reviewed" ? "bg-green-50 border-green-200 text-green-600" : "bg-amber-50 border-amber-200 text-amber-600")}>{e.status}</Badge>
                                   </td>
                                 </tr>
                               );
@@ -752,9 +771,9 @@ export default function BusinessReports() {
           {/* ── Monthly Report ─────────────────────────────────────── */}
           {activeReport === "monthly" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <Label className="text-sm text-muted-foreground">FY:</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">FY:</Label>
                   <Select
                     value={String(selectedMonthFY)}
                     onValueChange={val => {
@@ -763,16 +782,16 @@ export default function BusinessReports() {
                       setPeriod(`${fyS}-04`);
                     }}
                   >
-                    <SelectTrigger className="w-32 h-8 text-xs" data-testid="select-report-fy">
+                    <SelectTrigger className="w-32 h-8 text-xs rounded-none border-gray-200 bg-white focus:ring-accent" data-testid="select-report-fy">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-none border-gray-200 bg-white">
                       {getFYOptions().map(opt => (
-                        <SelectItem key={opt.startYear} value={String(opt.startYear)}>{opt.label}</SelectItem>
+                        <SelectItem key={opt.startYear} value={String(opt.startYear)} className="text-xs hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer">{opt.label}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <Label className="text-sm text-muted-foreground">Month:</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">Month:</Label>
                   <Input
                     type="month"
                     value={period}
@@ -783,28 +802,32 @@ export default function BusinessReports() {
                       const [y, m] = e.target.value.split("-").map(Number);
                       setSelectedMonthFY(m >= 4 ? y : y - 1);
                     }}
-                    className="w-36"
+                    className="w-36 rounded-none border-gray-200 bg-white focus-visible:ring-0 focus-visible:border-accent text-xs h-8"
                     data-testid="input-report-month"
                   />
                   {(() => {
                     const monthNum = parseInt(period.split("-")[1]);
-                    if ([10, 11].includes(monthNum)) return <Badge variant="secondary" className="text-xs text-amber-500 border-amber-500/30">🪔 Festival Season</Badge>;
-                    if ([12, 1].includes(monthNum)) return <Badge variant="secondary" className="text-xs text-blue-500 border-blue-500/20">🎉 Year-End Season</Badge>;
-                    if ([6, 9, 3].includes(monthNum)) return <Badge variant="secondary" className="text-xs text-muted-foreground">Q-End</Badge>;
+                    if ([10, 11].includes(monthNum)) return <Badge className="bg-amber-50 border-amber-200 text-amber-600 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5">🪔 Festival Season</Badge>;
+                    if ([12, 1].includes(monthNum)) return <Badge className="bg-blue-50 border-blue-200 text-blue-600 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5">🎉 Year-End Season</Badge>;
+                    if ([6, 9, 3].includes(monthNum)) return <Badge className="bg-gray-100 border-gray-200 text-gray-700 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5">Q-End</Badge>;
                     return null;
                   })()}
                 </div>
-                <Button onClick={exportMonthlyCSV} variant="outline" size="sm" data-testid="button-export-monthly">
+                <Button
+                  onClick={exportMonthlyCSV}
+                  className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                  data-testid="button-export-monthly"
+                >
                   <Download className="w-4 h-4 mr-1" /> Export CSV
                 </Button>
               </div>
               {teamLoading ? (
                 <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-16" />)}</div>
               ) : teamPerf.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <TrendingUp className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">No data for {period}</p>
-                  <p className="text-sm text-muted-foreground">Your team hasn't logged any EOD entries for this month yet.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No data for {period}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Your team hasn't logged any EOD entries for this month yet.</p>
                 </Card>
               ) : (
                 <>
@@ -820,23 +843,28 @@ export default function BusinessReports() {
                     return (
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
-                          { label: "Team Revenue", value: formatCurrency(curRev, sym), icon: DollarSign, color: "text-amber-500", delta: revDelta },
-                          { label: "Total Deals", value: teamPerf.reduce((s, m) => s + m.totalDeals, 0), icon: Handshake, color: "text-green-500", delta: null },
-                          { label: "Avg Achievement", value: `${avgAch.toFixed(0)}%`, icon: TrendingUp, color: "text-green-500", delta: null },
-                          { label: "Total Expenses", value: formatCurrency(curExp, sym), icon: Package, color: "text-purple-500", delta: expDelta },
+                          { label: "Team Revenue", value: formatCurrency(curRev, sym), icon: DollarSign, color: "text-primary", delta: revDelta },
+                          { label: "Total Deals", value: teamPerf.reduce((s, m) => s + m.totalDeals, 0), icon: Handshake, color: "text-accent", delta: null },
+                          { label: "Avg Achievement", value: `${avgAch.toFixed(0)}%`, icon: TrendingUp, color: "text-green-600", delta: null },
+                          { label: "Total Expenses", value: formatCurrency(curExp, sym), icon: Package, color: "text-red-600", delta: expDelta },
                         ].map(({ label, value, icon: Icon, color, delta }) => (
-                          <Card key={label} className="p-4">
-                            <div className={`flex items-center gap-2 mb-1 ${color}`}>
-                              <Icon className="w-4 h-4" />
-                              <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+                          <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300" key={label}>
+                            <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+                                <p className="text-2xl font-sans font-bold text-primary tracking-tight mt-1">{value}</p>
+                                {delta !== null && priorTeamPerf.length > 0 && (
+                                  <p className={`text-[10px] font-sans font-bold uppercase tracking-wider mt-1.5 {delta >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                    {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}% vs last month
+                                  </p>
+                                )}
+                              </div>
+                              <div className="w-8 h-8 border border-gray-200 bg-gray-50 flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shrink-0">
+                                <Icon className="w-4 h-4" />
+                              </div>
                             </div>
-                            <p className="text-xl font-bold">{value}</p>
-                            {delta !== null && priorTeamPerf.length > 0 && (
-                              <p className={`text-xs mt-1 ${delta >= 0 ? "text-green-500" : "text-red-500"}`}>
-                                {delta >= 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}% vs last month
-                              </p>
-                            )}
-                          </Card>
+                          </div>
                         ))}
                       </div>
                     );
@@ -844,17 +872,17 @@ export default function BusinessReports() {
 
                   {/* Team Revenue vs Deals Chart (bar chart comparison) */}
                   {teamPerf.length > 0 && (
-                    <Card className="p-4">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Revenue by Team Member</p>
+                    <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm">
+                      <p className="text-[10px] font-sans font-bold text-accent uppercase tracking-[0.2em] mb-3">Revenue by Team Member</p>
                       <ResponsiveContainer width="100%" height={220}>
                         <BarChart data={teamPerf.map(m => ({ name: m.memberName || m.memberEmail.split("@")[0], Revenue: m.totalRevenue, Target: m.targetRevenue > 0 ? m.targetRevenue : undefined }))} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
                           <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v: number) => formatCurrency(v, sym)} />
-                          <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                          <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 0, fontSize: 12 }} />
                           <Legend wrapperStyle={{ fontSize: 11 }} />
-                          <Bar dataKey="Revenue" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                          <Bar dataKey="Target" fill="hsl(var(--muted-foreground))" radius={[4, 4, 0, 0]} fillOpacity={0.35} />
+                          <Bar dataKey="Revenue" fill="#13322b" radius={[0, 0, 0, 0]} />
+                          <Bar dataKey="Target" fill="hsl(var(--muted-foreground))" radius={[0, 0, 0, 0]} fillOpacity={0.35} />
                         </BarChart>
                       </ResponsiveContainer>
                     </Card>
@@ -872,27 +900,27 @@ export default function BusinessReports() {
                       { month: monthName(period), Revenue: curRev, Expenses: teamPerf.reduce((s, m) => s + m.totalExpenses, 0) },
                     ];
                     return (
-                      <Card className="p-4">
-                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Month-over-Month Comparison</p>
+                      <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm">
+                        <p className="text-[10px] font-sans font-bold text-accent uppercase tracking-[0.2em] mb-3">Month-over-Month Comparison</p>
                         <ResponsiveContainer width="100%" height={180}>
                           <LineChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis dataKey="month" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
                             <YAxis tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v: number) => formatCurrency(v, sym)} />
-                            <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
+                            <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 0, fontSize: 12 }} />
                             <Legend wrapperStyle={{ fontSize: 11 }} />
-                            <Line type="monotone" dataKey="Revenue" stroke="#f59e0b" strokeWidth={2} dot={{ fill: "#f59e0b", r: 5 }} />
-                            <Line type="monotone" dataKey="Expenses" stroke="#a855f7" strokeWidth={2} dot={{ fill: "#a855f7", r: 5 }} />
+                            <Line type="monotone" dataKey="Revenue" stroke="#13322b" strokeWidth={2} dot={{ stroke: "#13322b", strokeWidth: 2, fill: "#ffffff", r: 4 }} activeDot={{ stroke: "#13322b", strokeWidth: 2, fill: "#13322b", r: 6 }} />
+                            <Line type="monotone" dataKey="Expenses" stroke="#ef4444" strokeWidth={2} dot={{ stroke: "#ef4444", strokeWidth: 2, fill: "#ffffff", r: 4 }} activeDot={{ stroke: "#ef4444", strokeWidth: 2, fill: "#ef4444", r: 6 }} />
                           </LineChart>
                         </ResponsiveContainer>
                       </Card>
                     );
                   })()}
-                  <Card>
+                  <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
                     <div className="overflow-x-auto">
-                      <table className="w-full text-sm" data-testid="table-monthly-report">
+                      <table className="w-full text-sm font-sans" data-testid="table-monthly-report">
                         <thead>
-                          <tr className="border-b border-border text-xs text-muted-foreground uppercase tracking-wide">
+                          <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
                             <th className="px-4 py-3 text-left">Member</th>
                             <th className="px-4 py-3 text-right">Revenue</th>
                             <th className="px-4 py-3 text-right">Deals</th>
@@ -905,18 +933,18 @@ export default function BusinessReports() {
                         </thead>
                         <tbody>
                           {teamPerf.map(m => (
-                            <tr key={m.memberId} className="border-b border-border last:border-0 hover:bg-muted/20 transition-colors">
-                              <td className="px-4 py-3 font-medium">{m.memberName || m.memberEmail}</td>
-                              <td className="px-4 py-3 text-right text-amber-500 font-medium">{formatCurrency(m.totalRevenue, sym)}</td>
-                              <td className="px-4 py-3 text-right text-green-500">{m.totalDeals}</td>
-                              <td className="px-4 py-3 text-right text-blue-500">{m.totalUnits}</td>
+                            <tr key={m.memberId} className="border-b border-gray-200 last:border-0 hover:bg-gray-50/50 transition-colors">
+                              <td className="px-4 py-3 font-semibold text-primary">{m.memberName || m.memberEmail}</td>
+                              <td className="px-4 py-3 text-right text-primary font-semibold">{formatCurrency(m.totalRevenue, sym)}</td>
+                              <td className="px-4 py-3 text-right text-accent font-medium">{m.totalDeals}</td>
+                              <td className="px-4 py-3 text-right text-gray-800 font-medium">{m.totalUnits}</td>
                               <td className="px-4 py-3 text-right text-muted-foreground">{m.targetRevenue > 0 ? formatCurrency(m.targetRevenue, sym) : "—"}</td>
                               <td className="px-4 py-3 text-right">
-                                <Badge variant="secondary" className={`text-xs ${m.achievementPercent >= 80 ? 'text-green-500' : m.achievementPercent >= 50 ? 'text-amber-500' : 'text-red-500'}`}>
+                                <Badge className={cn("text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5", m.achievementPercent >= 80 ? "bg-green-50 border-green-200 text-green-600" : m.achievementPercent >= 50 ? "bg-amber-50 border-amber-200 text-amber-600" : "bg-red-50 border-red-200 text-red-600")}>
                                   {m.achievementPercent}%
                                 </Badge>
                               </td>
-                              <td className="px-4 py-3 text-right text-purple-500">{formatCurrency(m.projectedIncentive, sym)}</td>
+                              <td className="px-4 py-3 text-right text-red-600 font-semibold">{formatCurrency(m.projectedIncentive, sym)}</td>
                               <td className="px-4 py-3 text-right text-muted-foreground">{m.entryCount}</td>
                             </tr>
                           ))}
@@ -932,33 +960,37 @@ export default function BusinessReports() {
           {/* ── Daily Summary ─────────────────────────────────────── */}
           {activeReport === "daily" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div className="flex items-center gap-3">
-                  <Label className="text-sm text-muted-foreground">Date:</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">Date:</Label>
                   <Input
                     type="date"
                     value={selectedDate}
                     onChange={e => setSelectedDate(e.target.value)}
                     max={new Date().toISOString().slice(0, 10)}
-                    className="w-40"
+                    className="w-40 rounded-none border-gray-200 bg-white focus-visible:ring-0 focus-visible:border-accent text-xs h-8"
                     data-testid="input-report-date"
                   />
                 </div>
-                <Button onClick={exportDailyCSV} variant="outline" size="sm" data-testid="button-export-daily">
+                <Button
+                  onClick={exportDailyCSV}
+                  className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                  data-testid="button-export-daily"
+                >
                   <Download className="w-4 h-4 mr-1" /> Export CSV
                 </Button>
               </div>
               {dailyLoading ? (
                 <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>
               ) : dailyEntries.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <FileText className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">No entries for {selectedDate}</p>
-                  <p className="text-sm text-muted-foreground">No team member submitted an EOD report for this date.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No entries for {selectedDate}</p>
+                  <p className="text-xs text-muted-foreground mt-1">No team member submitted an EOD report for this date.</p>
                 </Card>
               ) : (
-                <Card>
-                  <div className="divide-y divide-border">
+                <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
+                  <div className="divide-y divide-gray-200 font-sans">
                     {dailyEntries.map(entry => {
                       const member = members.find(m => m.id === entry.memberId);
                       const vertical = verticals.find(v => v.id === entry.verticalId);
@@ -967,21 +999,21 @@ export default function BusinessReports() {
                         <div key={entry.id} className="px-5 py-4" data-testid={`row-daily-${entry.id}`}>
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
-                              <div className="w-7 h-7 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 text-xs font-bold">
+                              <div className="w-7 h-7 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center text-primary text-xs font-bold uppercase">
                                 {(member?.name || member?.email || "?").charAt(0).toUpperCase()}
                               </div>
-                              <span className="font-medium text-sm">{member?.name || member?.email}</span>
-                              {vertical && <Badge variant="outline" className="text-xs">{vertical.name}</Badge>}
+                              <span className="font-semibold text-sm text-primary">{member?.name || member?.email}</span>
+                              {vertical && <Badge className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/5 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5">{vertical.name}</Badge>}
                             </div>
-                            <Badge variant="secondary" className={`text-xs ${entry.status === "reviewed" ? "text-green-500" : "text-amber-500"}`}>
+                            <Badge className={cn("text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5", entry.status === "reviewed" ? "bg-green-50 border-green-200 text-green-600" : "bg-amber-50 border-amber-200 text-amber-600")}>
                               {entry.status}
                             </Badge>
                           </div>
-                          <div className="flex flex-wrap gap-4 text-sm">
-                            {entry.revenueAmount > 0 && <span><span className="text-muted-foreground">Revenue:</span> <span className="text-amber-500 font-medium">{formatCurrency(entry.revenueAmount, sym)}</span></span>}
-                            {entry.dealsClosed > 0 && <span><span className="text-muted-foreground">Deals:</span> <span className="text-green-500 font-medium">{entry.dealsClosed}</span></span>}
-                            {entry.unitsSold > 0 && <span><span className="text-muted-foreground">Units:</span> <span className="text-blue-500 font-medium">{entry.unitsSold}</span></span>}
-                            {totalExpenses > 0 && <span><span className="text-muted-foreground">Expenses:</span> <span className="text-red-400 font-medium">{formatCurrency(totalExpenses, sym)}</span></span>}
+                          <div className="flex flex-wrap gap-4 text-xs">
+                            {entry.revenueAmount > 0 && <span><span className="text-muted-foreground">Revenue:</span> <span className="text-primary font-semibold">{formatCurrency(entry.revenueAmount, sym)}</span></span>}
+                            {entry.dealsClosed > 0 && <span><span className="text-muted-foreground">Deals:</span> <span className="text-accent font-semibold">{entry.dealsClosed}</span></span>}
+                            {entry.unitsSold > 0 && <span><span className="text-muted-foreground">Units:</span> <span className="text-gray-800 font-semibold">{entry.unitsSold}</span></span>}
+                            {totalExpenses > 0 && <span><span className="text-muted-foreground">Expenses:</span> <span className="text-red-600 font-semibold">{formatCurrency(totalExpenses, sym)}</span></span>}
                           </div>
                           {entry.notes && <p className="text-xs text-muted-foreground mt-1.5 italic">"{entry.notes}"</p>}
                         </div>
@@ -996,22 +1028,26 @@ export default function BusinessReports() {
           {/* ── YTD Report ─────────────────────────────────────────── */}
           {activeReport === "ytd" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div>
-                  <p className="font-medium">{fy.label} Year-to-Date</p>
-                  <p className="text-xs text-muted-foreground">{fyRange.from} → {fyRange.to}</p>
+                  <p className="font-sans font-bold text-primary text-sm uppercase tracking-wider">{fy.label} Year-to-Date</p>
+                  <p className="text-xs text-muted-foreground font-sans mt-0.5">{fyRange.from} → {fyRange.to}</p>
                 </div>
-                <Button onClick={exportYtdCSV} variant="outline" size="sm" data-testid="button-export-ytd">
+                <Button
+                  onClick={exportYtdCSV}
+                  className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                  data-testid="button-export-ytd"
+                >
                   <Download className="w-4 h-4 mr-1" /> Export CSV
                 </Button>
               </div>
               {ytdLoading ? (
                 <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>
               ) : ytdEntries.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <CalendarRange className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">No data for {fy.label}</p>
-                  <p className="text-sm text-muted-foreground">No EOD entries have been submitted this financial year yet.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No data for {fy.label}</p>
+                  <p className="text-xs text-muted-foreground mt-1 font-sans">No EOD entries have been submitted this financial year yet.</p>
                 </Card>
               ) : (() => {
                 const totalRevenue = ytdEntries.reduce((s, e) => s + e.revenueAmount, 0);
@@ -1035,32 +1071,37 @@ export default function BusinessReports() {
                   <>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {[
-                        { label: "Total Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign, color: "text-amber-500" },
-                        { label: "Total Deals", value: totalDeals, icon: Handshake, color: "text-green-500" },
-                        { label: "Total Units", value: totalUnits, icon: Package, color: "text-blue-500" },
-                        { label: "Total Expenses", value: formatCurrency(totalExpenses, sym), icon: TrendingUp, color: "text-purple-500" },
+                        { label: "Total Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign, color: "text-primary" },
+                        { label: "Total Deals", value: totalDeals, icon: Handshake, color: "text-accent" },
+                        { label: "Total Units", value: totalUnits, icon: Package, color: "text-gray-800" },
+                        { label: "Total Expenses", value: formatCurrency(totalExpenses, sym), icon: TrendingUp, color: "text-red-600" },
                       ].map(({ label, value, icon: Icon, color }) => (
-                        <Card key={label} className="p-4">
-                          <div className={`flex items-center gap-2 mb-1 ${color}`}>
-                            <Icon className="w-4 h-4" />
-                            <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+                        <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300" key={label}>
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+                              <p className="text-2xl font-sans font-bold text-primary tracking-tight mt-1">{value}</p>
+                              <p className="text-[10px] text-muted-foreground mt-1.5 font-sans">{entryDays} active days</p>
+                            </div>
+                            <div className="w-8 h-8 border border-gray-200 bg-gray-50 flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shrink-0">
+                              <Icon className="w-4 h-4" />
+                            </div>
                           </div>
-                          <p className="text-xl font-bold">{value}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{entryDays} active days</p>
-                        </Card>
+                        </div>
                       ))}
                     </div>
-                    <Card>
-                      <CardTitle className="text-sm px-5 pt-4 pb-2">Monthly Breakdown</CardTitle>
+                    <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
+                      <div className="text-xs font-bold text-accent uppercase tracking-[0.25em] px-5 pt-4 pb-2 font-sans">Monthly Breakdown</div>
                       <div className="overflow-x-auto">
-                        <table className="w-full text-sm" data-testid="table-ytd-breakdown">
+                        <table className="w-full text-sm font-sans" data-testid="table-ytd-breakdown">
                           <thead>
-                            <tr className="border-b border-border text-xs text-muted-foreground uppercase tracking-wide">
-                              <th className="px-4 py-2 text-left">Month</th>
-                              <th className="px-4 py-2 text-right">Revenue</th>
-                              <th className="px-4 py-2 text-right">Deals</th>
-                              <th className="px-4 py-2 text-right">Units</th>
-                              <th className="px-4 py-2 text-right">Entries</th>
+                            <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
+                              <th className="px-4 py-3 text-left">Month</th>
+                              <th className="px-4 py-3 text-right">Revenue</th>
+                              <th className="px-4 py-3 text-right">Deals</th>
+                              <th className="px-4 py-3 text-right">Units</th>
+                              <th className="px-4 py-3 text-right">Entries</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1069,16 +1110,16 @@ export default function BusinessReports() {
                               const isFestivalSeason = [9, 10, 11].includes(monthNum); // Oct, Nov = Navratri/Diwali; Dec = Year end
                               const isQuarterEnd = [6, 9, 12, 3].includes(monthNum); // Indian FY quarter ends
                               return (
-                              <tr key={mo} className={`border-b border-border last:border-0 hover:bg-muted/20 ${isFestivalSeason ? 'bg-amber-500/3' : ''}`}>
-                                <td className="px-4 py-2 font-medium">
+                              <tr key={mo} className={cn("border-b border-gray-200 last:border-0 hover:bg-gray-50/50 transition-colors", isFestivalSeason ? "bg-accent/5" : "")}>
+                                <td className="px-4 py-3 font-semibold text-primary">
                                   <span>{new Date(mo + "-01").toLocaleString("default", { month: "long", year: "numeric" })}</span>
-                                  {isFestivalSeason && <Badge variant="secondary" className="ml-2 text-[9px] text-amber-500 border-amber-500/30 py-0">🪔 Festival</Badge>}
-                                  {isQuarterEnd && !isFestivalSeason && <Badge variant="secondary" className="ml-2 text-[9px] text-blue-500 border-blue-500/20 py-0">Q-end</Badge>}
+                                  {isFestivalSeason && <Badge className="bg-amber-50 border-amber-200 text-amber-600 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5 ml-2">🪔 Festival</Badge>}
+                                  {isQuarterEnd && !isFestivalSeason && <Badge className="bg-blue-50 border-blue-200 text-blue-600 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5 ml-2">Q-end</Badge>}
                                 </td>
-                                <td className="px-4 py-2 text-right text-amber-500">{formatCurrency(data.revenue, sym)}</td>
-                                <td className="px-4 py-2 text-right text-green-500">{data.deals}</td>
-                                <td className="px-4 py-2 text-right text-blue-500">{data.units}</td>
-                                <td className="px-4 py-2 text-right text-muted-foreground">{data.entries}</td>
+                                <td className="px-4 py-3 text-right text-primary font-semibold">{formatCurrency(data.revenue, sym)}</td>
+                                <td className="px-4 py-3 text-right text-accent font-medium">{data.deals}</td>
+                                <td className="px-4 py-3 text-right text-gray-800 font-medium">{data.units}</td>
+                                <td className="px-4 py-3 text-right text-muted-foreground">{data.entries}</td>
                               </tr>
                               );
                             })}
@@ -1095,40 +1136,44 @@ export default function BusinessReports() {
           {/* ── Individual Employee Report ─────────────────────────── */}
           {activeReport === "employee" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div className="flex items-center gap-3">
-                  <Label className="text-sm text-muted-foreground">Team Member:</Label>
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">Team Member:</Label>
                   <Select value={selectedMemberId || "none"} onValueChange={v => setSelectedMemberId(v === "none" ? "" : v)}>
-                    <SelectTrigger className="w-52" data-testid="select-report-member">
+                    <SelectTrigger className="w-52 rounded-none border-gray-200 bg-white text-xs h-8 cursor-pointer focus:ring-accent" data-testid="select-report-member">
                       <SelectValue placeholder="Select member" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Select a member</SelectItem>
+                    <SelectContent className="rounded-none border-gray-200 bg-white">
+                      <SelectItem value="none" className="text-xs hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer">Select a member</SelectItem>
                       {activeMembers.map(m => (
-                        <SelectItem key={m.id} value={m.id}>{m.name || m.email}</SelectItem>
+                        <SelectItem key={m.id} value={m.id} className="text-xs hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer">{m.name || m.email}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 {selectedMemberId && (
-                  <Button onClick={exportEmployeeCSV} variant="outline" size="sm" data-testid="button-export-employee">
+                  <Button
+                    onClick={exportEmployeeCSV}
+                    className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                    data-testid="button-export-employee"
+                  >
                     <Download className="w-4 h-4 mr-1" /> Export CSV
                   </Button>
                 )}
               </div>
               {!selectedMemberId ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <Users className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">Select a team member</p>
-                  <p className="text-sm text-muted-foreground">Choose a member above to view their full-year performance history.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">Select a team member</p>
+                  <p className="text-xs text-muted-foreground mt-1">Choose a member above to view their full-year performance history.</p>
                 </Card>
               ) : memberLoading ? (
                 <div className="space-y-2">{[1,2,3,4].map(i => <Skeleton key={i} className="h-12" />)}</div>
               ) : memberEntries.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <FileText className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-                  <p className="font-medium mb-1">No entries for {selectedMember?.name || selectedMember?.email}</p>
-                  <p className="text-sm text-muted-foreground">This member hasn't submitted any EOD entries this financial year.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No entries for {selectedMember?.name || selectedMember?.email}</p>
+                  <p className="text-xs text-muted-foreground mt-1">This member hasn't submitted any EOD entries this financial year.</p>
                 </Card>
               ) : (() => {
                 const totalRevenue = memberEntries.reduce((s, e) => s + e.revenueAmount, 0);
@@ -1137,44 +1182,50 @@ export default function BusinessReports() {
                 return (
                   <>
                     <div className="grid grid-cols-3 gap-4">
-                      <Card className="p-4 text-center">
-                        <p className="text-xs text-muted-foreground mb-1">Total Revenue</p>
-                        <p className="text-xl font-bold text-amber-500">{formatCurrency(totalRevenue, sym)}</p>
-                      </Card>
-                      <Card className="p-4 text-center">
-                        <p className="text-xs text-muted-foreground mb-1">Total Deals</p>
-                        <p className="text-xl font-bold text-green-500">{totalDeals}</p>
-                      </Card>
-                      <Card className="p-4 text-center">
-                        <p className="text-xs text-muted-foreground mb-1">Total Entries</p>
-                        <p className="text-xl font-bold">{memberEntries.length}</p>
-                      </Card>
+                      {[
+                        { label: "Total Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign },
+                        { label: "Total Deals", value: totalDeals, icon: Handshake },
+                        { label: "Total Entries", value: memberEntries.length, icon: FileText },
+                      ].map(({ label, value, icon: Icon }) => (
+                        <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300" key={label}>
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1">
+                              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+                              <p className="text-2xl font-sans font-bold text-primary tracking-tight mt-1">{value}</p>
+                            </div>
+                            <div className="w-8 h-8 border border-gray-200 bg-gray-50 flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shrink-0">
+                              <Icon className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <Card>
+                    <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
                       <div className="overflow-x-auto">
-                        <table className="w-full text-sm" data-testid="table-employee-report">
+                        <table className="w-full text-sm font-sans" data-testid="table-employee-report">
                           <thead>
-                            <tr className="border-b border-border text-xs text-muted-foreground uppercase tracking-wide">
-                              <th className="px-4 py-2 text-left">Date</th>
-                              <th className="px-4 py-2 text-left">Vertical</th>
-                              <th className="px-4 py-2 text-right">Revenue</th>
-                              <th className="px-4 py-2 text-right">Deals</th>
-                              <th className="px-4 py-2 text-right">Units</th>
-                              <th className="px-4 py-2 text-center">Status</th>
+                            <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
+                              <th className="px-4 py-3 text-left">Date</th>
+                              <th className="px-4 py-3 text-left">Vertical</th>
+                              <th className="px-4 py-3 text-right">Revenue</th>
+                              <th className="px-4 py-3 text-right">Deals</th>
+                              <th className="px-4 py-3 text-right">Units</th>
+                              <th className="px-4 py-3 text-center">Status</th>
                             </tr>
                           </thead>
                           <tbody>
                             {memberEntries.slice(0, 60).map(e => {
                               const vertical = verticals.find(v => v.id === e.verticalId);
                               return (
-                                <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted/20">
-                                  <td className="px-4 py-2">{e.entryDate}</td>
-                                  <td className="px-4 py-2">{vertical ? <Badge variant="outline" className="text-xs">{vertical.name}</Badge> : <span className="text-muted-foreground">—</span>}</td>
-                                  <td className="px-4 py-2 text-right text-amber-500">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
-                                  <td className="px-4 py-2 text-right text-green-500">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
-                                  <td className="px-4 py-2 text-right text-blue-500">{e.unitsSold > 0 ? e.unitsSold : "—"}</td>
-                                  <td className="px-4 py-2 text-center">
-                                    <Badge variant="secondary" className={`text-xs ${e.status === "reviewed" ? "text-green-500" : ""}`}>{e.status}</Badge>
+                                <tr key={e.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50/50 transition-colors">
+                                  <td className="px-4 py-3">{e.entryDate}</td>
+                                  <td className="px-4 py-3">{vertical ? <Badge className="bg-primary/5 text-primary border-primary/20 hover:bg-primary/5 text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5">{vertical.name}</Badge> : <span className="text-muted-foreground">—</span>}</td>
+                                  <td className="px-4 py-3 text-right text-primary font-semibold">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
+                                  <td className="px-4 py-3 text-right text-accent font-semibold">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
+                                  <td className="px-4 py-3 text-right text-gray-800 font-semibold">{e.unitsSold > 0 ? e.unitsSold : "—"}</td>
+                                  <td className="px-4 py-3 text-center">
+                                    <Badge className={cn("text-[9px] font-bold rounded-none border uppercase tracking-wider px-1.5 py-0.5", e.status === "reviewed" ? "bg-green-50 border-green-200 text-green-600" : "bg-amber-50 border-amber-200 text-amber-600")}>{e.status}</Badge>
                                   </td>
                                 </tr>
                               );
@@ -1192,31 +1243,35 @@ export default function BusinessReports() {
           {/* ── Festival Season Report ──────────────────────────────── */}
           {activeReport === "festival" && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
-              <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center justify-between flex-wrap gap-3 bg-white border border-gray-200 p-4 rounded-none shadow-sm">
                 <div>
-                  <p className="font-medium flex items-center gap-2">🪔 Festival Season Report</p>
-                  <p className="text-xs text-muted-foreground">Analyze performance during any peak festival window</p>
+                  <p className="font-sans font-bold text-primary text-sm uppercase tracking-wider">🪔 Festival Season Report</p>
+                  <p className="text-xs text-muted-foreground font-sans mt-0.5">Analyze performance during any peak festival window</p>
                 </div>
-                <Button onClick={exportFestivalCSV} variant="outline" size="sm" data-testid="button-export-festival">
+                <Button
+                  onClick={exportFestivalCSV}
+                  className="rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground text-[10px] font-bold uppercase tracking-wider h-8 shadow-none animate-none"
+                  data-testid="button-export-festival"
+                >
                   <Download className="w-4 h-4 mr-1" /> Export CSV
                 </Button>
               </div>
-              <div className="flex items-center gap-3 flex-wrap bg-muted/30 border border-border rounded-xl p-3">
-                <Label className="text-sm text-muted-foreground">Season window:</Label>
+              <div className="flex items-center gap-3 flex-wrap bg-white border border-gray-200 p-4 rounded-none shadow-sm">
+                <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground font-sans">Season window:</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     type="date"
                     value={festivalFrom}
                     onChange={e => setFestivalFrom(e.target.value)}
-                    className="w-36"
+                    className="w-36 rounded-none border-gray-200 bg-white focus-visible:ring-0 focus-visible:border-accent text-xs h-8"
                     data-testid="input-festival-from"
                   />
-                  <span className="text-xs text-muted-foreground">to</span>
+                  <span className="text-xs text-muted-foreground font-sans">to</span>
                   <Input
                     type="date"
                     value={festivalTo}
                     onChange={e => setFestivalTo(e.target.value)}
-                    className="w-36"
+                    className="w-36 rounded-none border-gray-200 bg-white focus-visible:ring-0 focus-visible:border-accent text-xs h-8"
                     data-testid="input-festival-to"
                   />
                 </div>
@@ -1230,7 +1285,7 @@ export default function BusinessReports() {
                     <button
                       key={preset.label}
                       onClick={() => { setFestivalFrom(preset.from); setFestivalTo(preset.to); }}
-                      className="text-xs px-2 py-1 rounded border border-border hover:border-amber-500/50 hover:bg-amber-500/5 transition-all"
+                      className="text-xs px-2 py-1 rounded-none border border-gray-200 hover:border-accent hover:bg-primary/5 transition-all font-sans text-primary"
                       data-testid={`button-festival-preset-${preset.label}`}
                     >
                       {preset.label}
@@ -1241,17 +1296,18 @@ export default function BusinessReports() {
               {festivalLoading ? (
                 <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-14" />)}</div>
               ) : festivalEntries.length === 0 ? (
-                <Card className="p-10 text-center">
+                <Card className="p-10 text-center bg-white border border-gray-200 rounded-none shadow-sm">
                   <span className="text-4xl mb-3 block">🪔</span>
-                  <p className="font-medium mb-1">No Diwali season data yet</p>
-                  <p className="text-sm text-muted-foreground">EOD entries from Oct 1 to Nov 15 will appear here for season analysis.</p>
+                  <p className="font-sans font-bold text-primary uppercase text-sm mb-1 tracking-wider">No festival season data yet</p>
+                  <p className="text-xs text-muted-foreground mt-1 font-sans">EOD entries from Oct 1 to Nov 15 will appear here for season analysis.</p>
                 </Card>
               ) : (() => {
                 const totalRevenue = festivalEntries.reduce((s, e) => s + e.revenueAmount, 0);
                 const totalDeals = festivalEntries.reduce((s, e) => s + e.dealsClosed, 0);
                 const byMember: Record<string, number> = {};
                 for (const e of festivalEntries) {
-                  byMember[e.memberId] = (byMember[e.memberId] ?? 0) + e.revenueAmount;
+                  const mId = e.memberId || "unknown";
+                  byMember[mId] = (byMember[mId] ?? 0) + e.revenueAmount;
                 }
                 const topPerformer = Object.entries(byMember).sort(([, a], [, b]) => b - a)[0];
                 const topMember = topPerformer ? members.find(m => m.id === topPerformer[0]) : null;
@@ -1259,18 +1315,24 @@ export default function BusinessReports() {
                 return (
                   <>
                     <div className="grid grid-cols-3 gap-4">
-                      <Card className="p-4 text-center border-amber-500/30">
-                        <p className="text-xs text-muted-foreground mb-1">Season Revenue</p>
-                        <p className="text-xl font-bold text-amber-500">{formatCurrency(totalRevenue, sym)}</p>
-                      </Card>
-                      <Card className="p-4 text-center border-amber-500/30">
-                        <p className="text-xs text-muted-foreground mb-1">Season Deals</p>
-                        <p className="text-xl font-bold text-green-500">{totalDeals}</p>
-                      </Card>
-                      <Card className="p-4 text-center border-amber-500/30">
-                        <p className="text-xs text-muted-foreground mb-1">Top Performer</p>
-                        <p className="text-xl font-bold text-amber-500 truncate">{topMember?.name || topMember?.email || "—"}</p>
-                      </Card>
+                      {[
+                        { label: "Season Revenue", value: formatCurrency(totalRevenue, sym), icon: DollarSign },
+                        { label: "Season Deals", value: totalDeals, icon: Handshake },
+                        { label: "Top Performer", value: topMember?.name || topMember?.email || "—", icon: Users },
+                      ].map(({ label, value, icon: Icon }) => (
+                        <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300" key={label}>
+                          <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                          <div className="flex items-start justify-between">
+                            <div className="space-y-1 min-w-0 flex-1">
+                              <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+                              <p className="text-2xl font-sans font-bold text-primary tracking-tight mt-1 truncate">{value}</p>
+                            </div>
+                            <div className="w-8 h-8 border border-gray-200 bg-gray-50 flex items-center justify-center text-accent group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all duration-300 shrink-0">
+                              <Icon className="w-4 h-4" />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     {/* Daily revenue trend chart for festival window */}
                     {festivalEntries.length > 0 && (() => {
@@ -1284,19 +1346,19 @@ export default function BusinessReports() {
                       }));
                       const avgRevPerDay = chartData.length > 0 ? chartData.reduce((s, d) => s + d.Revenue, 0) / chartData.length : 0;
                       return (
-                        <Card className="p-4">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Daily Revenue — Festival Window</p>
+                        <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm">
+                          <p className="text-[10px] font-sans font-bold text-accent uppercase tracking-[0.2em] mb-3">Daily Revenue — Festival Window</p>
                           <ResponsiveContainer width="100%" height={200}>
                             <BarChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis dataKey="date" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                               <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v: number) => formatCurrency(v, sym)} />
-                              <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
-                              <ReferenceLine y={avgRevPerDay} stroke="#f59e0b" strokeDasharray="4 2" label={{ value: "Avg", position: "insideTopRight", fontSize: 10, fill: "#f59e0b" }} />
-                              <Bar dataKey="Revenue" fill="#f59e0b" radius={[4, 4, 0, 0]} fillOpacity={0.85} />
+                              <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 0, fontSize: 12 }} />
+                              <ReferenceLine y={avgRevPerDay} stroke="#c59b43" strokeDasharray="4 2" label={{ value: "Avg", position: "insideTopRight", fontSize: 10, fill: "#c59b43" }} />
+                              <Bar dataKey="Revenue" fill="#13322b" radius={[0, 0, 0, 0]} fillOpacity={0.85} />
                             </BarChart>
                           </ResponsiveContainer>
-                          <p className="text-xs text-muted-foreground mt-2">Avg daily revenue: {formatCurrency(Math.round(avgRevPerDay), sym)} · Dashed line = daily average baseline</p>
+                          <p className="text-xs text-muted-foreground mt-2 font-sans">Avg daily revenue: {formatCurrency(Math.round(avgRevPerDay), sym)} · Dashed line = daily average baseline</p>
                         </Card>
                       );
                     })()}
@@ -1305,34 +1367,35 @@ export default function BusinessReports() {
                     {festivalEntries.length > 0 && (() => {
                       const memberRevMap: Record<string, { name: string; Revenue: number }> = {};
                       for (const e of festivalEntries) {
-                        const member = members.find(m => m.id === e.memberId);
-                        const name = member?.name || member?.email?.split("@")[0] || e.memberId.slice(0, 8);
-                        if (!memberRevMap[e.memberId]) memberRevMap[e.memberId] = { name, Revenue: 0 };
-                        memberRevMap[e.memberId].Revenue += e.revenueAmount;
+                        const mId = e.memberId || "unknown";
+                        const member = members.find(m => m.id === mId);
+                        const name = member?.name || member?.email?.split("@")[0] || mId.slice(0, 8);
+                        if (!memberRevMap[mId]) memberRevMap[mId] = { name, Revenue: 0 };
+                        memberRevMap[mId].Revenue += e.revenueAmount;
                       }
                       const memberData = Object.values(memberRevMap).sort((a, b) => b.Revenue - a.Revenue);
                       return (
-                        <Card className="p-4">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Revenue by Member — Festival Window</p>
+                        <Card className="p-4 bg-white border border-gray-200 rounded-none shadow-sm">
+                          <p className="text-[10px] font-sans font-bold text-accent uppercase tracking-[0.2em] mb-3">Revenue by Member — Festival Window</p>
                           <ResponsiveContainer width="100%" height={180}>
                             <BarChart data={memberData} layout="vertical" margin={{ top: 4, right: 40, left: 40, bottom: 4 }}>
-                              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                               <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} tickFormatter={(v: number) => formatCurrency(v, sym)} />
                               <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={60} />
-                              <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }} />
-                              <Bar dataKey="Revenue" fill="#10b981" radius={[0, 4, 4, 0]} fillOpacity={0.85} />
+                              <Tooltip formatter={(v: number) => formatCurrency(v, sym)} contentStyle={{ background: "white", border: "1px solid #e2e8f0", borderRadius: 0, fontSize: 12 }} />
+                              <Bar dataKey="Revenue" fill="#13322b" radius={[0, 0, 0, 0]} fillOpacity={0.85} />
                             </BarChart>
                           </ResponsiveContainer>
                         </Card>
                       );
                     })()}
 
-                    <Card>
-                      <CardTitle className="text-sm px-5 pt-4 pb-2">Daily Entries — Diwali Season</CardTitle>
+                    <Card className="bg-white border border-gray-200 rounded-none shadow-sm">
+                      <div className="text-xs font-bold text-accent uppercase tracking-[0.25em] px-5 pt-4 pb-2 font-sans">Daily Entries — Diwali Season</div>
                       <div className="overflow-x-auto">
-                        <table className="w-full text-sm" data-testid="table-festival-report">
+                        <table className="w-full text-sm font-sans" data-testid="table-festival-report">
                           <thead>
-                            <tr className="border-b border-border text-xs text-muted-foreground uppercase tracking-wide">
+                            <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
                               <th className="px-4 py-2 text-left">Date</th>
                               <th className="px-4 py-2 text-left">Member</th>
                               <th className="px-4 py-2 text-right">Revenue</th>
@@ -1343,11 +1406,11 @@ export default function BusinessReports() {
                             {festivalEntries.map(e => {
                               const member = members.find(m => m.id === e.memberId);
                               return (
-                                <tr key={e.id} className="border-b border-border last:border-0 hover:bg-muted/20">
+                                <tr key={e.id} className="border-b border-gray-200 last:border-0 hover:bg-gray-50/50 transition-colors">
                                   <td className="px-4 py-2">{e.entryDate}</td>
-                                  <td className="px-4 py-2">{member?.name || member?.email || "—"}</td>
-                                  <td className="px-4 py-2 text-right text-amber-500">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
-                                  <td className="px-4 py-2 text-right text-green-500">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
+                                  <td className="px-4 py-2 font-semibold text-primary">{member?.name || member?.email || "—"}</td>
+                                  <td className="px-4 py-2 text-right text-primary font-semibold">{e.revenueAmount > 0 ? formatCurrency(e.revenueAmount, sym) : "—"}</td>
+                                  <td className="px-4 py-2 text-right text-accent font-semibold">{e.dealsClosed > 0 ? e.dealsClosed : "—"}</td>
                                 </tr>
                               );
                             })}
@@ -1366,31 +1429,31 @@ export default function BusinessReports() {
 
     {/* Share Report Dialog */}
     <Dialog open={shareDialogOpen} onOpenChange={(open) => { setShareDialogOpen(open); if (!open) setGeneratedShareLink(""); }}>
-      <DialogContent className="max-w-md" data-testid="dialog-share-report">
+      <DialogContent className="max-w-md rounded-none border border-gray-200 bg-white" data-testid="dialog-share-report">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-amber-500" /> Share {REPORT_TYPES.find(r => r.id === activeReport)?.label}
+          <DialogTitle className="flex items-center gap-2 font-sans font-bold uppercase tracking-wider text-primary text-sm">
+            <Share2 className="w-4 h-4 text-accent" /> Share {REPORT_TYPES.find(r => r.id === activeReport)?.label}
           </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 pt-2">
-          <p className="text-sm text-muted-foreground">
-            Generate a read-only shareable link for this report. <span className="font-medium text-foreground">Anyone with the link can view the report</span> — no login required. The link is token-based and scoped to this specific report view.
+        <div className="space-y-4 pt-2 font-sans">
+          <p className="text-xs text-muted-foreground leading-relaxed font-sans">
+            Generate a read-only shareable link for this report. <span className="font-semibold text-primary">Anyone with the link can view the report</span> — no login required. The link is token-based and scoped to this specific report view.
           </p>
           {generatedShareLink ? (
             <>
-              <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-lg px-3 py-2">
+              <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-none px-3 py-2">
                 <span className="text-xs text-muted-foreground truncate flex-1 font-mono">{generatedShareLink}</span>
-                <Button size="sm" variant="ghost" className="shrink-0 h-7 px-2" onClick={copyShareLink} data-testid="button-copy-share-link">
-                  {shareLinkCopied ? <Check className="w-3.5 h-3.5 text-green-500" /> : <Copy className="w-3.5 h-3.5" />}
+                <Button size="sm" variant="ghost" className="shrink-0 h-7 px-2 hover:bg-gray-100 rounded-none" onClick={copyShareLink} data-testid="button-copy-share-link">
+                  {shareLinkCopied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5 text-muted-foreground" />}
                 </Button>
               </div>
-              <Button className="w-full bg-amber-500 hover:bg-amber-600 text-black font-semibold" onClick={copyShareLink} data-testid="button-share-copy-main">
+              <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-semibold rounded-none uppercase tracking-wider text-xs h-10 shadow-none" onClick={copyShareLink} data-testid="button-share-copy-main">
                 {shareLinkCopied ? <><Check className="w-4 h-4 mr-2" /> Copied!</> : <><Copy className="w-4 h-4 mr-2" /> Copy Link</>}
               </Button>
             </>
           ) : (
             <Button
-              className="w-full bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+              className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-semibold rounded-none uppercase tracking-wider text-xs h-10 shadow-none"
               onClick={generateShareLink}
               disabled={shareLoading}
               data-testid="button-generate-share-link"
@@ -1399,14 +1462,14 @@ export default function BusinessReports() {
             </Button>
           )}
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={printReport} data-testid="button-share-print">
-              <Printer className="w-4 h-4 mr-1" /> Print / Save PDF
+            <Button variant="outline" className="flex-1 rounded-none border border-gray-200 hover:bg-gray-50 text-[10px] font-bold uppercase tracking-wider h-9" onClick={printReport} data-testid="button-share-print">
+              <Printer className="w-4 h-4 mr-1 text-muted-foreground" /> Print / Save PDF
             </Button>
-            <Button variant="outline" className="flex-1" onClick={exportPDF} data-testid="button-share-export-pdf">
-              <Download className="w-4 h-4 mr-1" /> Export PDF
+            <Button variant="outline" className="flex-1 rounded-none border border-gray-200 hover:bg-gray-50 text-[10px] font-bold uppercase tracking-wider h-9" onClick={exportPDF} data-testid="button-share-export-pdf">
+              <Download className="w-4 h-4 mr-1 text-muted-foreground" /> Export PDF
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-[10px] text-muted-foreground italic leading-normal">
             Each link is unique and token-protected. Only business owners and managers can access it.
           </p>
         </div>

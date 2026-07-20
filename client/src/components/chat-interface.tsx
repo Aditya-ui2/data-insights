@@ -3,6 +3,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -49,6 +50,8 @@ interface ChatInterfaceProps {
   conversationId?: string | null;
   onConversationCreated?: (id: string) => void;
   businessMode?: boolean;
+  initialDatasetId?: string;
+  sidebarMode?: boolean;
 }
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
@@ -178,8 +181,14 @@ function getDatasetSuggestions(dataset?: Dataset) {
   return suggestions.slice(0, 8);
 }
 
-export default function ChatInterface({ conversationId, onConversationCreated, businessMode = false }: ChatInterfaceProps) {
-  const [selectedDatasetId, setSelectedDatasetId] = useState<string>("");
+export default function ChatInterface({ 
+  conversationId, 
+  onConversationCreated, 
+  businessMode = false,
+  initialDatasetId,
+  sidebarMode = false
+}: ChatInterfaceProps) {
+  const [selectedDatasetId, setSelectedDatasetId] = useState<string>(initialDatasetId || "");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [showColumns, setShowColumns] = useState(false);
@@ -188,6 +197,7 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(conversationId || null);
   const [showDataSourceOptions, setShowDataSourceOptions] = useState(false);
   const [showSheetSelector, setShowSheetSelector] = useState(false);
+  const [useRag, setUseRag] = useState(false);
   const [sheetSelectorStep, setSheetSelectorStep] = useState<"spreadsheets" | "sheets">("spreadsheets");
   const [selectedSpreadsheet, setSelectedSpreadsheet] = useState<GoogleSheet | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -422,10 +432,16 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
       if (!conversationId) {
         // Starting a new chat
         setMessages([]);
-        setSelectedDatasetId("");
+        setSelectedDatasetId(initialDatasetId || "");
       }
     }
-  }, [conversationId]);
+  }, [conversationId, initialDatasetId]);
+
+  useEffect(() => {
+    if (initialDatasetId) {
+      setSelectedDatasetId(initialDatasetId);
+    }
+  }, [initialDatasetId]);
 
   // Refresh Google Sheets data
   const syncMutation = useMutation({
@@ -530,6 +546,7 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
         question,
         conversationHistory: messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
         businessMode,
+        useRag,
       });
       return await res.json();
     },
@@ -650,24 +667,26 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
   const datasetSuggestions = getDatasetSuggestions(selectedDataset);
 
   return (
-    <div className="h-full flex flex-col w-full px-4 md:px-8 lg:px-12">
+    <div className={cn("h-full flex flex-col w-full", sidebarMode ? "p-0" : "px-4 md:px-8 lg:px-12")}>
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
-        <div>
-          <h1 className="font-serif text-2xl font-bold">Chat with Your Data</h1>
-          <p className="text-muted-foreground">Ask questions about your datasets in natural language</p>
+      {!sidebarMode && (
+        <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+          <div>
+            <h1 className="font-sans text-2xl font-bold">Chat with Your Data</h1>
+            <p className="text-muted-foreground">Ask questions about your datasets in natural language</p>
+          </div>
+          <div className="flex items-center gap-2">
+            {messages.length > 0 && (
+              <Button variant="outline" size="sm" onClick={exportChatPdf} data-testid="button-export-chat-pdf">
+                <Download className="w-4 h-4 mr-2" />Export Chat
+              </Button>
+            )}
+            <span className="text-sm text-muted-foreground">
+              Unlimited actions remaining today
+            </span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          {messages.length > 0 && (
-            <Button variant="outline" size="sm" onClick={exportChatPdf} data-testid="button-export-chat-pdf">
-              <Download className="w-4 h-4 mr-2" />Export Chat
-            </Button>
-          )}
-          <span className="text-sm text-muted-foreground">
-            {actionsRemaining} actions remaining today
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* Hidden file input for Excel upload */}
       <input
@@ -689,8 +708,8 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
         data-testid="input-replace-file"
       />
 
-      {/* Dataset Selector — hidden in business mode */}
-      <Card className={`p-4 mb-4 ${businessMode ? 'hidden' : ''}`}>
+      {/* Dataset Selector — hidden in business mode or sidebar mode */}
+      <Card className={`p-4 mb-4 ${businessMode || sidebarMode ? 'hidden' : ''}`}>
         <div className="flex items-center gap-4 flex-wrap">
           <FileSpreadsheet className="w-5 h-5 text-muted-foreground" />
           <div className="flex-1 min-w-[200px]">
@@ -820,6 +839,20 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
             )}
           </div>
         )}
+        <div className="mt-3 pt-3 border-t border-border flex items-center gap-4">
+          <button
+            onClick={() => setUseRag(!useRag)}
+            className={`text-xs px-3 py-1.5 rounded-md font-semibold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
+              useRag
+                ? 'bg-blue-500/15 text-blue-600 border border-blue-200'
+                : 'bg-muted text-muted-foreground border border-border hover:bg-muted/80'
+            }`}
+            data-testid="button-toggle-rag"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            {useRag ? 'RAG Mode' : 'SQL Mode'}
+          </button>
+        </div>
         {selectedDataset && (
           <div className="mt-3 pt-3 border-t border-border">
             <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
@@ -872,8 +905,8 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
       </Card>
 
       {/* Chat Area */}
-      <Card className="flex-1 flex flex-col overflow-hidden min-h-[500px]">
-        <ScrollArea className="flex-1 p-6" ref={scrollRef}>
+      <Card className={cn("flex-1 flex flex-col overflow-hidden", sidebarMode ? "border-none shadow-none rounded-none bg-transparent min-h-0 h-full" : "min-h-[500px]")}>
+        <ScrollArea className={cn("flex-1", sidebarMode ? "p-3" : "p-6")} ref={scrollRef}>
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center text-center py-12">
               <div>
@@ -981,22 +1014,22 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
         </ScrollArea>
 
         {/* Input Area */}
-        <div className="p-6 border-t border-border">
+        <div className={cn("border-t border-border", sidebarMode ? "p-3 bg-white" : "p-6")}>
           {actionsRemaining <= 0 ? (
             <div className="flex items-center gap-2 text-sm text-muted-foreground p-4 bg-muted rounded-xl">
               <AlertCircle className="w-4 h-4" />
               <span>Daily limit reached. Come back tomorrow for more AI actions!</span>
             </div>
           ) : (
-            <div className="flex gap-3 items-end">
+            <div className="flex gap-2 items-end">
               <Button
                 onClick={toggleVoiceInput}
                 variant={isListening ? "default" : "outline"}
                 size="icon"
-                className={`h-[56px] w-[56px] rounded-xl flex-shrink-0 ${isListening ? "animate-pulse" : ""}`}
+                className={cn("rounded-xl flex-shrink-0", sidebarMode ? "h-10 w-10" : "h-[56px] w-[56px]", isListening ? "animate-pulse" : "")}
                 data-testid="button-voice-input"
               >
-                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                {isListening ? <MicOff className={sidebarMode ? "w-4 h-4" : "w-5 h-5"} /> : <Mic className={sidebarMode ? "w-4 h-4" : "w-5 h-5"} />}
               </Button>
               <Textarea
                 value={input}
@@ -1004,7 +1037,7 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
                 onKeyDown={handleKeyDown}
                 placeholder={businessMode ? "Ask about your business performance..." : selectedDatasetId ? "Ask anything about your data..." : "Select a dataset first..."}
                 disabled={(!businessMode && !selectedDatasetId) || chatMutation.isPending}
-                className="min-h-[56px] max-h-40 resize-none text-base rounded-xl"
+                className={cn("resize-none rounded-xl", sidebarMode ? "min-h-10 h-10 py-2.5 text-xs" : "min-h-[56px] max-h-40 text-base")}
                 rows={1}
                 data-testid="input-chat-message"
               />
@@ -1012,10 +1045,10 @@ export default function ChatInterface({ conversationId, onConversationCreated, b
                 onClick={handleSend}
                 disabled={!input.trim() || (!businessMode && !selectedDatasetId) || chatMutation.isPending}
                 size="icon"
-                className="h-[56px] w-[56px] rounded-xl flex-shrink-0"
+                className={cn("rounded-xl flex-shrink-0", sidebarMode ? "h-10 w-10" : "h-[56px] w-[56px]")}
                 data-testid="button-send-message"
               >
-                <Send className="w-5 h-5" />
+                <Send className={sidebarMode ? "w-4 h-4" : "w-5 h-5"} />
               </Button>
             </div>
           )}

@@ -35,27 +35,36 @@ export function datasetToText(headers: string[], data: Record<string, any>[]): s
 export async function embedText(text: string): Promise<number[]> {
   try {
     const result = await ai.models.embedContent({
-      model: "text-embedding-004",
+      model: "text-embedding-005",
       contents: text,
     });
     return result.embeddings?.[0]?.values ?? [];
   } catch (error) {
-    console.error("Embedding error:", error);
+    // Embedding failure is non-critical - RAG will just skip indexing
     return [];
   }
 }
 
 export async function embedBatch(texts: string[]): Promise<number[][]> {
   const embeddings: number[][] = [];
-  // Process in batches of 5 to respect rate limits
-  const BATCH = 5;
+  const BATCH = 100; // Batch content requests in groups of 100
   for (let i = 0; i < texts.length; i += BATCH) {
     const batch = texts.slice(i, i + BATCH);
-    const results = await Promise.all(batch.map(t => embedText(t)));
-    embeddings.push(...results);
+    try {
+      const result = await ai.models.embedContent({
+        model: "text-embedding-004",
+        contents: batch,
+      });
+      const batchEmbeds = result.embeddings?.map(e => e.values ?? []) ?? [];
+      embeddings.push(...batchEmbeds);
+    } catch (error) {
+      console.error(`Batch embedding error for indices ${i} to ${i + batch.length}, falling back:`, error);
+      const individualResults = await Promise.all(batch.map(t => embedText(t)));
+      embeddings.push(...individualResults);
+    }
     // Small delay to avoid rate limiting
     if (i + BATCH < texts.length) {
-      await new Promise(r => setTimeout(r, 200));
+      await new Promise(r => setTimeout(r, 250));
     }
   }
   return embeddings;

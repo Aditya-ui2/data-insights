@@ -398,33 +398,28 @@ export default function RunnerFieldTracking({
   // ─────────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="w-full min-h-full bg-black p-4 pb-20">
-      {/* Header */}
-      <div className="mb-6 pt-2">
-        <h1 className="text-3xl font-bold text-white mb-1">Field Tracker</h1>
-        <p className="text-white/50">Geo-tagged attendance &amp; site visits</p>
-      </div>
+    <div className="w-full min-h-full bg-transparent p-6 pb-20">
 
       {/* GPS Status Bar */}
       <motion.div
-        className={`rounded-xl p-4 mb-6 flex items-center gap-3 border ${
+        className={`rounded-none p-4 mb-6 flex items-center gap-3 border ${
           gpsStatus === "locked"
-            ? "bg-green-500/10 border-green-500/30"
+            ? "bg-green-500/5 border-green-500/20 text-primary"
             : gpsStatus === "acquiring"
-            ? "bg-yellow-500/10 border-yellow-500/30"
+            ? "bg-amber-500/5 border-amber-500/20 text-primary"
             : gpsStatus === "weak"
-            ? "bg-orange-500/10 border-orange-500/30"
-            : "bg-red-500/10 border-red-500/30"
+            ? "bg-orange-500/5 border-orange-500/20 text-primary"
+            : "bg-red-500/5 border-red-500/20 text-primary"
         }`}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
       >
         {gpsStatus === "locked" && (
           <>
-            <Signal className="w-5 h-5 text-green-400" />
+            <Signal className="w-5 h-5 text-green-600" />
             <div>
-              <p className="text-sm font-semibold text-green-300">GPS Locked ✓</p>
-              <p className="text-xs text-green-200">
+              <p className="text-sm font-semibold text-green-800">GPS Locked ✓</p>
+              <p className="text-xs text-muted-foreground">
                 Accuracy: ±{Math.round(currentLocation?.accuracy || 0)}m — Ready for punch-in
               </p>
             </div>
@@ -432,10 +427,10 @@ export default function RunnerFieldTracking({
         )}
         {gpsStatus === "acquiring" && (
           <>
-            <Loader2 className="w-5 h-5 text-yellow-400 animate-spin" />
+            <Loader2 className="w-5 h-5 text-amber-600 animate-spin" />
             <div>
-              <p className="text-sm font-semibold text-yellow-300">Improving Accuracy...</p>
-              <p className="text-xs text-yellow-200">
+              <p className="text-sm font-semibold text-amber-800">Improving Accuracy...</p>
+              <p className="text-xs text-muted-foreground">
                 Current: ±{Math.round(currentLocation?.accuracy || 0)}m — Need ≤50m
               </p>
             </div>
@@ -443,10 +438,10 @@ export default function RunnerFieldTracking({
         )}
         {gpsStatus === "weak" && (
           <>
-            <Signal className="w-5 h-5 text-orange-400" />
+            <Signal className="w-5 h-5 text-orange-600" />
             <div>
-              <p className="text-sm font-semibold text-orange-300">⚠️ Weak GPS Signal</p>
-              <p className="text-xs text-orange-200">
+              <p className="text-sm font-semibold text-orange-800">⚠️ Weak GPS Signal</p>
+              <p className="text-xs text-muted-foreground">
                 Accuracy: ±{Math.round(currentLocation?.accuracy || 0)}m — Move outside for better signal (need ≤50m)
               </p>
             </div>
@@ -454,10 +449,10 @@ export default function RunnerFieldTracking({
         )}
         {gpsStatus === "waiting" && (
           <>
-            <MapPinOff className="w-5 h-5 text-red-400" />
+            <MapPinOff className="w-5 h-5 text-red-600" />
             <div>
-              <p className="text-sm font-semibold text-red-300">GPS Not Ready</p>
-              <p className="text-xs text-red-200">Enable location access</p>
+              <p className="text-sm font-semibold text-red-800">GPS Not Ready</p>
+              <p className="text-xs text-muted-foreground">Enable location access</p>
             </div>
           </>
         )}
@@ -471,28 +466,29 @@ export default function RunnerFieldTracking({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-black border border-amber-500/20 rounded-2xl p-6 mb-6"
+            className="bg-white border border-gray-200 rounded-none p-6 mb-6 shadow-sm relative overflow-hidden group"
           >
-            <div className="text-center mb-4">
-              <Clock className="w-10 h-10 text-yellow-400 mx-auto mb-3" />
-              <h2 className="text-xl font-bold text-white mb-2">Start Your Day</h2>
-              <p className="text-gray-400 text-sm">
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+            <div className="text-center mb-6">
+              <Clock className="w-10 h-10 text-accent mx-auto mb-3" />
+              <h2 className="text-xl font-sans font-normal text-primary mb-2">Start Your Day</h2>
+              <p className="text-muted-foreground text-sm font-sans">
                 Punch in to begin tracking your visits
               </p>
             </div>
             <Button
               onClick={handlePunchIn}
               disabled={gpsStatus !== "locked" || isLoading}
-              className="w-full h-12 bg-gradient-to-r from-yellow-500 to-yellow-600 hover:from-yellow-600 hover:to-yellow-700 text-black font-bold text-lg rounded-xl transition-all"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground border border-primary px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none transition-all"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Punching In...
                 </>
               ) : (
                 <>
-                  <LogIn className="w-5 h-5 mr-2" />
+                  <LogIn className="w-4 h-4 mr-2" />
                   Start My Day
                 </>
               )}
@@ -511,24 +507,25 @@ export default function RunnerFieldTracking({
             {/* Current Visit Display */}
             {selectedSite && (
               <motion.div
-                className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-2xl p-4 border border-blue-400/30"
+                className="bg-accent/5 rounded-none p-5 border border-accent/25 relative"
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent" />
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <p className="text-xs text-gray-400 uppercase tracking-wider">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-1">
                       Current Visit
                     </p>
-                    <h3 className="text-lg font-bold text-white">{selectedSite.name}</h3>
-                    <p className="text-sm text-gray-300 mt-1">{selectedSite.address}</p>
+                    <h3 className="text-lg font-sans font-normal text-primary">{selectedSite.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-1 font-sans">{selectedSite.address}</p>
                   </div>
-                  <CheckCircle2 className="w-6 h-6 text-green-400 flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-green-650 flex-shrink-0" />
                 </div>
                 <Button
                   onClick={handleCheckOut}
                   disabled={isLoading}
-                  className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold rounded-lg"
+                  className="w-full h-10 bg-accent hover:bg-accent/90 text-accent-foreground border border-accent rounded-none text-xs uppercase tracking-wider font-semibold"
                 >
                   {isLoading ? "Checking Out..." : "Check Out"}
                 </Button>
@@ -537,31 +534,33 @@ export default function RunnerFieldTracking({
 
             {/* Sites List */}
             <div>
-              <h3 className="text-lg font-bold text-white mb-3">Today's Sites</h3>
-              <div className="space-y-2">
+              <h3 className="text-lg font-sans font-normal text-primary mb-3">Today's Sites</h3>
+              <div className="space-y-3">
                 {clientSites.map((site) => (
                   <motion.div
                     key={site.id}
-                    className={`rounded-xl p-4 border transition-all cursor-pointer ${
+                    className={`rounded-none p-4 border transition-all cursor-pointer relative group ${
                       selectedSite?.id === site.id
-                        ? "bg-yellow-500/10 border-yellow-400 ring-2 ring-yellow-400/30"
-                        : "bg-white/5 border-white/10 hover:border-amber-500/30"
+                        ? "bg-accent/5 border-accent shadow-sm"
+                        : "bg-white border-gray-200 hover:border-accent hover:shadow-md"
                     }`}
                     onClick={() => !selectedSite && handleCheckIn(site)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                   >
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
+                      <div className="w-8 h-8 border border-gray-200 group-hover:border-accent group-hover:bg-primary group-hover:text-primary-foreground flex items-center justify-center transition-all duration-300 flex-shrink-0">
+                        <MapPin className="w-4 h-4 text-accent" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-white truncate">{site.name}</p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="font-sans font-normal text-base text-primary truncate">{site.name}</p>
+                        <p className="text-xs text-muted-foreground mt-1 font-sans">
                           {site.contactPerson && <span>{site.contactPerson} • </span>}
                           Within {site.geofenceRadiusMeters}m
                         </p>
                       </div>
                       {selectedSite?.id === site.id && (
-                        <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-1.5" />
                       )}
                     </div>
                   </motion.div>
@@ -571,18 +570,19 @@ export default function RunnerFieldTracking({
 
             {/* Visit Timeline */}
             {daySiteLogs.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {/* Attendance Summary Card */}
-                <div className="bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-xl p-4 border border-amber-500/30">
-                  <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Clock className="w-4 h-4" />
+                <div className="bg-gray-50 border border-gray-200 rounded-none p-5 relative overflow-hidden">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent" />
+                  <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-3 flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5" />
                     My Attendance
                   </h3>
                   <div className="grid grid-cols-3 gap-3">
                     {/* Punch-in time */}
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-1">Punch In</p>
-                      <p className="text-sm font-bold text-green-400">
+                      <p className="text-xs text-muted-foreground mb-1">Punch In</p>
+                      <p className="text-sm font-semibold font-sans text-green-700">
                         {daySiteLogs.find((l) => l.actionType === "punch_in")
                           ? new Date(
                               daySiteLogs.find((l) => l.actionType === "punch_in")!.timestamp
@@ -591,51 +591,51 @@ export default function RunnerFieldTracking({
                       </p>
                     </div>
                     {/* Sites visited */}
-                    <div className="text-center border-x border-white/10">
-                      <p className="text-xs text-gray-500 mb-1">Sites</p>
-                      <p className="text-sm font-bold text-blue-400">
+                    <div className="text-center border-x border-gray-200">
+                      <p className="text-xs text-muted-foreground mb-1">Sites</p>
+                      <p className="text-sm font-semibold font-sans text-primary">
                         {daySiteLogs.filter((l) => l.actionType === "check_in").length}
                       </p>
                     </div>
                     {/* Punch-out time or ongoing */}
                     <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-1">Punch Out</p>
-                      <p className="text-sm font-bold text-red-400">
+                      <p className="text-xs text-muted-foreground mb-1">Punch Out</p>
+                      <p className="text-sm font-semibold font-sans text-destructive">
                         {daySiteLogs.find((l) => l.actionType === "punch_out")
                           ? new Date(
                               daySiteLogs.find((l) => l.actionType === "punch_out")!.timestamp
                             ).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                          : <span className="text-yellow-400">Active</span>}
+                          : <span className="text-accent">Active</span>}
                       </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Timeline */}
-                <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                  <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-amber-400" />
+                <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm">
+                  <h3 className="text-lg font-sans font-normal text-primary mb-4 flex items-center gap-2">
+                    <TrendingUp className="w-4.5 h-4.5 text-accent" />
                     Today's Timeline
                   </h3>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                  <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
                     {daySiteLogs.map((log, idx) => (
                       <div
                         key={idx}
-                        className="flex items-center gap-3 text-sm border-l-2 border-yellow-400/30 pl-3 py-2"
+                        className="flex items-center gap-3 text-sm border-l-2 border-accent/30 pl-3 py-1"
                       >
-                        <div className="w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0" />
+                        <div className="w-2 h-2 rounded-none bg-accent flex-shrink-0" />
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-200 capitalize">
+                          <p className="font-semibold text-primary capitalize font-sans text-xs">
                             {log.actionType.replace(/_/g, " ")}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-[10px] text-muted-foreground font-sans">
                             {new Date(log.timestamp).toLocaleTimeString()}
                           </p>
                         </div>
                         {log.status === "success" ? (
-                          <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
+                          <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
                         ) : (
-                          <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                          <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0" />
                         )}
                       </div>
                     ))}
@@ -648,16 +648,16 @@ export default function RunnerFieldTracking({
             <Button
               onClick={handlePunchOut}
               disabled={isLoading || selectedSite !== null}
-              className="w-full h-12 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-bold text-lg rounded-xl transition-all"
+              className="w-full h-12 bg-destructive hover:bg-destructive/90 text-destructive-foreground border border-destructive px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none transition-all"
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Ending Day...
                 </>
               ) : (
                 <>
-                  <LogOut className="w-5 h-5 mr-2" />
+                  <LogOut className="w-4 h-4 mr-2" />
                   End My Day
                 </>
               )}
@@ -673,24 +673,26 @@ export default function RunnerFieldTracking({
             exit={{ opacity: 0, scale: 0.95 }}
             className="space-y-4"
           >
-            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-2xl p-6 border border-green-500/30 text-center">
-              <CheckCircle2 className="w-12 h-12 text-green-400 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">Day Completed!</h2>
-              <p className="text-gray-300 mb-4">
+            <div className="bg-green-500/5 border border-green-500/20 rounded-none p-6 text-center relative overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-600" />
+              <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-sans font-normal text-primary mb-2">Day Completed!</h2>
+              <p className="text-muted-foreground text-sm font-sans mb-4">
                 {daySiteLogs.filter((l) => l.actionType === "check_in").length} sites visited
               </p>
             </div>
 
             {/* Attendance Summary */}
-            <div className="bg-gradient-to-br from-amber-500/10 to-yellow-500/5 rounded-xl p-4 border border-amber-500/30">
-              <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+            <div className="bg-gray-50 border border-gray-200 rounded-none p-5 relative overflow-hidden">
+              <div className="absolute left-0 top-0 bottom-0 w-1 bg-accent" />
+              <h3 className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent mb-3 flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5" />
                 My Attendance
               </h3>
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Punch In</p>
-                  <p className="text-sm font-bold text-green-400">
+                  <p className="text-xs text-muted-foreground mb-1">Punch In</p>
+                  <p className="text-sm font-semibold font-sans text-green-700">
                     {daySiteLogs.find((l) => l.actionType === "punch_in")
                       ? new Date(
                           daySiteLogs.find((l) => l.actionType === "punch_in")!.timestamp
@@ -698,15 +700,15 @@ export default function RunnerFieldTracking({
                       : "--"}
                   </p>
                 </div>
-                <div className="text-center border-x border-white/10">
-                  <p className="text-xs text-gray-500 mb-1">Sites</p>
-                  <p className="text-sm font-bold text-blue-400">
+                <div className="text-center border-x border-gray-200">
+                  <p className="text-xs text-muted-foreground mb-1">Sites</p>
+                  <p className="text-sm font-semibold font-sans text-primary">
                     {daySiteLogs.filter((l) => l.actionType === "check_in").length}
                   </p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs text-gray-500 mb-1">Punch Out</p>
-                  <p className="text-sm font-bold text-red-400">
+                  <p className="text-xs text-muted-foreground mb-1">Punch Out</p>
+                  <p className="text-sm font-semibold font-sans text-destructive">
                     {daySiteLogs.find((l) => l.actionType === "punch_out")
                       ? new Date(
                           daySiteLogs.find((l) => l.actionType === "punch_out")!.timestamp
@@ -719,27 +721,27 @@ export default function RunnerFieldTracking({
 
             {/* Timeline */}
             {daySiteLogs.length > 0 && (
-              <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <h3 className="text-base font-bold text-white mb-3 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-amber-400" />
+              <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm">
+                <h3 className="text-base font-sans font-normal text-primary mb-3 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-accent" />
                   Today's Timeline
                 </h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                   {daySiteLogs.map((log, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3 text-sm border-l-2 border-yellow-400/30 pl-3 py-1"
+                      className="flex items-center gap-3 text-sm border-l-2 border-accent/30 pl-3 py-1"
                     >
-                      <div className="w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0" />
+                      <div className="w-2 h-2 rounded-none bg-accent flex-shrink-0" />
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-200 capitalize">
+                        <p className="font-semibold text-primary capitalize font-sans text-xs">
                           {log.actionType.replace(/_/g, " ")}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-[10px] text-muted-foreground font-sans">
                           {new Date(log.timestamp).toLocaleTimeString()}
                         </p>
                       </div>
-                      <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
                     </div>
                   ))}
                 </div>
@@ -751,7 +753,7 @@ export default function RunnerFieldTracking({
 
       {/* Debug Info - Only in dev */}
       {process.env.NODE_ENV === "development" && currentLocation && (
-        <div className="mt-6 bg-white/5 rounded-lg p-3 text-xs text-white/40 border border-white/10">
+        <div className="mt-6 bg-gray-50 rounded-none p-3 text-xs text-muted-foreground border border-gray-200">
           <p>📍 Lat: {currentLocation.latitude.toFixed(6)}</p>
           <p>📍 Lon: {currentLocation.longitude.toFixed(6)}</p>
           <p>📡 Accuracy: ±{Math.round(currentLocation.accuracy)}m</p>

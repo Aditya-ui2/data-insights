@@ -245,7 +245,7 @@ export function AboutModal({ open, onOpenChange }: ModalProps) {
             <div className="w-16 h-16 rounded-xl bg-primary flex items-center justify-center mx-auto mb-4">
               <BarChart3 className="w-8 h-8 text-primary-foreground" />
             </div>
-            <h2 className="font-serif text-xl font-bold">DataInsights</h2>
+            <h2 className="font-sans text-xl font-bold">DataInsights</h2>
             <p className="text-sm text-muted-foreground">Version 1.0.0</p>
           </div>
           

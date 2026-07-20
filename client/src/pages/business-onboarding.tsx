@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -13,22 +15,25 @@ import {
   Sparkles, User, Mail, Lock, Building2, ChevronRight, 
   Brain, Target, Loader2, CheckCircle2, AlertTriangle,
   TrendingUp, RotateCcw, ArrowRight, ArrowLeft, Zap, BarChart3,
-  Users, FileSpreadsheet, Activity, Briefcase
+  Users, FileSpreadsheet, Activity, Briefcase,
+  Home, ShoppingCart, Factory, Utensils, HeartPulse,
+  GraduationCap, Truck, Laptop, HelpCircle
 } from "lucide-react";
 
 // Industry options for the magic dropdown
 const INDUSTRIES = [
-  { key: "real-estate", label: "Real Estate", icon: "🏠" },
-  { key: "retail", label: "Retail & E-commerce", icon: "🛒" },
-  { key: "manufacturing", label: "Manufacturing", icon: "🏭" },
-  { key: "agency", label: "Agency / Consulting", icon: "💼" },
-  { key: "hospitality", label: "Hospitality & F&B", icon: "🍽️" },
-  { key: "healthcare", label: "Healthcare", icon: "🏥" },
-  { key: "education", label: "Education", icon: "📚" },
-  { key: "logistics", label: "Logistics & Transport", icon: "🚚" },
-  { key: "services", label: "Professional Services", icon: "👔" },
-  { key: "other", label: "Other", icon: "📊" },
+  { key: "real-estate", label: "Real Estate", icon: Home },
+  { key: "retail", label: "Retail & E-commerce", icon: ShoppingCart },
+  { key: "manufacturing", label: "Manufacturing", icon: Factory },
+  { key: "agency", label: "Agency / Consulting", icon: Briefcase },
+  { key: "hospitality", label: "Hospitality & F&B", icon: Utensils },
+  { key: "healthcare", label: "Healthcare", icon: HeartPulse },
+  { key: "education", label: "Education", icon: GraduationCap },
+  { key: "logistics", label: "Logistics & Transport", icon: Truck },
+  { key: "services", label: "Professional Services", icon: Laptop },
+  { key: "other", label: "Other", icon: HelpCircle },
 ];
+
 
 // Likert scale options
 const LIKERT_OPTIONS = [
@@ -95,15 +100,15 @@ function RotatingQuotes() {
           <motion.div
             className="flex items-center gap-2"
             animate={{ 
-              textShadow: ["0 0 20px rgba(234,179,8,0)", "0 0 30px rgba(234,179,8,0.5)", "0 0 20px rgba(234,179,8,0)"]
+              textShadow: ["0 0 20px rgba(197,155,67,0)", "0 0 30px rgba(197,155,67,0.5)", "0 0 20px rgba(197,155,67,0)"]
             }}
             transition={{ duration: 2, repeat: Infinity }}
           >
-            <Sparkles className="w-5 h-5 text-yellow-400" />
-            <span className="text-lg font-semibold bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-400 bg-clip-text text-transparent">
+            <Sparkles className="w-5 h-5 text-[#c59b43]" />
+            <span className="text-lg font-semibold bg-gradient-to-r from-[#c59b43] via-[#e2bd70] to-[#c59b43] bg-clip-text text-transparent">
               "{DATA_INSIGHTS_QUOTES[currentQuote].quote}"
             </span>
-            <Sparkles className="w-5 h-5 text-yellow-400" />
+            <Sparkles className="w-5 h-5 text-[#c59b43]" />
           </motion.div>
         </motion.div>
       </AnimatePresence>
@@ -199,7 +204,7 @@ const getHealthStatus = (score: number): HealthStatus => {
   }
 };
 
-// Animated Line Chart Component (Golden Theme)
+// Animated Line Chart Component (Green/Teal Theme)
 function AnimatedLineChart() {
   const pathData = "M 0 80 Q 30 60, 60 70 T 120 50 T 180 65 T 240 35 T 300 45";
   
@@ -216,8 +221,8 @@ function AnimatedLineChart() {
       {/* Animated gradient area under chart */}
       <defs>
         <linearGradient id="chartGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#eab308" stopOpacity="0.4" />
-          <stop offset="100%" stopColor="#eab308" stopOpacity="0" />
+          <stop offset="0%" stopColor="white" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="white" stopOpacity="0" />
         </linearGradient>
       </defs>
       
@@ -233,7 +238,7 @@ function AnimatedLineChart() {
       <motion.path
         d={pathData}
         fill="none"
-        stroke="#eab308"
+        stroke="white"
         strokeWidth="2"
         strokeLinecap="round"
         initial={{ pathLength: 0, opacity: 0 }}
@@ -251,7 +256,7 @@ function AnimatedLineChart() {
           cx={point.x}
           cy={point.y}
           r="4"
-          fill="#eab308"
+          fill="white"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.3 * i, duration: 0.3 }}
@@ -275,8 +280,8 @@ function AnimatedBarChart() {
           width="15"
           height={height}
           rx="2"
-          fill="#eab308"
-          fillOpacity="0.4"
+          fill="white"
+          fillOpacity="0.3"
           initial={{ height: 0, y: 100 }}
           animate={{ height, y: 100 - height }}
           transition={{ 
@@ -293,7 +298,7 @@ function AnimatedBarChart() {
   );
 }
 
-// Animated Pie/Donut Chart (Golden)
+// Animated Pie/Donut Chart
 function AnimatedDonutChart() {
   const segments = [
     { percent: 35, delay: 0 },
@@ -325,8 +330,8 @@ function AnimatedDonutChart() {
           <motion.path
             key={i}
             d={`M 50 50 L ${x1} ${y1} A 35 35 0 ${largeArc} 1 ${x2} ${y2} Z`}
-            fill="#eab308"
-            fillOpacity={0.2 + i * 0.15}
+            fill="white"
+            fillOpacity={0.15 + i * 0.1}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: segment.delay, duration: 0.5 }}
@@ -334,12 +339,12 @@ function AnimatedDonutChart() {
         );
       })}
       {/* Center circle for donut effect */}
-      <circle cx="50" cy="50" r="20" fill="black" />
+      <circle cx="50" cy="50" r="20" fill="#13322b" />
       <motion.text
         x="50"
         y="54"
         textAnchor="middle"
-        fill="#eab308"
+        fill="white"
         fontSize="12"
         fontWeight="bold"
         initial={{ opacity: 0 }}
@@ -352,34 +357,34 @@ function AnimatedDonutChart() {
   );
 }
 
-// Floating Stats Card (Golden)
+// Floating Stats Card
 function FloatingStatsCard({ value, label, delay }: { value: string; label: string; delay: number }) {
   return (
     <motion.div
-      className="bg-yellow-500/10 backdrop-blur-md rounded-xl p-3 border border-yellow-500/30"
+      className="bg-white/10 backdrop-blur-md rounded-none p-3 border border-white/10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
       whileHover={{ scale: 1.05 }}
     >
       <motion.div 
-        className="text-yellow-400 text-xl font-bold"
+        className="text-white text-xl font-bold"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: delay + 0.3 }}
       >
         {value}
       </motion.div>
-      <div className="text-yellow-400/60 text-xs">{label}</div>
+      <div className="text-white/60 text-xs">{label}</div>
     </motion.div>
   );
 }
 
-// Pulsing Data Node (Golden)
+// Pulsing Data Node
 function DataNode({ x, y, size, delay }: { x: string; y: string; size: number; delay: number }) {
   return (
     <motion.div
-      className="absolute rounded-full bg-yellow-500/30"
+      className="absolute rounded-full bg-white/30"
       style={{ left: x, top: y, width: size, height: size }}
       initial={{ scale: 0 }}
       animate={{ 
@@ -394,7 +399,7 @@ function DataNode({ x, y, size, delay }: { x: string; y: string; size: number; d
       }}
     >
       <motion.div
-        className="absolute inset-0 rounded-full bg-yellow-500/50"
+        className="absolute inset-0 rounded-full bg-white/50"
         animate={{ scale: [1, 2, 1], opacity: [0.5, 0, 0.5] }}
         transition={{ duration: 2, repeat: Infinity, delay }}
       />
@@ -402,14 +407,39 @@ function DataNode({ x, y, size, delay }: { x: string; y: string; size: number; d
   );
 }
 
-// Animated Background with charts and golden elements - MORE VISIBLE VERSION
+// Animated Background with charts and green elements
 function AnimatedChartBackground() {
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {/* Base gradient glow */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-yellow-500/5" />
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Base gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#13322b] via-[#1a473d] to-[#0d221e]" />
       
-      {/* Animated Line Chart - Top Right - LARGER & MORE VISIBLE */}
+      {/* Animated gradient overlay */}
+      <motion.div
+        className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-[#c59b43]/10"
+        animate={{
+          opacity: [0.5, 0.8, 0.5],
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      
+      {/* Grid Background */}
+      <div className="absolute inset-0 opacity-10">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
+      
+      {/* Animated Line Chart - Top Right */}
       <motion.div 
         className="absolute top-[8%] right-[3%] w-64 h-32 opacity-80"
         initial={{ opacity: 0, x: 50 }}
@@ -429,7 +459,7 @@ function AnimatedChartBackground() {
         <AnimatedLineChart />
       </motion.div>
 
-      {/* Animated Bar Chart - Bottom Left - LARGER */}
+      {/* Animated Bar Chart - Bottom Left */}
       <motion.div 
         className="absolute bottom-[15%] left-[3%] w-52 h-28 opacity-75"
         initial={{ opacity: 0, y: 30 }}
@@ -449,7 +479,7 @@ function AnimatedChartBackground() {
         <AnimatedBarChart />
       </motion.div>
 
-      {/* Donut Chart - Center Right - LARGER */}
+      {/* Donut Chart - Center Right */}
       <motion.div 
         className="absolute top-[35%] right-[8%] w-32 h-32 opacity-80"
         initial={{ opacity: 0, scale: 0.5 }}
@@ -469,7 +499,7 @@ function AnimatedChartBackground() {
         <AnimatedDonutChart />
       </motion.div>
 
-      {/* Floating Stats Cards - More of them and more visible */}
+      {/* Floating Stats Cards */}
       <div className="absolute top-[10%] right-[15%]">
         <FloatingStatsCard value="+24%" label="Growth" delay={0.2} />
       </div>
@@ -497,7 +527,7 @@ function AnimatedChartBackground() {
       <svg className="absolute inset-0 w-full h-full opacity-20" preserveAspectRatio="none">
         <motion.line
           x1="25%" y1="15%" x2="55%" y2="30%"
-          stroke="#eab308"
+          stroke="white"
           strokeWidth="1"
           strokeDasharray="5,5"
           initial={{ pathLength: 0 }}
@@ -506,7 +536,7 @@ function AnimatedChartBackground() {
         />
         <motion.line
           x1="55%" y1="30%" x2="65%" y2="70%"
-          stroke="#eab308"
+          stroke="white"
           strokeWidth="1"
           strokeDasharray="5,5"
           initial={{ pathLength: 0 }}
@@ -515,7 +545,7 @@ function AnimatedChartBackground() {
         />
         <motion.line
           x1="20%" y1="60%" x2="40%" y2="80%"
-          stroke="#eab308"
+          stroke="white"
           strokeWidth="1"
           strokeDasharray="5,5"
           initial={{ pathLength: 0 }}
@@ -526,7 +556,7 @@ function AnimatedChartBackground() {
 
       {/* Large floating orb 1 */}
       <motion.div
-        className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-br from-yellow-400/20 to-amber-500/10 blur-3xl"
+        className="absolute w-[400px] h-[400px] rounded-full bg-gradient-to-br from-[#c59b43]/20 to-[#13322b]/10 blur-3xl"
         animate={{
           x: [0, 80, 40, 0],
           y: [0, -40, 80, 0],
@@ -542,7 +572,7 @@ function AnimatedChartBackground() {
 
       {/* Large floating orb 2 */}
       <motion.div
-        className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-amber-600/30 to-yellow-500/10 blur-3xl"
+        className="absolute w-[300px] h-[300px] rounded-full bg-gradient-to-tr from-[#13322b]/40 to-black/20 blur-3xl"
         animate={{
           x: [0, -60, 30, 0],
           y: [0, 60, -30, 0],
@@ -560,7 +590,7 @@ function AnimatedChartBackground() {
       {[...Array(8)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-1 h-1 rounded-full bg-yellow-400/60"
+          className="absolute w-1 h-1 rounded-full bg-white/60"
           animate={{
             y: [0, -200],
             opacity: [0, 1, 0],
@@ -586,6 +616,7 @@ export default function BusinessOnboarding() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const { user, isAuthenticated, isLoading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
 
   // Current step in the funnel
   const [currentStep, setCurrentStep] = useState<OnboardingStep>("signup");
@@ -781,13 +812,21 @@ export default function BusinessOnboarding() {
 
   // Handle Likert answer selection - auto advance to next question
   const handleAnswerSelect = (questionIndex: number, value: number) => {
-    setAnswers(prev => ({ ...prev, [questionIndex]: value }));
+    const newAnswers = { ...answers, [questionIndex]: value };
+    setAnswers(newAnswers);
     
     // Auto advance to next question after a short delay
     if (questionIndex < questions.length - 1) {
       setTimeout(() => {
         setCurrentQuestionIndex(questionIndex + 1);
       }, 400);
+    } else if (Object.keys(newAnswers).length === questions.length) {
+      // Last question answered and all questions complete — auto-submit
+      setTimeout(() => {
+        const score = Object.values(newAnswers).reduce((sum, val) => sum + val, 0);
+        setTotalScore(score);
+        setCurrentStep("results");
+      }, 600);
     }
   };
 
@@ -811,7 +850,19 @@ export default function BusinessOnboarding() {
   };
 
   // Final navigation to selected suite
-  const handleSelectSuite = (suite: "business" | "analytics") => {
+  const handleSelectSuite = async (suite: "business" | "analytics") => {
+    // Mark onboarding as complete so user doesn't get redirected back
+    try {
+      await apiRequest("PATCH", "/api/users/me", { onboardingComplete: true });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+    } catch (e) {
+      // Silently proceed — navigation is more important
+      console.warn("Could not mark onboarding complete:", e);
+    }
+    // Set localStorage flag so home.tsx doesn't redirect back to /get-started
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('onboardingDone', 'true');
+    }
     if (suite === "business") {
       navigate("/business/setup");
     } else {
@@ -843,47 +894,65 @@ export default function BusinessOnboarding() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
           >
             <AnimatedChartBackground />
             <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 30 }}
-              transition={{ type: "spring", bounce: 0.3 }}
-              className="relative z-10 w-full max-w-sm bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl p-8 text-center"
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative z-10 w-full max-w-sm bg-zinc-950/80 backdrop-blur-md rounded-none border border-[#13322b]/40 shadow-[0_0_50px_rgba(19,50,43,0.35)] p-8 text-center"
             >
-              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-3xl" />
-              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-3xl" />
+              {/* Sleek outer thin border */}
+              <div className="absolute inset-1.5 border border-zinc-800/40 pointer-events-none" />
 
-              <motion.div
-                className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mx-auto mb-5"
-                animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 24px rgba(234,179,8,0.3)", "0 0 0 rgba(234,179,8,0)"] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <Lock className="w-7 h-7 text-yellow-400" />
-              </motion.div>
+              {/* Animated Lock icon */}
+              <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                {/* Concentric rotating outer ring */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-dashed border-[#1a473d]/45"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Concentric counter-rotating inner ring */}
+                <motion.div
+                  className="absolute inset-2 rounded-full border border-dotted border-[#1a473d]/65"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Glowing center circle */}
+                <motion.div
+                  className="absolute inset-4 rounded-full bg-[#13322b]/15 border border-[#13322b]/45 flex items-center justify-center"
+                  animate={{ boxShadow: ["0 0 0 rgba(19,50,43,0)", "0 0 15px rgba(19,50,43,0.3)", "0 0 0 rgba(19,50,43,0)"] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Lock className="w-5 h-5 text-[#c59b43]" />
+                </motion.div>
+              </div>
 
               <RotatingQuotes />
 
-              <h2 className="text-xl font-bold text-white mb-2">Login Required</h2>
-              <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                You need to be logged in to take the Business Health Audit.<br />
-                Would you like to go to the login page?
-              </p>
+              <div className="space-y-1 mb-6 mt-4">
+                <p className="text-[9px] font-sans font-bold uppercase tracking-[0.2em] text-[#c59b43]">Authentication Required</p>
+                <h2 className="text-xl font-serif font-medium text-white tracking-wide">Login Required</h2>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-[260px] mx-auto pt-2">
+                  You need to be logged in to take the Business Health Audit. Would you like to log in now?
+                </p>
+              </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => { navigate("/login"); }}
-                  className="flex-1 h-11 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-sm transition-colors"
+                  className="flex-1 h-11 rounded-none bg-gradient-to-r from-[#13322b] to-[#1a473d] hover:from-[#1a473d] hover:to-[#225f52] text-white font-sans uppercase tracking-[0.15em] text-[10px] font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(19,50,43,0.3)] hover:shadow-[0_4px_30px_rgba(19,50,43,0.45)]"
                 >
                   Yes, Login
                 </button>
                 <button
                   onClick={() => { navigate("/"); }}
-                  className="flex-1 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 font-medium text-sm border border-slate-700 transition-colors"
+                  className="flex-1 h-11 rounded-none border border-slate-700 bg-transparent hover:bg-slate-900/60 text-slate-300 font-sans uppercase tracking-[0.15em] text-[10px] font-bold transition-all duration-200 group"
                 >
-                  Maybe Later
+                  <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Maybe Later</span>
                 </button>
               </div>
             </motion.div>
@@ -899,65 +968,68 @@ export default function BusinessOnboarding() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm"
           >
             <AnimatedChartBackground />
             <motion.div
-              initial={{ scale: 0.85, opacity: 0, y: 30 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.85, opacity: 0, y: 30 }}
-              transition={{ type: "spring", bounce: 0.3 }}
-              className="relative z-10 w-full max-w-sm bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl p-8 text-center"
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative z-10 w-full max-w-sm bg-zinc-950/80 backdrop-blur-md rounded-none border border-[#13322b]/40 shadow-[0_0_50px_rgba(19,50,43,0.35)] p-8 text-center"
             >
-              <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-3xl" />
-              <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-3xl" />
+              {/* Sleek outer thin border */}
+              <div className="absolute inset-1.5 border border-zinc-800/40 pointer-events-none" />
 
-              {/* Mini animated bar chart */}
-              <motion.div
-                className="w-16 h-16 rounded-full bg-yellow-500/10 border border-yellow-500/30 flex items-end justify-center gap-[3px] px-3 pb-3 mx-auto mb-5 overflow-hidden"
-                animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 24px rgba(234,179,8,0.3)", "0 0 0 rgba(234,179,8,0)"] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                {[0.4, 0.7, 0.5, 0.9, 0.6].map((h, i) => (
-                  <motion.div
-                    key={i}
-                    className="w-[6px] rounded-sm bg-yellow-400"
-                    initial={{ scaleY: 0, originY: 1 }}
-                    animate={{ scaleY: [h, h * 0.7, h, h * 1.1, h] }}
-                    transition={{
-                      duration: 1.8,
-                      delay: i * 0.12,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    style={{ height: `${h * 28}px`, transformOrigin: "bottom" }}
-                  />
-                ))}
-              </motion.div>
+              {/* Animated high-tech target icon */}
+              <div className="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                {/* Concentric rotating outer ring */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-dashed border-[#1a473d]/45"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Concentric counter-rotating inner ring */}
+                <motion.div
+                  className="absolute inset-2 rounded-full border border-dotted border-[#1a473d]/65"
+                  animate={{ rotate: -360 }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                />
+                {/* Glowing center circle */}
+                <motion.div
+                  className="absolute inset-4 rounded-full bg-[#13322b]/15 border border-[#13322b]/45 flex items-center justify-center"
+                  animate={{ boxShadow: ["0 0 0 rgba(19,50,43,0)", "0 0 15px rgba(19,50,43,0.3)", "0 0 0 rgba(19,50,43,0)"] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Activity className="w-6 h-6 text-[#c59b43]" />
+                </motion.div>
+              </div>
 
               <RotatingQuotes />
 
-              <h2 className="text-xl font-bold text-white mb-2">
-                Welcome Back, {user?.firstName || "there"}! 👋
-              </h2>
-              <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                You are already logged in.<br />
-                Would you like to retake the Business Health Audit?
-              </p>
+              <div className="space-y-1 mb-6 mt-4">
+                <p className="text-[9px] font-sans font-bold uppercase tracking-[0.2em] text-[#c59b43]">Authenticated Session</p>
+                <h2 className="text-xl font-serif font-medium text-white tracking-wide">
+                  Welcome Back, {user?.firstName || "there"}! 👋
+                </h2>
+                <p className="text-slate-400 text-xs leading-relaxed max-w-[260px] mx-auto pt-2">
+                  You are currently logged in. Would you like to retake the Business Health Audit?
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <div className="flex gap-3">
                   <button
                     onClick={() => { setShowRetakeConfirm(false); setCurrentStep("industry-select"); }}
-                    className="flex-1 h-11 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-sm transition-colors"
+                    className="flex-1 h-11 rounded-none bg-gradient-to-r from-[#13322b] to-[#1a473d] hover:from-[#1a473d] hover:to-[#225f52] text-white font-sans uppercase tracking-[0.15em] text-[10px] font-bold transition-all duration-200 shadow-[0_4px_20px_rgba(19,50,43,0.3)] hover:shadow-[0_4px_30px_rgba(19,50,43,0.45)]"
                   >
                     Yes, Retake
                   </button>
                   <button
                     onClick={() => navigate("/business")}
-                    className="flex-1 h-11 rounded-xl bg-slate-800 hover:bg-slate-700 text-gray-300 font-medium text-sm border border-slate-700 transition-colors"
+                    className="flex-1 h-11 rounded-none border border-slate-700 bg-transparent hover:bg-slate-900/60 text-slate-300 font-sans uppercase tracking-[0.15em] text-[10px] font-bold transition-all duration-200 group"
                   >
-                    Go to Dashboard
+                    <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Dashboard</span>
                   </button>
                 </div>
                 <button
@@ -970,9 +1042,9 @@ export default function BusinessOnboarding() {
                     }
                     navigate("/");
                   }}
-                  className="w-full h-11 rounded-xl bg-red-600/20 hover:bg-red-600/30 text-red-300 font-medium text-sm border border-red-500/30 transition-colors"
+                  className="w-full h-11 rounded-none border border-red-500/20 bg-red-950/10 hover:bg-red-950/20 text-red-400/90 font-sans uppercase tracking-[0.15em] text-[10px] font-semibold transition-all duration-200 group"
                 >
-                  Back to Landing
+                  <span className="text-red-400/90 group-hover:text-red-400 transition-colors duration-200">Logout & Exit</span>
                 </button>
               </div>
             </motion.div>
@@ -1009,7 +1081,7 @@ export default function BusinessOnboarding() {
                   }
                   navigate("/"); 
                 }}
-                className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 mb-4 transition-colors"
+                className="flex items-center gap-2 text-gray-400 hover:text-[#1cbd9c] mb-4 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back</span>
@@ -1024,7 +1096,7 @@ export default function BusinessOnboarding() {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ type: "spring", delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm font-medium mb-4"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1cbd9c]/10 border border-[#1cbd9c]/20 text-[#1cbd9c] text-sm font-medium mb-4"
                 >
                   <Target className="w-4 h-4" />
                   Free Business Health Audit
@@ -1036,7 +1108,7 @@ export default function BusinessOnboarding() {
               </div>
 
               {/* Signup Form */}
-              <Card className="bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl p-8 space-y-5">
+              <Card className="bg-zinc-950/80 backdrop-blur-md rounded-none border border-[#1cbd9c]/30 shadow-[0_0_50px_rgba(28,189,156,0.15)] p-8 space-y-5">
                 {/* Name */}
                 <div className="space-y-2">
                   <Label className="text-gray-300">Your Name</Label>
@@ -1046,7 +1118,7 @@ export default function BusinessOnboarding() {
                       placeholder="Rahul Sharma"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="pl-10 h-12 rounded-xl bg-slate-800/50 border-slate-600 focus:border-yellow-500"
+                      className="pl-10 h-12 rounded-none bg-zinc-900/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-[#c59b43]"
                     />
                   </div>
                 </div>
@@ -1061,7 +1133,7 @@ export default function BusinessOnboarding() {
                       placeholder="rahul@company.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-12 rounded-xl bg-slate-800/50 border-slate-600 focus:border-yellow-500"
+                      className="pl-10 h-12 rounded-none bg-zinc-900/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-[#c59b43]"
                     />
                   </div>
                 </div>
@@ -1076,7 +1148,7 @@ export default function BusinessOnboarding() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 h-12 rounded-xl bg-slate-800/50 border-slate-600 focus:border-yellow-500"
+                      className="pl-10 h-12 rounded-none bg-zinc-900/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-[#c59b43]"
                     />
                   </div>
                 </div>
@@ -1084,7 +1156,7 @@ export default function BusinessOnboarding() {
                 {/* Industry Selection - The Magic Input */}
                 <div className="space-y-2">
                   <Label className="text-gray-300 flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-yellow-400" />
+                    <Building2 className="w-4 h-4 text-[#c59b43]" style={{ color: "#c59b43" }} />
                     What's your business type?
                   </Label>
                   <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
@@ -1092,14 +1164,21 @@ export default function BusinessOnboarding() {
                       <button
                         key={ind.key}
                         onClick={() => setIndustry(ind.key)}
-                        className={`p-3 rounded-xl border-2 text-left transition-all text-sm ${
+                        className={`p-3 rounded-none border text-left transition-all text-sm flex items-center gap-2 group ${
                           industry === ind.key
-                            ? "border-yellow-500 bg-yellow-500/10"
-                            : "border-slate-700 bg-slate-800/50 hover:border-slate-600 hover:bg-slate-800"
+                            ? "border-[#1cbd9c] bg-[#1cbd9c]/10 text-white shadow-[0_0_15px_rgba(28,189,156,0.15)]"
+                            : "border-slate-800 bg-zinc-900/40 text-slate-300 hover:text-white hover:border-[#1cbd9c]/60 hover:bg-zinc-900/80"
                         }`}
                       >
-                        <span className="mr-2">{ind.icon}</span>
-                        {ind.label}
+                        <ind.icon 
+                          className={`w-4 h-4 transition-colors duration-200 shrink-0 ${
+                            industry === ind.key ? "text-white" : "text-[#c59b43] group-hover:text-white"
+                          }`}
+                          style={{ color: industry === ind.key ? "#ffffff" : "#c59b43" }}
+                        />
+                        <span className={industry === ind.key ? "text-white font-medium" : "text-slate-300 group-hover:text-white transition-colors duration-200"}>
+                          {ind.label}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1116,7 +1195,7 @@ export default function BusinessOnboarding() {
                         placeholder="Describe your business type..."
                         value={customIndustry}
                         onChange={(e) => setCustomIndustry(e.target.value)}
-                        className="h-12 rounded-xl bg-slate-800/50 border-slate-600 focus:border-yellow-500 text-white placeholder:text-gray-500"
+                        className="h-12 rounded-none bg-zinc-900/50 border-slate-700 text-white placeholder:text-gray-500 focus:border-[#c59b43]"
                       />
                     </motion.div>
                   )}
@@ -1126,7 +1205,7 @@ export default function BusinessOnboarding() {
                 <Button
                   onClick={handleSignup}
                   disabled={isSubmitting}
-                  className="w-full h-12 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-base"
+                  className="w-full h-12 rounded-none bg-gradient-to-r from-[#13322b] to-[#1a473d] hover:from-[#1a473d] hover:to-[#225f52] text-white font-sans uppercase tracking-[0.15em] text-[10px] font-bold border border-[#c59b43]/30 shadow-[0_4px_20px_rgba(19,50,43,0.3)] hover:shadow-[0_4px_30px_rgba(19,50,43,0.45)]"
                 >
                   {isSubmitting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -1154,19 +1233,20 @@ export default function BusinessOnboarding() {
                   variant="outline"
                   onClick={handleGoogleSignup}
                   disabled={isSubmitting}
-                  className="w-full h-11 rounded-xl border-slate-600 bg-slate-800/50 hover:bg-slate-800"
+                  className="w-full h-11 rounded-none border-slate-700 bg-transparent hover:bg-slate-900/60 text-slate-300 font-sans uppercase tracking-[0.15em] text-[10px] font-bold group"
                 >
-                  <SiGoogle className="w-4 h-4 mr-2" />
-                  Continue with Google
+                  <SiGoogle className="w-4 h-4 mr-2 text-slate-300 group-hover:text-white transition-colors" />
+                  <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Continue with Google</span>
                 </Button>
 
                 <p className="text-center text-xs text-gray-500">
                   Already have an account?{" "}
-                  <button onClick={() => navigate("/login")} className="text-yellow-400 hover:underline">
+                  <button onClick={() => navigate("/login")} className="text-[#c59b43] hover:underline">
                     Sign in
                   </button>
                 </p>
               </Card>
+
             </div>
           </motion.div>
         )}
@@ -1189,11 +1269,11 @@ export default function BusinessOnboarding() {
               {/* Rotating Quotes */}
               <RotatingQuotes />
 
-              <Card className="p-8 bg-slate-900/95 backdrop-blur-xl rounded-3xl border border-slate-700/50 shadow-2xl relative overflow-hidden">
+              <Card className="p-8 bg-zinc-950/80 backdrop-blur-md rounded-none border border-[#1cbd9c]/30 shadow-[0_0_50px_rgba(28,189,156,0.15)] relative overflow-hidden">
                 {/* Corner accents */}
-                <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-xl" />
-                <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-xl" />
-                <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-3xl" />
+                <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-[#1cbd9c]/5 rounded-full blur-3xl" />
                 
                 {/* Welcome Message */}
                 <div className="text-center mb-8 relative">
@@ -1206,13 +1286,13 @@ export default function BusinessOnboarding() {
                     <motion.div
                       className="absolute inset-0 rounded-full border-2 border-transparent"
                       style={{
-                        background: "linear-gradient(black, black) padding-box, linear-gradient(90deg, #eab308, #f59e0b, #eab308) border-box",
+                        background: "linear-gradient(black, black) padding-box, linear-gradient(90deg, #13322b, #c59b43, #13322b) border-box",
                       }}
                       animate={{ rotate: 360 }}
                       transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                     />
-                    <div className="w-14 h-14 rounded-full bg-slate-800 border border-yellow-500/30 flex items-center justify-center">
-                      <Building2 className="w-7 h-7 text-yellow-400" />
+                    <div className="relative z-10 w-14 h-14 rounded-full bg-zinc-900 border border-[#c59b43]/30 flex items-center justify-center">
+                      <Building2 className="w-7 h-7 text-accent" style={{ color: "#c59b43" }} />
                     </div>
                   </motion.div>
                   <h1 className="text-2xl font-bold text-white mb-2">
@@ -1226,7 +1306,7 @@ export default function BusinessOnboarding() {
                 {/* Industry Selection */}
                 <div className="space-y-4">
                   <Label className="text-gray-300 flex items-center gap-2 text-base">
-                    <Sparkles className="w-4 h-4 text-yellow-400" />
+                    <Sparkles className="w-4 h-4 text-accent" style={{ color: "#c59b43" }} />
                     What's your business type?
                   </Label>
                   <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-1">
@@ -1234,14 +1314,21 @@ export default function BusinessOnboarding() {
                       <button
                         key={ind.key}
                         onClick={() => setIndustry(ind.key)}
-                        className={`p-3 rounded-xl border-2 text-left transition-all text-sm ${
+                        className={`p-3 rounded-none border text-left transition-all text-sm flex items-center gap-2 group ${
                           industry === ind.key
-                            ? "border-yellow-500 bg-yellow-500/10"
-                            : "border-slate-700 bg-slate-800/50 hover:border-slate-600 hover:bg-slate-800"
+                            ? "border-[#1cbd9c] bg-[#1cbd9c]/10 text-white shadow-[0_0_15px_rgba(28,189,156,0.15)]"
+                            : "border-slate-800 bg-zinc-900/40 text-slate-300 hover:text-white hover:border-[#1cbd9c]/60 hover:bg-zinc-900/80"
                         }`}
                       >
-                        <span className="mr-2">{ind.icon}</span>
-                        {ind.label}
+                        <ind.icon 
+                          className={`w-4 h-4 transition-colors duration-200 shrink-0 ${
+                            industry === ind.key ? "text-white" : "text-[#c59b43] group-hover:text-white"
+                          }`}
+                          style={{ color: industry === ind.key ? "#ffffff" : "#c59b43" }}
+                        />
+                        <span className={industry === ind.key ? "text-white font-medium" : "text-slate-300 group-hover:text-white transition-colors duration-200"}>
+                          {ind.label}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1258,7 +1345,7 @@ export default function BusinessOnboarding() {
                         placeholder="Describe your business type..."
                         value={customIndustry}
                         onChange={(e) => setCustomIndustry(e.target.value)}
-                        className="bg-gray-950 border-gray-800 focus:border-yellow-500 text-white placeholder:text-gray-600"
+                        className="bg-gray-950 border-gray-800 focus:border-[#c59b43] text-white placeholder:text-gray-600 rounded-none h-12"
                       />
                     </motion.div>
                   )}
@@ -1267,14 +1354,14 @@ export default function BusinessOnboarding() {
                 {/* Premium CTA Button */}
                 <motion.div className="relative mt-6">
                   <motion.div
-                    className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/50 to-amber-500/50 rounded-xl blur-sm"
+                    className="absolute -inset-0.5 bg-gradient-to-r from-[#13322b]/50 to-[#1cbd9c]/50 rounded-none blur-sm"
                     animate={{ opacity: industry ? [0.5, 0.8, 0.5] : 0 }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
                   <Button
                     onClick={handleIndustrySelect}
                     disabled={!industry}
-                    className="relative w-full h-12 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black font-semibold text-base disabled:opacity-50 overflow-hidden"
+                    className="relative w-full h-12 rounded-none bg-gradient-to-r from-[#13322b] to-[#1a473d] hover:from-[#1a473d] hover:to-[#225f52] text-white font-sans uppercase tracking-[0.15em] text-[10px] font-bold border border-[#c59b43]/30 shadow-[0_4px_20px_rgba(19,50,43,0.3)] hover:shadow-[0_4px_30px_rgba(19,50,43,0.45)] disabled:opacity-50 overflow-hidden"
                   >
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12"
@@ -1311,7 +1398,7 @@ export default function BusinessOnboarding() {
             {/* Background effects */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <motion.div 
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-yellow-500/10 to-amber-500/10 blur-3xl"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-[#1cbd9c]/10 to-[#13322b]/10 blur-3xl"
                 animate={{ 
                   scale: [1, 1.5, 1],
                   opacity: [0.3, 0.5, 0.3],
@@ -1332,14 +1419,14 @@ export default function BusinessOnboarding() {
                 <motion.div
                   className="absolute inset-0 rounded-full border-2 border-transparent"
                   style={{
-                    background: "linear-gradient(black, black) padding-box, linear-gradient(90deg, #eab308, transparent, #eab308) border-box",
+                    background: "linear-gradient(black, black) padding-box, linear-gradient(90deg, #1cbd9c, transparent, #1cbd9c) border-box",
                   }}
                   animate={{ rotate: 360 }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
                 {/* Pulsing glow */}
                 <motion.div
-                  className="absolute inset-2 rounded-full bg-yellow-500/20"
+                  className="absolute inset-2 rounded-full bg-[#1cbd9c]/20"
                   animate={{ 
                     scale: [1, 1.1, 1],
                     opacity: [0.3, 0.6, 0.3]
@@ -1347,14 +1434,14 @@ export default function BusinessOnboarding() {
                   transition={{ duration: 2, repeat: Infinity }}
                 />
                 {/* Brain icon */}
-                <div className="absolute inset-3 rounded-full bg-black border border-yellow-500/30 flex items-center justify-center">
+                <div className="absolute inset-3 rounded-full bg-black border border-[#1cbd9c]/30 flex items-center justify-center">
                   <motion.div
                     animate={{ 
                       scale: [1, 1.1, 1],
                     }}
                     transition={{ duration: 2, repeat: Infinity }}
                   >
-                    <Brain className="w-10 h-10 text-yellow-400" />
+                    <Brain className="w-10 h-10 text-[#1cbd9c]" style={{ color: "#1cbd9c" }} />
                   </motion.div>
                 </div>
               </motion.div>
@@ -1376,7 +1463,7 @@ export default function BusinessOnboarding() {
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                     >
-                      <Loader2 className="w-4 h-4 text-yellow-400" />
+                      <Loader2 className="w-4 h-4 text-[#1cbd9c]" />
                     </motion.div>
                     <span className="text-gray-400">{msg}</span>
                   </motion.div>
@@ -1386,7 +1473,7 @@ export default function BusinessOnboarding() {
               {/* Premium progress bar */}
               <div className="mt-8 h-1 bg-gray-900 rounded-full overflow-hidden max-w-xs mx-auto border border-gray-800">
                 <motion.div
-                  className="h-full bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-[#13322b] via-[#1cbd9c] to-[#13322b] relative overflow-hidden"
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 3, ease: "easeInOut" }}
@@ -1421,7 +1508,7 @@ export default function BusinessOnboarding() {
             {/* Background effect */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
               <motion.div 
-                className="absolute top-0 right-1/4 w-64 h-64 rounded-full bg-gradient-to-r from-yellow-500/5 to-amber-500/5 blur-3xl"
+                className="absolute top-0 right-1/4 w-64 h-64 rounded-full bg-gradient-to-r from-[#1cbd9c]/5 to-[#13322b]/5 blur-3xl"
                 animate={{ 
                   y: [0, 50, 0],
                   opacity: [0.3, 0.5, 0.3],
@@ -1434,7 +1521,7 @@ export default function BusinessOnboarding() {
               {/* Back Button */}
               <button
                 onClick={() => setCurrentStep("industry-select")}
-                className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-4"
+                className="flex items-center gap-2 text-gray-400 hover:text-[#1cbd9c] transition-colors mb-4"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back
@@ -1452,13 +1539,13 @@ export default function BusinessOnboarding() {
                   transition={{ type: "spring" }}
                 >
                   <motion.div
-                    className="absolute inset-0 rounded-full bg-yellow-500/20 blur-md"
+                    className="absolute inset-0 rounded-full bg-[#1cbd9c]/20 blur-md"
                     animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
-                  <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-yellow-500/30 text-yellow-400 text-sm font-medium mb-4">
-                    <Activity className="w-4 h-4" />
-                    Business Health Audit
+                  <div className="relative inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-800/80 border border-[#c59b43]/30 text-[#1cbd9c] text-sm font-medium mb-4">
+                    <Activity className="w-4 h-4 text-[#c59b43]" style={{ color: "#c59b43" }} />
+                    <span className="text-[#1cbd9c]" style={{ color: "#1cbd9c" }}>Business Health Audit</span>
                   </div>
                 </motion.div>
                 <h1 className="text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
@@ -1472,14 +1559,16 @@ export default function BusinessOnboarding() {
               {/* Progress Bar */}
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-500">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                  <span className="text-sm font-medium text-yellow-400">
+                  <span className="text-sm text-gray-500">
+                    Question <span className="text-[#c59b43] font-medium" style={{ color: "#c59b43" }}>{currentQuestionIndex + 1}</span> of {questions.length}
+                  </span>
+                  <span className="text-sm font-medium text-[#1cbd9c]" style={{ color: "#1cbd9c" }}>
                     {answeredCount} / {questions.length} answered
                   </span>
                 </div>
                 <div className="h-1.5 bg-gray-900 rounded-full overflow-hidden border border-gray-800">
                   <motion.div
-                    className="h-full bg-gradient-to-r from-yellow-500 via-amber-400 to-yellow-500 rounded-full relative overflow-hidden"
+                    className="h-full bg-gradient-to-r from-[#1cbd9c] via-[#c59b43] to-[#1cbd9c] rounded-full relative overflow-hidden"
                     animate={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                     transition={{ duration: 0.4, ease: "easeOut" }}
                   >
@@ -1505,21 +1594,21 @@ export default function BusinessOnboarding() {
                     className="relative"
                   >
                     {/* Question Card */}
-                    <div className="relative overflow-hidden rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl p-8">
+                    <div className="relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl p-8">
                       {/* Corner accents */}
-                      <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-3xl" />
-                      <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-3xl" />
-                      <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-3xl" />
+                      <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                      <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-[#1cbd9c]/5 rounded-full blur-3xl" />
 
                       <div className="relative">
                         {/* Question Number */}
                         <motion.div 
-                          className="flex items-center justify-center w-14 h-14 mx-auto mb-6 rounded-full bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border border-yellow-500/30"
+                          className="flex items-center justify-center w-14 h-14 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#13322b]/20 to-[#c59b43]/15 border border-[#c59b43]/30"
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
                           transition={{ type: "spring" }}
                         >
-                          <span className="text-2xl font-bold text-yellow-400">{currentQuestionIndex + 1}</span>
+                          <span className="text-2xl font-bold text-[#c59b43]" style={{ color: "#c59b43" }}>{currentQuestionIndex + 1}</span>
                         </motion.div>
 
                         {/* Question Text */}
@@ -1540,25 +1629,32 @@ export default function BusinessOnboarding() {
                                 onClick={() => handleAnswerSelect(currentQuestionIndex, option.value)}
                                 whileHover={{ scale: 1.02, x: 5 }}
                                 whileTap={{ scale: 0.98 }}
-                                className={`w-full px-6 py-4 rounded-xl text-left font-medium transition-all duration-200 border flex items-center gap-4 ${
+                                className={`w-full px-6 py-4 rounded-none text-left font-medium transition-all duration-200 border flex items-center gap-4 group ${
                                   isSelected
-                                    ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-black border-yellow-500 shadow-lg shadow-yellow-500/20"
-                                    : "bg-slate-800/50 text-gray-300 border-slate-600 hover:border-yellow-500/50 hover:bg-slate-800"
+                                    ? "bg-gradient-to-r from-[#13322b] to-[#1a473d] text-white border-[#1cbd9c] shadow-lg shadow-[#13322b]/20"
+                                    : "bg-slate-800/50 text-gray-300 border-slate-600 hover:border-[#c59b43]/50 hover:bg-slate-800"
                                 }`}
                               >
-                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                                  isSelected ? "bg-black/20 text-black" : "bg-yellow-500/10 text-yellow-400"
-                                }`}>
+                                <span 
+                                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                                    isSelected ? "bg-black/20 text-white" : "bg-[#c59b43]/10"
+                                  }`}
+                                  style={isSelected ? {} : { color: "#c59b43" }}
+                                >
                                   {option.value}
                                 </span>
-                                <span className="flex-1">{option.label}</span>
+                                <span className={`flex-1 transition-colors duration-200 ${
+                                  isSelected ? "text-white" : "text-gray-300 group-hover:text-white"
+                                }`}>
+                                  {option.label}
+                                </span>
                                 {isSelected && (
                                   <motion.div
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
                                     transition={{ type: "spring" }}
                                   >
-                                    <CheckCircle2 className="w-5 h-5" />
+                                    <CheckCircle2 className="w-5 h-5 text-[#1cbd9c]" />
                                   </motion.div>
                                 )}
                               </motion.button>
@@ -1573,14 +1669,14 @@ export default function BusinessOnboarding() {
                       <button
                         onClick={handlePreviousQuestion}
                         disabled={currentQuestionIndex === 0}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors border group ${
                           currentQuestionIndex === 0 
-                            ? "text-gray-700 cursor-not-allowed" 
-                            : "text-gray-400 hover:text-white"
+                            ? "text-gray-700 border-gray-800 cursor-not-allowed" 
+                            : "border-slate-800 text-slate-300 hover:text-white hover:border-slate-700"
                         }`}
                       >
-                        <ArrowLeft className="w-4 h-4" />
-                        Previous
+                        <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-white" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Previous</span>
                       </button>
 
                       {/* Progress dots */}
@@ -1590,9 +1686,9 @@ export default function BusinessOnboarding() {
                             key={idx}
                             className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
                               idx === currentQuestionIndex 
-                                ? "bg-yellow-400" 
+                                ? "bg-[#c59b43]" 
                                 : answers[idx] 
-                                  ? "bg-yellow-500/50" 
+                                  ? "bg-[#1cbd9c]/50" 
                                   : "bg-gray-700"
                             }`}
                             onClick={() => setCurrentQuestionIndex(idx)}
@@ -1604,14 +1700,14 @@ export default function BusinessOnboarding() {
                       <button
                         onClick={() => setCurrentQuestionIndex(Math.min(currentQuestionIndex + 1, questions.length - 1))}
                         disabled={currentQuestionIndex === questions.length - 1}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-2 rounded-none transition-colors border group ${
                           currentQuestionIndex === questions.length - 1 
-                            ? "text-gray-700 cursor-not-allowed" 
-                            : "text-gray-400 hover:text-white"
+                            ? "text-gray-700 border-gray-800 cursor-not-allowed" 
+                            : "border-slate-800 text-slate-300 hover:text-white hover:border-slate-700"
                         }`}
                       >
-                        Next
-                        <ArrowRight className="w-4 h-4" />
+                        <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Next</span>
+                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-white" />
                       </button>
                     </div>
                   </motion.div>
@@ -1623,7 +1719,7 @@ export default function BusinessOnboarding() {
                 <motion.div className="relative">
                   {isAuditComplete && (
                     <motion.div
-                      className="absolute -inset-1 bg-gradient-to-r from-yellow-500/50 to-amber-500/50 rounded-xl blur-md"
+                      className="absolute -inset-1 bg-gradient-to-r from-[#13322b]/50 to-[#1cbd9c]/50 rounded-none blur-md"
                       animate={{ opacity: [0.5, 0.8, 0.5] }}
                       transition={{ duration: 2, repeat: Infinity }}
                     />
@@ -1633,9 +1729,9 @@ export default function BusinessOnboarding() {
                     disabled={!isAuditComplete}
                     whileHover={isAuditComplete ? { scale: 1.02 } : {}}
                     whileTap={isAuditComplete ? { scale: 0.98 } : {}}
-                    className={`relative group flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 overflow-hidden ${
+                    className={`relative group flex items-center gap-2 px-8 py-4 rounded-none font-semibold text-lg transition-all duration-300 overflow-hidden ${
                       isAuditComplete
-                        ? "bg-gradient-to-r from-yellow-500 to-amber-500 text-black"
+                        ? "bg-gradient-to-r from-[#13322b] to-[#1a473d] hover:from-[#1a473d] hover:to-[#225f52] text-white shadow-[0_4px_20px_rgba(19,50,43,0.3)] hover:shadow-[0_4px_30px_rgba(19,50,43,0.45)]"
                         : "bg-gray-950 text-gray-600 cursor-not-allowed border border-gray-800"
                     }`}
                   >
@@ -1728,7 +1824,7 @@ export default function BusinessOnboarding() {
               {/* Back Navigation */}
               <button
                 onClick={() => setCurrentStep("audit")}
-                className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-2"
+                className="flex items-center gap-2 text-gray-400 hover:text-[#c59b43] transition-colors mb-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Back to Audit</span>
@@ -1743,37 +1839,37 @@ export default function BusinessOnboarding() {
                 animate={{ y: 0, opacity: 1 }}
                 className="relative"
               >
-                {/* Golden glow border */}
+                {/* Gold/Teal glow border */}
                 <motion.div 
-                  className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/50 via-amber-400/30 to-yellow-500/50 rounded-3xl blur-sm"
+                  className="absolute -inset-0.5 bg-gradient-to-r from-[#c59b43]/40 via-[#1cbd9c]/20 to-[#c59b43]/40 rounded-none blur-sm"
                   animate={{ 
                     opacity: [0.5, 0.8, 0.5],
                   }}
                   transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 />
                 
-                <div className="relative overflow-hidden rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl p-8">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl p-8">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#c59b43]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#c59b43]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                   <div className="relative text-center">
                     {/* Score Circle */}
                     <div className="relative inline-flex items-center justify-center w-32 h-32 mb-4">
-                      {/* Rotating golden ring */}
+                      {/* Rotating green ring */}
                       <motion.div
-                        className="absolute inset-0 rounded-full border-4 border-yellow-500"
+                        className="absolute inset-0 rounded-full border-4 border-[#c59b43]"
                         animate={{ rotate: 360 }}
                         transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                         style={{
                           borderTopColor: "transparent",
-                          borderRightColor: "#eab308",
-                          borderBottomColor: "#f59e0b", 
+                          borderRightColor: "#c59b43",
+                          borderBottomColor: "#1cbd9c", 
                           borderLeftColor: "transparent",
                         }}
                       />
                       {/* Inner circle with score */}
-                      <div className="w-28 h-28 rounded-full bg-slate-800 border-2 border-yellow-500/50 flex items-center justify-center">
-                        <span className="text-5xl font-bold text-yellow-400">
+                      <div className="w-28 h-28 rounded-full bg-slate-800 border-2 border-[#c59b43]/50 flex items-center justify-center">
+                        <span className="text-5xl font-bold text-[#c59b43]" style={{ color: "#c59b43" }}>
                           {totalScore}
                         </span>
                       </div>
@@ -1829,11 +1925,11 @@ export default function BusinessOnboarding() {
                       className="relative inline-block"
                     >
                       <motion.div
-                        className={`absolute inset-0 rounded-xl ${healthStatus.bgColor} blur-md`}
+                        className={`absolute inset-0 rounded-none ${healthStatus.bgColor} blur-md`}
                         animate={{ opacity: [0.5, 0.8, 0.5] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       />
-                      <div className={`relative inline-flex items-center gap-3 px-6 py-4 rounded-xl bg-black border ${healthStatus.borderColor}`}>
+                      <div className={`relative inline-flex items-center gap-3 px-6 py-4 rounded-none bg-black border ${healthStatus.borderColor}`}>
                         <StatusIcon className={`w-6 h-6 ${healthStatus.color}`} />
                         <div className="text-left">
                           <p className={`font-semibold text-lg ${healthStatus.color}`}>
@@ -1852,7 +1948,7 @@ export default function BusinessOnboarding() {
               {/* Smart Recommendation Card */}
               {recommendation.type !== "both" ? (
                 <>
-                  {/* Primary Recommendation - Premium Golden Card */}
+                  {/* Primary Recommendation - Premium Green Card */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1861,7 +1957,7 @@ export default function BusinessOnboarding() {
                   >
                     {/* Animated glow effect */}
                     <motion.div 
-                      className="absolute -inset-1 bg-gradient-to-r from-yellow-500/40 via-amber-400/30 to-yellow-500/40 rounded-3xl blur-lg"
+                      className="absolute -inset-1 bg-gradient-to-r from-[#c59b43]/30 via-[#1cbd9c]/20 to-[#c59b43]/30 rounded-none blur-lg"
                       animate={{ 
                         opacity: [0.4, 0.7, 0.4],
                         scale: [1, 1.02, 1],
@@ -1869,29 +1965,29 @@ export default function BusinessOnboarding() {
                       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                     />
                     
-                    <div className="relative overflow-hidden rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/60 p-8">
+                    <div className="relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/60 p-8">
                       {/* Animated corner accents */}
-                      <div className="absolute top-0 left-0 w-20 h-20 border-l-2 border-t-2 border-yellow-500/50 rounded-tl-2xl" />
-                      <div className="absolute bottom-0 right-0 w-20 h-20 border-r-2 border-b-2 border-yellow-500/50 rounded-br-2xl" />
+                      <div className="absolute top-0 left-0 w-20 h-20 border-l-2 border-t-2 border-[#c59b43]/50 rounded-none" />
+                      <div className="absolute bottom-0 right-0 w-20 h-20 border-r-2 border-b-2 border-[#c59b43]/50 rounded-none" />
                       
-                      <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl" />
-                      <div className="absolute bottom-0 left-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl" />
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-[#c59b43]/10 rounded-full blur-3xl" />
+                      <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#c59b43]/5 rounded-full blur-3xl" />
                       
                       <div className="relative">
                         {/* Header with Badge */}
                         <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center gap-3">
                             <motion.div 
-                              className="w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border border-yellow-500/30"
+                              className="w-14 h-14 rounded-none flex items-center justify-center bg-gradient-to-br from-[#c59b43]/10 to-[#c59b43]/5 border border-[#c59b43]/30"
                               animate={{ 
-                                boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 20px rgba(234,179,8,0.3)", "0 0 0 rgba(234,179,8,0)"]
+                                boxShadow: ["0 0 0 rgba(197,155,67,0)", "0 0 20px rgba(197,155,67,0.3)", "0 0 0 rgba(197,155,67,0)"]
                               }}
                               transition={{ duration: 2, repeat: Infinity }}
                             >
                               {recommendation.type === "business" ? (
-                                <Briefcase className="w-7 h-7 text-yellow-400" />
+                                <Briefcase className="w-7 h-7 text-[#c59b43]" style={{ color: "#c59b43" }} />
                               ) : (
-                                <BarChart3 className="w-7 h-7 text-yellow-400" />
+                                <BarChart3 className="w-7 h-7 text-[#c59b43]" style={{ color: "#c59b43" }} />
                               )}
                             </motion.div>
                             <div>
@@ -1904,11 +2000,12 @@ export default function BusinessOnboarding() {
                             </div>
                           </div>
                           <motion.div 
-                            className="px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/30 text-yellow-400 text-xs font-semibold flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-full bg-gradient-to-r from-[#c59b43]/15 to-[#c59b43]/10 border border-[#c59b43]/40 text-[#c59b43] text-xs font-semibold flex items-center gap-1.5"
                             animate={{ scale: [1, 1.05, 1] }}
                             transition={{ duration: 2, repeat: Infinity }}
+                            style={{ color: "#c59b43" }}
                           >
-                            <Sparkles className="w-3.5 h-3.5" />
+                            <Sparkles className="w-3.5 h-3.5" style={{ color: "#c59b43" }} />
                             Highly Recommended
                           </motion.div>
                         </div>
@@ -1937,7 +2034,7 @@ export default function BusinessOnboarding() {
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: 0.7 + i * 0.1 }}
                             >
-                              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-yellow-400" />
+                              <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#c59b43]" style={{ color: "#c59b43" }} />
                               {feature}
                             </motion.div>
                           ))}
@@ -1946,7 +2043,7 @@ export default function BusinessOnboarding() {
                         {/* Premium CTA Button */}
                         <motion.button
                           onClick={handleSmartLaunch}
-                          className="w-full group relative overflow-hidden flex items-center justify-center gap-3 px-8 py-4 font-semibold text-lg rounded-xl transition-all duration-300 bg-gradient-to-r from-yellow-500 to-amber-500 hover:from-yellow-400 hover:to-amber-400 text-black"
+                          className="w-full group relative overflow-hidden flex items-center justify-center gap-3 px-8 py-4 font-semibold text-lg rounded-none transition-all duration-300 bg-gradient-to-r from-[#8a6d2b] to-[#c59b43] hover:from-[#c59b43] hover:to-[#d4ab53] text-white shadow-[0_4px_20px_rgba(197,155,67,0.3)] hover:shadow-[0_4px_30px_rgba(197,155,67,0.45)]"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                         >
@@ -1977,15 +2074,15 @@ export default function BusinessOnboarding() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.7 }}
                     onClick={() => handleSelectSuite(recommendation.type === "business" ? "analytics" : "business")}
-                    className="cursor-pointer group relative overflow-hidden rounded-xl bg-black border border-gray-800 hover:border-yellow-500/50 p-5 transition-all"
+                    className="cursor-pointer group relative overflow-hidden rounded-none bg-black border border-gray-800 hover:border-[#c59b43]/50 p-5 transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-yellow-500/10 border border-yellow-500/20">
+                        <div className="w-10 h-10 rounded-none flex items-center justify-center bg-[#c59b43]/10 border border-[#c59b43]/20">
                           {recommendation.type === "business" ? (
-                            <BarChart3 className="w-5 h-5 text-yellow-400" />
+                            <BarChart3 className="w-5 h-5 text-[#c59b43]" style={{ color: "#c59b43" }} />
                           ) : (
-                            <Briefcase className="w-5 h-5 text-yellow-400" />
+                            <Briefcase className="w-5 h-5 text-[#c59b43]" style={{ color: "#c59b43" }} />
                           )}
                         </div>
                         <div>
@@ -1999,7 +2096,7 @@ export default function BusinessOnboarding() {
                           </p>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-yellow-400 transition-colors" />
+                      <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-[#c59b43] transition-colors" />
                     </div>
                   </motion.div>
                 </>
@@ -2015,19 +2112,19 @@ export default function BusinessOnboarding() {
                   <motion.div
                     whileHover={{ scale: 1.02, y: -4 }}
                     onClick={() => handleSelectSuite("business")}
-                    className="cursor-pointer group relative overflow-hidden rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 hover:border-yellow-500/50 p-6 transition-all shadow-xl"
+                    className="cursor-pointer group relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 hover:border-[#c59b43]/50 p-6 transition-all shadow-xl"
                   >
-                    <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-2xl" />
-                    <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-yellow-500/30 rounded-br-2xl" />
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-colors" />
+                    <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#c59b43]/5 rounded-full blur-2xl group-hover:bg-[#c59b43]/10 transition-colors" />
                     
                     <div className="relative">
                       <motion.div 
-                        className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mb-4"
-                        animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 15px rgba(234,179,8,0.2)", "0 0 0 rgba(234,179,8,0)"] }}
+                        className="w-12 h-12 rounded-none bg-[#c59b43]/10 border border-[#c59b43]/30 flex items-center justify-center mb-4"
+                        animate={{ boxShadow: ["0 0 0 rgba(197,155,67,0)", "0 0 15px rgba(197,155,67,0.2)", "0 0 0 rgba(197,155,67,0)"] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <Briefcase className="w-6 h-6 text-yellow-400" />
+                        <Briefcase className="w-6 h-6 text-[#c59b43]" style={{ color: "#c59b43" }} />
                       </motion.div>
 
                       <h3 className="text-xl font-bold text-white mb-2">Business Suite</h3>
@@ -2035,7 +2132,7 @@ export default function BusinessOnboarding() {
                         Manage team operations, track daily EOD reports, and automate expense logging.
                       </p>
 
-                      <div className="flex items-center gap-2 text-yellow-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                      <div className="flex items-center gap-2 text-[#c59b43] font-semibold text-sm group-hover:gap-3 transition-all" style={{ color: "#c59b43" }}>
                         Start with Operations
                         <ArrowRight className="w-4 h-4" />
                       </div>
@@ -2046,19 +2143,19 @@ export default function BusinessOnboarding() {
                   <motion.div
                     whileHover={{ scale: 1.02, y: -4 }}
                     onClick={() => handleSelectSuite("analytics")}
-                    className="cursor-pointer group relative overflow-hidden rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 hover:border-yellow-500/50 p-6 transition-all shadow-xl"
+                    className="cursor-pointer group relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 hover:border-[#c59b43]/50 p-6 transition-all shadow-xl"
                   >
-                    <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-2xl" />
-                    <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-yellow-500/30 rounded-br-2xl" />
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl group-hover:bg-yellow-500/10 transition-colors" />
+                    <div className="absolute top-0 left-0 w-12 h-12 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute bottom-0 right-0 w-12 h-12 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#c59b43]/5 rounded-full blur-2xl group-hover:bg-[#c59b43]/10 transition-colors" />
                     
                     <div className="relative">
                       <motion.div 
-                        className="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center mb-4"
-                        animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 15px rgba(234,179,8,0.2)", "0 0 0 rgba(234,179,8,0)"] }}
+                        className="w-12 h-12 rounded-none bg-[#c59b43]/10 border border-[#c59b43]/30 flex items-center justify-center mb-4"
+                        animate={{ boxShadow: ["0 0 0 rgba(197,155,67,0)", "0 0 15px rgba(197,155,67,0.2)", "0 0 0 rgba(197,155,67,0)"] }}
                         transition={{ duration: 2, repeat: Infinity }}
                       >
-                        <BarChart3 className="w-6 h-6 text-yellow-400" />
+                        <BarChart3 className="w-6 h-6 text-[#c59b43]" style={{ color: "#c59b43" }} />
                       </motion.div>
 
                       <h3 className="text-xl font-bold text-white mb-2">Analytics Suite</h3>
@@ -2066,7 +2163,7 @@ export default function BusinessOnboarding() {
                         Upload your data and let AI uncover hidden trends and growth strategies.
                       </p>
 
-                      <div className="flex items-center gap-2 text-yellow-400 font-semibold text-sm group-hover:gap-3 transition-all">
+                      <div className="flex items-center gap-2 text-[#c59b43] font-semibold text-sm group-hover:gap-3 transition-all" style={{ color: "#c59b43" }}>
                         Start with Analytics
                         <ArrowRight className="w-4 h-4" />
                       </div>
@@ -2123,11 +2220,11 @@ export default function BusinessOnboarding() {
             
             {/* Animated background effects */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-              {/* Golden particles */}
+              {/* Green/Teal particles */}
               {[...Array(15)].map((_, i) => (
                 <motion.div
                   key={i}
-                  className="absolute w-1 h-1 bg-yellow-400/20 rounded-full"
+                  className="absolute w-1 h-1 bg-[#1cbd9c]/20 rounded-full"
                   initial={{ 
                     x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
                     y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800),
@@ -2146,7 +2243,7 @@ export default function BusinessOnboarding() {
                 />
               ))}
               <motion.div 
-                className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gradient-to-r from-yellow-500/5 to-amber-500/5 blur-3xl"
+                className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gradient-to-r from-[#1cbd9c]/5 to-[#13322b]/5 blur-3xl"
                 animate={{ 
                   scale: [1, 1.3, 1],
                   opacity: [0.2, 0.4, 0.2],
@@ -2154,7 +2251,7 @@ export default function BusinessOnboarding() {
                 transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
               />
               <motion.div 
-                className="absolute bottom-1/3 right-1/3 w-64 h-64 rounded-full bg-gradient-to-r from-yellow-500/5 to-amber-500/5 blur-3xl"
+                className="absolute bottom-1/3 right-1/3 w-64 h-64 rounded-full bg-gradient-to-r from-[#13322b]/5 to-[#1cbd9c]/5 blur-3xl"
                 animate={{ 
                   scale: [1.2, 1, 1.2],
                   opacity: [0.2, 0.4, 0.2],
@@ -2167,10 +2264,10 @@ export default function BusinessOnboarding() {
               {/* Back Navigation */}
               <button
                 onClick={() => setCurrentStep("results")}
-                className="flex items-center gap-2 text-gray-400 hover:text-yellow-400 transition-colors mb-4"
+                className="flex items-center gap-2 text-gray-400 hover:text-[#1cbd9c] transition-colors mb-4 group"
               >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to Results</span>
+                <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-white" />
+                <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Back to Results</span>
               </button>
               
               {/* Rotating Quotes */}
@@ -2185,13 +2282,13 @@ export default function BusinessOnboarding() {
                   className="relative inline-block"
                 >
                   <motion.div
-                    className="absolute inset-0 rounded-full bg-emerald-500/20 blur-md"
+                    className="absolute inset-0 rounded-none bg-emerald-500/20 blur-md"
                     animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
                     transition={{ duration: 2, repeat: Infinity }}
                   />
-                  <div className="relative inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-emerald-500/30 text-emerald-400 text-sm font-medium mb-4">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Workspace Unlocked
+                  <div className="relative inline-flex items-center gap-2 px-4 py-2 rounded-none bg-slate-800/80 border border-emerald-500/30 text-emerald-400 text-sm font-medium mb-4">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" style={{ color: "#34d399" }} />
+                    <span style={{ color: "#34d399" }}>Workspace Unlocked</span>
                   </div>
                 </motion.div>
                 <h1 className="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-white via-gray-200 to-white bg-clip-text text-transparent">
@@ -2215,21 +2312,21 @@ export default function BusinessOnboarding() {
                 >
                   {/* Glow effect */}
                   <motion.div 
-                    className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -inset-0.5 bg-gradient-to-r from-[#c59b43]/30 to-[#13322b]/30 rounded-none blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
                   />
                   
-                  <div className="relative overflow-hidden rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl group-hover:border-yellow-500/50 p-8 transition-all">
-                    <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-3xl" />
-                    <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-3xl" />
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/5 rounded-full blur-3xl group-hover:bg-yellow-500/10 transition-colors" />
+                  <div className="relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl group-hover:border-[#c59b43]/50 p-8 transition-all">
+                    <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-[#1cbd9c]/5 rounded-full blur-3xl group-hover:bg-[#1cbd9c]/10 transition-colors" />
                     
                     <div className="relative">
                       <motion.div 
-                        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border border-yellow-500/30 flex items-center justify-center mb-6"
-                        animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 20px rgba(234,179,8,0.2)", "0 0 0 rgba(234,179,8,0)"] }}
+                        className="w-16 h-16 rounded-none bg-gradient-to-br from-[#13322b]/20 to-[#1cbd9c]/10 border border-[#c59b43]/30 flex items-center justify-center mb-6"
+                        animate={{ boxShadow: ["0 0 0 rgba(197,155,67,0)", "0 0 20px rgba(197,155,67,0.2)", "0 0 0 rgba(197,155,67,0)"] }}
                         transition={{ duration: 3, repeat: Infinity }}
                       >
-                        <Briefcase className="w-8 h-8 text-yellow-400" />
+                        <Briefcase className="w-8 h-8 text-accent" style={{ color: "#c59b43" }} />
                       </motion.div>
 
                       <h2 className="text-2xl font-bold text-white mb-2">Business Suite</h2>
@@ -2252,15 +2349,15 @@ export default function BusinessOnboarding() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.3 + i * 0.1 }}
                           >
-                            <CheckCircle2 className="w-4 h-4 text-yellow-400" />
+                            <CheckCircle2 className="w-4 h-4 text-accent" style={{ color: "#c59b43" }} />
                             {feature}
                           </motion.div>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2 text-yellow-400 font-semibold group-hover:gap-3 transition-all">
-                        Launch Business Suite
-                        <ArrowRight className="w-5 h-5" />
+                      <div className="flex items-center gap-2 text-accent font-semibold group-hover:gap-3 transition-all">
+                        <span className="text-accent group-hover:text-white transition-colors duration-200">Launch Business Suite</span>
+                        <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </div>
@@ -2277,21 +2374,21 @@ export default function BusinessOnboarding() {
                 >
                   {/* Glow effect */}
                   <motion.div 
-                    className="absolute -inset-0.5 bg-gradient-to-r from-yellow-500/30 to-amber-500/30 rounded-3xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute -inset-0.5 bg-gradient-to-r from-[#c59b43]/30 to-[#13322b]/30 rounded-none blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
                   />
                   
-                  <div className="relative overflow-hidden rounded-3xl bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl group-hover:border-yellow-500/50 p-8 transition-all">
-                    <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-yellow-500/30 rounded-tl-3xl" />
-                    <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-yellow-500/30 rounded-br-3xl" />
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-500/5 rounded-full blur-3xl group-hover:bg-yellow-500/10 transition-colors" />
+                  <div className="relative overflow-hidden rounded-none bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl group-hover:border-[#c59b43]/50 p-8 transition-all">
+                    <div className="absolute top-0 left-0 w-16 h-16 border-l-2 border-t-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute bottom-0 right-0 w-16 h-16 border-r-2 border-b-2 border-[#c59b43]/30 rounded-none" />
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-[#1cbd9c]/5 rounded-full blur-3xl group-hover:bg-[#1cbd9c]/10 transition-colors" />
                     
                     <div className="relative">
                       <motion.div 
-                        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-500/20 to-amber-500/10 border border-yellow-500/30 flex items-center justify-center mb-6"
-                        animate={{ boxShadow: ["0 0 0 rgba(234,179,8,0)", "0 0 20px rgba(234,179,8,0.2)", "0 0 0 rgba(234,179,8,0)"] }}
+                        className="w-16 h-16 rounded-none bg-gradient-to-br from-[#13322b]/20 to-[#1cbd9c]/10 border border-[#c59b43]/30 flex items-center justify-center mb-6"
+                        animate={{ boxShadow: ["0 0 0 rgba(197,155,67,0)", "0 0 20px rgba(197,155,67,0.2)", "0 0 0 rgba(197,155,67,0)"] }}
                         transition={{ duration: 3, repeat: Infinity }}
                       >
-                        <BarChart3 className="w-8 h-8 text-yellow-400" />
+                        <BarChart3 className="w-8 h-8 text-accent" style={{ color: "#c59b43" }} />
                       </motion.div>
 
                       <h2 className="text-2xl font-bold text-white mb-2">Analytics Suite</h2>
@@ -2314,15 +2411,15 @@ export default function BusinessOnboarding() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: 0.4 + i * 0.1 }}
                           >
-                            <CheckCircle2 className="w-4 h-4 text-yellow-400" />
+                            <CheckCircle2 className="w-4 h-4 text-accent" style={{ color: "#c59b43" }} />
                             {feature}
                           </motion.div>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2 text-yellow-400 font-semibold group-hover:gap-3 transition-all">
-                        Launch Analytics Suite
-                        <ArrowRight className="w-5 h-5" />
+                      <div className="flex items-center gap-2 text-accent font-semibold group-hover:gap-3 transition-all">
+                        <span className="text-accent group-hover:text-white transition-colors duration-200">Launch Analytics Suite</span>
+                        <ArrowRight className="w-5 h-5 text-accent group-hover:text-white transition-colors" />
                       </div>
                     </div>
                   </div>
@@ -2338,10 +2435,10 @@ export default function BusinessOnboarding() {
               >
                 <button
                   onClick={() => setCurrentStep("results")}
-                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-white transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-white transition-colors group"
                 >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Results
+                  <ArrowLeft className="w-4 h-4 text-slate-400 group-hover:text-white" />
+                  <span className="text-slate-300 group-hover:text-white transition-colors duration-200">Back to Results</span>
                 </button>
               </motion.div>
 

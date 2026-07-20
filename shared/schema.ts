@@ -54,6 +54,7 @@ export const datasets = pgTable("datasets", {
   data: jsonb("data").$type<Record<string, any>[]>().notNull(),
   rowCount: integer("row_count").notNull(),
   source: varchar("source").default("google"), // 'google' or 'excel'
+  syncSchedule: varchar("sync_schedule").notNull().default("manual"),
   lastSyncedAt: timestamp("last_synced_at").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -254,13 +255,14 @@ export const eodEntries = pgTable("eod_entries", {
 
 export interface ChartConfig {
   id: string;
-  type: 'bar' | 'line' | 'pie' | 'kpi' | 'table' | 'area' | 'scatter' | 'donut' | 'horizontal_bar' | 'stacked_bar' | 'gauge' | 'funnel' | 'treemap' | 'heatmap' | 'waterfall' | 'combo';
+  type: 'bar' | 'line' | 'pie' | 'kpi' | 'table' | 'area' | 'scatter' | 'donut' | 'horizontal_bar' | 'stacked_bar' | 'gauge' | 'funnel' | 'treemap' | 'heatmap' | 'waterfall' | 'combo' | 'count' | 'unique';
   title: string;
   dataKey: string;
   labelKey?: string;
   valueKeys?: string[];
   color?: string;
   insights?: string;
+  value?: any; // For KPI metric values
   // Advanced options
   aggregation?: 'sum' | 'average' | 'count' | 'min' | 'max' | 'median';
   sortOrder?: 'asc' | 'desc' | 'none';
@@ -275,11 +277,18 @@ export interface ChartConfig {
   colorScheme?: 'default' | 'rainbow' | 'blue' | 'green' | 'warm' | 'cool' | 'monochrome';
   percentageMode?: boolean;
   stacked?: boolean;
+  changePct?: number;
+  trend?: number;
+  data?: any[];
 }
 
 export interface DashboardConfig {
   charts: ChartConfig[];
   summary?: string;
+  anomalies?: any[];
+  recommendations?: string[];
+  profilingStats?: any;
+  schemaMap?: Record<string, string>;
   generatedAt: string;
 }
 
@@ -476,6 +485,8 @@ export interface GoogleSheet {
   id: string;
   name: string;
   sheets: { sheetId: number; title: string }[];
+  fileType?: 'sheet' | 'excel' | 'csv' | 'pdf';
+  mimeType?: string;
 }
 
 export interface ChatMessage {
@@ -593,3 +604,127 @@ export type TrackingTemplate = typeof trackingTemplates.$inferSelect;
 export type InsertTrackingTemplate = z.infer<typeof insertTrackingTemplateSchema>;
 export type TrackingLog = typeof trackingLogs.$inferSelect;
 export type InsertTrackingLog = z.infer<typeof insertTrackingLogSchema>;
+
+// ── Enterprise AI Copilot Tables ───────────────────────────────────────────
+
+// Knowledge base documents uploaded by users (PDF, DOCX, TXT, CSV)
+export const knowledgeBaseDocuments = pgTable("knowledge_base_documents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  fileName: varchar("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileType: varchar("file_type").notNull(), // 'pdf', 'docx', 'txt', 'csv'
+  processingStatus: varchar("processing_status").notNull().default("pending"), // 'pending', 'processing', 'completed', 'failed'
+  indexingStatus: varchar("indexing_status").notNull().default("pending"), // 'pending', 'indexing', 'completed', 'failed'
+  rowCount: integer("row_count").default(0), // page count or CSV row count
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_kb_docs_user_id").on(table.userId),
+]);
+
+// Chunks and embeddings for RAG over KB documents
+export const knowledgeBaseChunks = pgTable("knowledge_base_chunks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  documentId: varchar("document_id").notNull().references(() => knowledgeBaseDocuments.id, { onDelete: "cascade" }),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  chunkIndex: integer("chunk_index").notNull(),
+  chunkText: text("chunk_text").notNull(),
+  embedding: jsonb("embedding").$type<number[]>().notNull().default([]),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_kb_chunks_doc_id").on(table.documentId),
+  index("idx_kb_chunks_user_id").on(table.userId),
+]);
+
+// Copilot actions center
+export const copilotActions = pgTable("copilot_actions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  actionType: varchar("action_type").notNull(), // 'generate_report', 'create_task', etc.
+  status: varchar("status").notNull().default("pending"), // 'pending', 'approved', 'completed', 'rejected'
+  details: jsonb("details").$type<Record<string, any>>().notNull(),
+  logs: text("logs"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_copilot_actions_user_id").on(table.userId),
+]);
+
+// Integrations Hub
+export const integrations = pgTable("integrations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  sourceName: varchar("source_name").notNull(), // e.g., 'Main PostgreSQL', 'ERP Hub'
+  sourceType: varchar("source_type").notNull(), // 'postgres', 'mysql', 'erp', 'crm'
+  connectionStatus: varchar("connection_status").notNull().default("disconnected"), // 'connected', 'disconnected', 'failed'
+  connectionHealth: varchar("connection_health").notNull().default("healthy"), // 'healthy', 'unhealthy'
+  syncStatus: varchar("sync_status").notNull().default("synced"), // 'synced', 'syncing', 'failed'
+  syncSchedule: varchar("sync_schedule").notNull().default("manual"), // 'manual', 'hourly', 'daily', 'weekly'
+  lastSyncedAt: timestamp("last_synced_at"),
+  config: jsonb("config").$type<Record<string, any>>(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_integrations_user_id").on(table.userId),
+]);
+
+// Multi-Agent consensus and reports
+export const agentReports = pgTable("agent_reports", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  period: varchar("period").notNull(), // e.g., '2026-06'
+  salesAnalysis: text("sales_analysis"),
+  financeAnalysis: text("finance_analysis"),
+  operationsAnalysis: text("operations_analysis"),
+  hrAnalysis: text("hr_analysis"),
+  consensusReport: text("consensus_report"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_agent_reports_user_id").on(table.userId),
+]);
+
+// Dataset historical snapshots
+export const datasetSnapshots = pgTable("dataset_snapshots", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  datasetId: varchar("dataset_id").notNull().references(() => datasets.id),
+  snapshotData: jsonb("snapshot_data").$type<Record<string, any>[]>().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_dataset_snapshots_dataset_id").on(table.datasetId),
+]);
+
+// Real database-backed business alerts
+export const alerts = pgTable("alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  title: varchar("title").notNull(),
+  description: text("description").notNull(),
+  severity: varchar("severity").notNull(), // 'low', 'medium', 'high'
+  category: varchar("category").notNull(), // 'revenue', 'customers', 'tasks'
+  actionRoute: varchar("action_route"),
+  recommendedAction: varchar("recommended_action"),
+  isResolved: boolean("is_resolved").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_alerts_user_id").on(table.userId),
+]);
+
+// Insert schemas and Types
+export const insertKnowledgeBaseDocumentSchema = createInsertSchema(knowledgeBaseDocuments).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertKnowledgeBaseChunkSchema = createInsertSchema(knowledgeBaseChunks).omit({ id: true, createdAt: true });
+export const insertCopilotActionSchema = createInsertSchema(copilotActions).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertIntegrationSchema = createInsertSchema(integrations).omit({ id: true, createdAt: true, updatedAt: true });
+export const insertAgentReportSchema = createInsertSchema(agentReports).omit({ id: true, createdAt: true });
+export const insertDatasetSnapshotSchema = createInsertSchema(datasetSnapshots).omit({ id: true, createdAt: true });
+export const insertAlertSchema = createInsertSchema(alerts).omit({ id: true, createdAt: true });
+
+export type KnowledgeBaseDocument = typeof knowledgeBaseDocuments.$inferSelect;
+export type KnowledgeBaseChunk = typeof knowledgeBaseChunks.$inferSelect;
+export type CopilotAction = typeof copilotActions.$inferSelect;
+export type Integration = typeof integrations.$inferSelect;
+export type AgentReport = typeof agentReports.$inferSelect;
+export type DatasetSnapshot = typeof datasetSnapshots.$inferSelect;
+export type Alert = typeof alerts.$inferSelect;
+

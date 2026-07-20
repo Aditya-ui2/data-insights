@@ -111,7 +111,7 @@ function StarRating({ value, onChange, max = 5 }: { value: number; onChange: (v:
           <Star
             className={cn(
               "w-6 h-6 transition-colors",
-              i < value ? "text-amber-400 fill-amber-400" : "text-white/20 hover:text-amber-400/50"
+              i < value ? "text-amber-400 fill-amber-400" : "text-gray-200 hover:text-amber-400/50"
             )}
           />
         </button>
@@ -138,10 +138,10 @@ function DynamicField({
     case "number":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <div className="relative">
             <Input
@@ -151,16 +151,16 @@ function DynamicField({
               placeholder={field.placeholder}
               min={field.min}
               max={field.max}
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40 pr-12"
+              className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none pr-12 font-sans"
             />
             {field.unit && (
-              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
                 {field.unit}
               </span>
             )}
           </div>
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -168,13 +168,13 @@ function DynamicField({
     case "currency":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {currencySymbol}
             </span>
             <Input
@@ -184,11 +184,11 @@ function DynamicField({
               placeholder={field.placeholder}
               min={field.min}
               max={field.max}
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40 pl-8"
+              className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none pl-8 font-sans"
             />
           </div>
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -196,19 +196,19 @@ function DynamicField({
     case "text":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <Input
             value={value ?? field.defaultValue ?? ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder}
-            className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+            className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none font-sans"
           />
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -216,20 +216,20 @@ function DynamicField({
     case "textarea":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <Textarea
             value={value ?? field.defaultValue ?? ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder}
-            className="bg-white/5 border-white/20 text-white placeholder:text-white/40 resize-none"
+            className="bg-white border-gray-200 text-primary placeholder:text-muted-foreground rounded-none resize-none font-sans"
             rows={3}
           />
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -237,25 +237,25 @@ function DynamicField({
     case "select":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <Select value={value ?? field.defaultValue ?? ""} onValueChange={onChange}>
-            <SelectTrigger className="bg-white/5 border-white/20 text-white">
+            <SelectTrigger className="bg-white border-gray-200 text-primary rounded-none shadow-none focus:outline-none font-sans">
               <SelectValue placeholder={field.placeholder || "Select..."} />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-amber-500/30">
+            <SelectContent className="bg-white border-gray-250 shadow-lg rounded-none">
               {(field.options || []).map((opt) => (
-                <SelectItem key={opt} value={opt} className="text-white hover:bg-white/10">
+                <SelectItem key={opt} value={opt} className="text-primary hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer font-sans">
                   {opt}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -263,19 +263,19 @@ function DynamicField({
     case "date":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <Input
             type="date"
             value={value ?? field.defaultValue ?? ""}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-white/5 border-white/20 text-white"
+            className="bg-white border-gray-200 text-primary rounded-none font-sans"
           />
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -283,19 +283,19 @@ function DynamicField({
     case "time":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <Input
             type="time"
             value={value ?? field.defaultValue ?? ""}
             onChange={(e) => onChange(e.target.value)}
-            className="bg-white/5 border-white/20 text-white"
+            className="bg-white border-gray-200 text-primary rounded-none font-sans"
           />
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
@@ -307,13 +307,13 @@ function DynamicField({
             checked={value ?? (field.defaultValue === true || field.defaultValue === "true") ?? false}
             onCheckedChange={onChange}
           />
-          <Label className="text-white/80 text-sm flex items-center gap-1.5 cursor-pointer">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5 cursor-pointer">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           {field.description && (
-            <span className="text-xs text-white/40 ml-2">({field.description})</span>
+            <span className="text-xs text-muted-foreground ml-2 font-sans">({field.description})</span>
           )}
         </div>
       );
@@ -321,21 +321,21 @@ function DynamicField({
     case "rating":
       return (
         <div className="space-y-1.5">
-          <Label className="text-white/80 text-sm flex items-center gap-1.5">
-            <Icon className="w-3.5 h-3.5 text-amber-400" />
+          <Label className="text-primary/80 text-sm font-semibold flex items-center gap-1.5">
+            <Icon className="w-3.5 h-3.5 text-accent" />
             {field.name}
-            {field.required && <span className="text-red-400">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </Label>
           <StarRating value={value ?? 0} onChange={onChange} max={field.max || 5} />
           {field.description && (
-            <p className="text-xs text-white/40">{field.description}</p>
+            <p className="text-xs text-muted-foreground font-sans">{field.description}</p>
           )}
         </div>
       );
 
     default:
       return (
-        <div className="text-white/40 text-sm">
+        <div className="text-muted-foreground text-sm font-sans">
           Unknown field type: {field.type}
         </div>
       );
@@ -425,14 +425,15 @@ function TrackingFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-zinc-900 border-amber-500/30 text-white max-w-lg max-h-[85vh] overflow-y-auto">
+      <DialogContent className="bg-white border border-gray-250 text-primary max-w-lg max-h-[85vh] overflow-y-auto rounded-none shadow-xl relative overflow-hidden group">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-amber-400" />
+          <DialogTitle className="text-xl font-sans font-semibold text-primary flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-accent" />
             {template.name}
           </DialogTitle>
           {template.description && (
-            <p className="text-white/60 text-sm">{template.description}</p>
+            <p className="text-muted-foreground text-sm font-sans mt-1">{template.description}</p>
           )}
         </DialogHeader>
 
@@ -448,26 +449,26 @@ function TrackingFormDialog({
           ))}
 
           {/* Notes field */}
-          <div className="space-y-1.5 pt-2 border-t border-white/10">
-            <Label className="text-white/60 text-sm">Additional Notes (optional)</Label>
+          <div className="space-y-1.5 pt-4 border-t border-gray-200">
+            <Label className="text-muted-foreground text-sm font-sans">Additional Notes (optional)</Label>
             <Textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Any other details to add..."
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40 resize-none"
+              className="bg-white border border-gray-200 text-primary placeholder:text-muted-foreground rounded-none resize-none font-sans"
               rows={2}
             />
           </div>
         </div>
 
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose} className="border-white/20 text-white hover:bg-white/10">
+          <Button variant="outline" onClick={onClose} className="border-gray-200 text-muted-foreground hover:bg-gray-50 rounded-none h-10 shadow-none">
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={submitMutation.isPending}
-            className="bg-amber-500 text-black hover:bg-amber-400 font-semibold gap-2"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none h-10 shadow-none gap-2"
           >
             {submitMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
             {existingLog ? (
@@ -511,12 +512,14 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
   });
 
   // Combine templates with their today's log
+  const safeTemplates = Array.isArray(templates) ? templates : [];
+  const safeMyLogs = Array.isArray(myLogs) ? myLogs : [];
   const templatesWithLogs: TemplateWithLog[] = useMemo(() => {
-    return templates.map((t) => ({
+    return safeTemplates.map((t) => ({
       ...t,
-      todayLog: myLogs.find((l) => l.templateId === t.id),
+      todayLog: safeMyLogs.find((l) => l.templateId === t.id),
     }));
-  }, [templates, myLogs]);
+  }, [safeTemplates, safeMyLogs]);
 
   const pendingCount = templatesWithLogs.filter((t) => !t.todayLog).length;
   const completedCount = templatesWithLogs.filter((t) => t.todayLog).length;
@@ -529,14 +532,15 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
   const isLoading = profileLoading || templatesLoading || logsLoading;
 
   // ── No Templates State ─────────────────────────────────────────────────────
-  if (!isLoading && templates.length === 0) {
+  if (!isLoading && safeTemplates.length === 0) {
     if (compact) return null;
     return (
-      <Card className="bg-white/5 border-amber-500/20">
+      <Card className="bg-white border border-gray-200 rounded-none shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
         <CardContent className="flex flex-col items-center justify-center py-8 text-center">
-          <ClipboardList className="w-12 h-12 text-amber-500/40 mb-3" />
-          <h3 className="text-lg font-semibold text-white mb-1">No Tracking Forms</h3>
-          <p className="text-white/60 text-sm max-w-xs">
+          <ClipboardList className="w-12 h-12 text-accent/40 mb-3" />
+          <h3 className="text-lg font-sans font-bold text-primary mb-1">No Tracking Forms</h3>
+          <p className="text-muted-foreground text-sm font-sans max-w-xs leading-relaxed">
             Your admin hasn't created any tracking templates for you yet.
           </p>
         </CardContent>
@@ -547,30 +551,31 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
   // ── Compact View (for dashboard widget) ────────────────────────────────────
   if (compact) {
     return (
-      <Card className="bg-white/5 border-amber-500/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-white flex items-center gap-2 text-base">
-            <ClipboardList className="w-4 h-4 text-amber-400" />
+      <Card className="bg-white border border-gray-250 rounded-none shadow-sm relative overflow-hidden group">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+        <CardHeader className="pb-3 border-b border-gray-100">
+          <CardTitle className="text-primary flex items-center gap-2 text-base font-sans font-semibold">
+            <ClipboardList className="w-4 h-4 text-accent" />
             Daily Tracking
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
-              <Loader2 className="w-5 h-5 animate-spin text-amber-400" />
+              <Loader2 className="w-5 h-5 animate-spin text-accent" />
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {/* Summary */}
-              <div className="flex items-center gap-4 text-sm mb-3">
+              <div className="flex items-center gap-4 text-xs font-semibold mb-3">
                 {pendingCount > 0 && (
-                  <span className="text-amber-400 flex items-center gap-1">
+                  <span className="text-accent flex items-center gap-1 uppercase tracking-wider">
                     <AlertCircle className="w-3.5 h-3.5" />
                     {pendingCount} pending
                   </span>
                 )}
                 {completedCount > 0 && (
-                  <span className="text-green-400 flex items-center gap-1">
+                  <span className="text-green-700 flex items-center gap-1 uppercase tracking-wider">
                     <Check className="w-3.5 h-3.5" />
                     {completedCount} done
                   </span>
@@ -583,36 +588,36 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
                   key={template.id}
                   onClick={() => setSelectedTemplate(template)}
                   className={cn(
-                    "w-full flex items-center gap-3 p-2.5 rounded-lg border transition-colors text-left",
+                    "w-full flex items-center gap-3 p-3 rounded-none border transition-all text-left group/item",
                     template.todayLog
-                      ? "bg-green-500/10 border-green-500/30 hover:border-green-500/50"
-                      : "bg-white/5 border-white/10 hover:border-amber-500/40"
+                      ? "bg-green-500/5 border-green-500/20 hover:border-green-500/40"
+                      : "bg-white border border-gray-200 hover:border-accent hover:shadow-sm"
                   )}
                 >
                   <div
                     className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center shrink-0",
-                      template.todayLog ? "bg-green-500/20" : "bg-amber-500/20"
+                      "w-8 h-8 rounded-none flex items-center justify-center shrink-0 border",
+                      template.todayLog ? "bg-green-500/10 border-green-500/20" : "bg-accent/5 border-accent/25"
                     )}
                   >
                     {template.todayLog ? (
-                      <Check className="w-4 h-4 text-green-400" />
+                      <Check className="w-4 h-4 text-green-700" />
                     ) : (
-                      <ClipboardList className="w-4 h-4 text-amber-400" />
+                      <ClipboardList className="w-4 h-4 text-accent" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-medium truncate">{template.name}</p>
-                    <p className="text-white/40 text-xs truncate">
+                    <p className="text-primary text-sm font-sans font-semibold truncate">{template.name}</p>
+                    <p className="text-muted-foreground text-xs font-sans truncate">
                       {template.todayLog ? "Submitted" : "Pending"}
                     </p>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-white/30" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/45 group-hover/item:translate-x-0.5 transition-transform" />
                 </button>
               ))}
 
               {templatesWithLogs.length > 3 && (
-                <p className="text-xs text-white/40 text-center pt-1">
+                <p className="text-xs text-muted-foreground text-center pt-1 font-sans">
                   +{templatesWithLogs.length - 3} more forms
                 </p>
               )}
@@ -638,26 +643,26 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
 
   // ── Full View ──────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-b border-gray-150 pb-4">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <ClipboardList className="w-5 h-5 text-amber-400" />
+          <h2 className="text-2xl font-sans font-bold text-primary flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-accent" />
             Daily Tracking
           </h2>
-          <p className="text-white/60 text-sm">
+          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider mt-1.5 font-sans">
             Fill in your daily metrics for {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}
           </p>
         </div>
         <div className="flex items-center gap-3">
           {pendingCount > 0 && (
-            <Badge variant="outline" className="border-amber-500/40 text-amber-400">
+            <Badge variant="outline" className="border-accent/40 text-accent bg-accent/5 rounded-none font-semibold uppercase tracking-wider text-[10px]">
               {pendingCount} pending
             </Badge>
           )}
           {completedCount > 0 && (
-            <Badge variant="outline" className="border-green-500/40 text-green-400">
+            <Badge variant="outline" className="border-green-500/20 text-green-700 bg-green-500/5 rounded-none font-semibold uppercase tracking-wider text-[10px]">
               {completedCount} done
             </Badge>
           )}
@@ -667,13 +672,13 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
       {/* Loading */}
       {isLoading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-400" />
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
         </div>
       )}
 
       {/* Templates Grid */}
       {!isLoading && (
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence>
             {templatesWithLogs.map((template) => (
               <motion.div
@@ -684,66 +689,67 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
               >
                 <Card
                   className={cn(
-                    "cursor-pointer transition-all hover:shadow-lg",
+                    "cursor-pointer transition-all hover:shadow-md rounded-none relative group",
                     template.todayLog
-                      ? "bg-green-500/10 border-green-500/30 hover:border-green-500/50"
-                      : "bg-white/5 border-amber-500/20 hover:border-amber-500/40"
+                      ? "bg-green-500/5 border-green-500/20 hover:border-green-500/40 shadow-sm"
+                      : "bg-white border-gray-200 hover:border-accent hover:shadow-md"
                   )}
                   onClick={() => setSelectedTemplate(template)}
                 >
-                  <CardHeader className="pb-2">
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+                  <CardHeader className="pb-2 pt-5">
                     <div className="flex items-start gap-3">
                       <div
                         className={cn(
-                          "w-10 h-10 rounded-lg flex items-center justify-center shrink-0",
-                          template.todayLog ? "bg-green-500/20" : "bg-amber-500/20"
+                          "w-10 h-10 border rounded-none flex items-center justify-center shrink-0",
+                          template.todayLog ? "bg-green-500/10 border-green-500/20" : "bg-accent/5 border-accent/25"
                         )}
                       >
                         {template.todayLog ? (
-                          <Check className="w-5 h-5 text-green-400" />
+                          <Check className="w-5 h-5 text-green-700" />
                         ) : (
-                          <ClipboardList className="w-5 h-5 text-amber-400" />
+                          <ClipboardList className="w-5 h-5 text-accent" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-white text-base">{template.name}</CardTitle>
+                        <CardTitle className="text-primary font-sans font-semibold text-lg">{template.name}</CardTitle>
                         {template.description && (
-                          <CardDescription className="text-white/50 text-sm line-clamp-1 mt-0.5">
+                          <CardDescription className="text-muted-foreground text-xs line-clamp-1 mt-0.5">
                             {template.description}
                           </CardDescription>
                         )}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="pt-2">
                     {/* Fields Preview */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
+                    <div className="flex flex-wrap gap-1.5 mb-4">
                       {((template.fieldsConfig as TrackingFieldConfig[]) || []).slice(0, 3).map((field, i) => {
                         const Icon = FIELD_ICONS[field.type] || Hash;
                         return (
-                          <Badge key={i} variant="outline" className="text-xs border-white/20 text-white/60 gap-1">
+                          <Badge key={i} variant="outline" className="text-[10px] uppercase font-semibold tracking-wider border-gray-200 text-muted-foreground bg-gray-50 rounded-none gap-1 py-0.5">
                             <Icon className="w-3 h-3" />
                             {field.name}
                           </Badge>
                         );
                       })}
                       {((template.fieldsConfig as TrackingFieldConfig[]) || []).length > 3 && (
-                        <Badge variant="outline" className="text-xs border-white/20 text-white/40">
+                        <Badge variant="outline" className="text-[10px] uppercase font-semibold tracking-wider border-gray-200 text-muted-foreground/60 rounded-none py-0.5">
                           +{((template.fieldsConfig as TrackingFieldConfig[]) || []).length - 3}
                         </Badge>
                       )}
                     </div>
 
                     {/* Status */}
-                    <div className="flex items-center justify-between pt-2 border-t border-white/10">
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                       {template.todayLog ? (
-                        <span className="text-green-400 text-xs flex items-center gap-1">
-                          <Check className="w-3 h-3" />
+                        <span className="text-green-700 text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
+                          <Check className="w-3.5 h-3.5" />
                           Submitted
                         </span>
                       ) : (
-                        <span className="text-amber-400 text-xs flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3" />
+                        <span className="text-accent text-xs font-semibold uppercase tracking-wider flex items-center gap-1">
+                          <AlertCircle className="w-3.5 h-3.5" />
                           Pending
                         </span>
                       )}
@@ -751,19 +757,19 @@ export default function DynamicDailyTracker({ compact = false }: { compact?: boo
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "h-7 text-xs gap-1",
+                          "h-8 text-xs font-semibold uppercase tracking-wider rounded-none border px-3",
                           template.todayLog
-                            ? "text-white/60 hover:text-white hover:bg-white/10"
-                            : "text-amber-400 hover:text-amber-300 hover:bg-amber-500/10"
+                            ? "text-muted-foreground border-gray-200 hover:text-primary hover:bg-gray-50"
+                            : "text-accent border-accent/25 hover:text-accent hover:bg-accent/5"
                         )}
                       >
                         {template.todayLog ? (
                           <>
-                            <Edit className="w-3 h-3" /> Edit
+                            <Edit className="w-3 h-3 mr-1" /> Edit
                           </>
                         ) : (
                           <>
-                            <Send className="w-3 h-3" /> Fill
+                            <Send className="w-3 h-3 mr-1" /> Fill
                           </>
                         )}
                       </Button>

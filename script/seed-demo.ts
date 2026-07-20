@@ -25,28 +25,28 @@ const FIREBASE_API_KEY =
 
 const DEMO_ACCOUNTS = [
   {
-    email: "admin@demodatainsights.com",
+    email: "admin.local.test@demodatainsights.com",
     password: "Demo@1234",
     firstName: "Rahul",
     lastName: "Sharma",
     role: "owner" as const,
   },
   {
-    email: "emp1@demodatainsights.com",
+    email: "emp1.local.test@demodatainsights.com",
     password: "Demo@1234",
     firstName: "Priya",
     lastName: "Verma",
     role: "employee" as const,
   },
   {
-    email: "emp2@demodatainsights.com",
+    email: "emp2.local.test@demodatainsights.com",
     password: "Demo@1234",
     firstName: "Aman",
     lastName: "Gupta",
     role: "employee" as const,
   },
   {
-    email: "emp3@demodatainsights.com",
+    email: "emp3.local.test@demodatainsights.com",
     password: "Demo@1234",
     firstName: "Neha",
     lastName: "Singh",
@@ -116,9 +116,10 @@ async function main() {
     throw new Error("DATABASE_URL is not set");
   }
 
+  const isLocalhost = process.env.DATABASE_URL.includes("localhost") || process.env.DATABASE_URL.includes("127.0.0.1");
   const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
+    ssl: isLocalhost ? false : { rejectUnauthorized: false },
   });
   const db = drizzle(pool, { schema });
 

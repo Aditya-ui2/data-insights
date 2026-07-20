@@ -34,34 +34,35 @@ interface EodRow {
 
 function KpiCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{label}</p>
-      <p className="text-xl font-bold text-amber-500">{value}</p>
+    <div className="bg-white border border-gray-200 rounded-none p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition-all duration-300">
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent/40 group-hover:bg-accent transition-colors" />
+      <p className="text-[10px] font-sans font-bold uppercase tracking-[0.15em] text-muted-foreground">{label}</p>
+      <p className="text-xl font-sans font-bold text-primary tracking-tight mt-1">{value}</p>
     </div>
   );
 }
 
 function TeamTable({ rows, sym }: { rows: TeamRow[]; sym: string }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto bg-white border border-gray-200 rounded-none shadow-sm">
+      <table className="w-full text-sm font-sans">
         <thead>
-          <tr className="bg-amber-500/10 border-b border-border">
-            <th className="text-left px-4 py-2 font-semibold">Member</th>
-            <th className="text-right px-4 py-2 font-semibold">Revenue</th>
-            <th className="text-right px-4 py-2 font-semibold">Units</th>
-            <th className="text-right px-4 py-2 font-semibold">Deals</th>
-            <th className="text-right px-4 py-2 font-semibold">Achievement</th>
+          <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
+            <th className="text-left px-4 py-3 font-semibold">Member</th>
+            <th className="text-right px-4 py-3 font-semibold">Revenue</th>
+            <th className="text-right px-4 py-3 font-semibold">Units</th>
+            <th className="text-right px-4 py-3 font-semibold">Deals</th>
+            <th className="text-right px-4 py-3 font-semibold">Achievement</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((r, i) => (
-            <tr key={r.memberId} className={i % 2 === 0 ? "bg-muted/30" : ""}>
-              <td className="px-4 py-2">{r.memberName}</td>
-              <td className="px-4 py-2 text-right">{sym}{r.totalRevenue.toLocaleString()}</td>
-              <td className="px-4 py-2 text-right">{r.totalUnits}</td>
-              <td className="px-4 py-2 text-right">{r.totalDeals}</td>
-              <td className="px-4 py-2 text-right font-medium">{r.achievementPercent.toFixed(1)}%</td>
+          {rows.map((r) => (
+            <tr key={r.memberId} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+              <td className="px-4 py-3 font-semibold text-primary">{r.memberName}</td>
+              <td className="px-4 py-3 text-right text-primary font-semibold">{sym}{r.totalRevenue.toLocaleString()}</td>
+              <td className="px-4 py-3 text-right text-gray-800 font-medium">{r.totalUnits}</td>
+              <td className="px-4 py-3 text-right text-accent font-medium">{r.totalDeals}</td>
+              <td className="px-4 py-3 text-right font-bold text-primary">{r.achievementPercent.toFixed(1)}%</td>
             </tr>
           ))}
         </tbody>
@@ -72,25 +73,25 @@ function TeamTable({ rows, sym }: { rows: TeamRow[]; sym: string }) {
 
 function EodTable({ rows, sym }: { rows: EodRow[]; sym: string }) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto bg-white border border-gray-200 rounded-none shadow-sm">
+      <table className="w-full text-sm font-sans">
         <thead>
-          <tr className="bg-amber-500/10 border-b border-border">
-            <th className="text-left px-4 py-2 font-semibold">Date</th>
-            <th className="text-left px-4 py-2 font-semibold">Member</th>
-            <th className="text-right px-4 py-2 font-semibold">Revenue</th>
-            <th className="text-right px-4 py-2 font-semibold">Expenses</th>
-            <th className="text-left px-4 py-2 font-semibold">Notes</th>
+          <tr className="border-b border-gray-200 text-xs text-muted-foreground uppercase tracking-wide bg-gray-50/50">
+            <th className="text-left px-4 py-3 font-semibold">Date</th>
+            <th className="text-left px-4 py-3 font-semibold">Member</th>
+            <th className="text-right px-4 py-3 font-semibold">Revenue</th>
+            <th className="text-right px-4 py-3 font-semibold">Expenses</th>
+            <th className="text-left px-4 py-3 font-semibold">Notes</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((e, i) => (
-            <tr key={e.id} className={i % 2 === 0 ? "bg-muted/30" : ""}>
-              <td className="px-4 py-2 text-muted-foreground">{e.entryDate}</td>
-              <td className="px-4 py-2">{e.memberName}</td>
-              <td className="px-4 py-2 text-right">{sym}{(e.revenue ?? 0).toLocaleString()}</td>
-              <td className="px-4 py-2 text-right">{sym}{(e.expenses ?? 0).toLocaleString()}</td>
-              <td className="px-4 py-2 text-muted-foreground text-xs">{e.notes ?? ""}</td>
+          {rows.map((e) => (
+            <tr key={e.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+              <td className="px-4 py-3 text-muted-foreground">{e.entryDate}</td>
+              <td className="px-4 py-3 font-semibold text-primary">{e.memberName}</td>
+              <td className="px-4 py-3 text-right text-primary font-semibold">{sym}{(e.revenue ?? 0).toLocaleString()}</td>
+              <td className="px-4 py-3 text-right text-red-600 font-semibold">{sym}{(e.expenses ?? 0).toLocaleString()}</td>
+              <td className="px-4 py-3 text-muted-foreground text-xs italic">{e.notes ?? ""}</td>
             </tr>
           ))}
         </tbody>
@@ -115,20 +116,20 @@ export default function SharedBusinessReport() {
   });
 
   const REPORT_LABELS: Record<string, string> = {
-    monthly: "Monthly Report",
-    ytd: "Year-to-Date Report",
-    daily: "Daily Summary",
-    weekly: "Weekly Recap",
-    employee: "Employee Report",
-    festival: "Festival Season Report",
+    monthly: "Monthly Performance Report",
+    ytd: "Indian FY Year-to-Date Report",
+    daily: "EOD Daily Summary",
+    weekly: "Weekly Recap Report",
+    employee: "Individual Team Member Report",
+    festival: "Festival Season Analysis Report",
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-[#fbfaf7] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3 text-muted-foreground">
-          <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
-          <p>Loading shared report…</p>
+          <Loader2 className="w-8 h-8 animate-spin text-accent" />
+          <p className="font-sans text-xs uppercase tracking-wider font-semibold">Loading shared report…</p>
         </div>
       </div>
     );
@@ -136,11 +137,11 @@ export default function SharedBusinessReport() {
 
   if (isError || !data) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <Card className="max-w-sm w-full p-8 text-center space-y-4">
+      <div className="min-h-screen bg-[#fbfaf7] flex items-center justify-center p-6">
+        <Card className="max-w-sm w-full p-8 text-center space-y-4 bg-white border border-gray-200 rounded-none shadow-sm">
           <AlertCircle className="w-10 h-10 mx-auto text-destructive" />
-          <h2 className="text-lg font-semibold">Report Not Found</h2>
-          <p className="text-sm text-muted-foreground">This share link may be expired or invalid.</p>
+          <h2 className="text-lg font-sans font-bold text-primary uppercase tracking-wider">Report Not Found</h2>
+          <p className="text-xs text-muted-foreground">This share link may be expired or invalid.</p>
         </Card>
       </div>
     );
@@ -150,28 +151,28 @@ export default function SharedBusinessReport() {
   const d = data.data;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#fbfaf7]">
       {/* Header */}
-      <header className="border-b border-border bg-card">
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center gap-4">
-          <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-amber-500" />
+          <div className="w-9 h-9 rounded-none bg-primary/10 border border-primary/20 flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-accent" />
           </div>
           <div>
-            <h1 className="font-bold text-foreground">{businessName}</h1>
+            <h1 className="font-sans font-bold text-primary uppercase tracking-wider leading-tight">{businessName}</h1>
             <p className="text-xs text-muted-foreground">{businessIndustry} · {REPORT_LABELS[reportType] ?? reportType}</p>
           </div>
           <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
             <FileText className="w-3.5 h-3.5" />
-            <span>Read-only · Shared report</span>
+            <span className="font-sans">Read-only · Shared report</span>
           </div>
         </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-8 space-y-6">
         {/* Shared report notice */}
-        <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 text-sm text-muted-foreground">
-          This is a <span className="font-medium text-foreground">read-only shared report</span> from <span className="font-medium text-foreground">{businessName}</span>. Data is presented as of the time this link was created.
+        <div className="bg-sidebar border border-sidebar-border rounded-none px-4 py-3 text-xs text-muted-foreground font-sans">
+          This is a <span className="font-semibold text-primary">read-only shared report</span> from <span className="font-semibold text-primary">{businessName}</span>. Data is presented as of the time this link was created.
         </div>
 
         {/* MONTHLY / YTD — Team performance table */}
@@ -186,8 +187,8 @@ export default function SharedBusinessReport() {
           return (
             <>
               <div className="flex items-center gap-3">
-                <BarChart3 className="w-5 h-5 text-amber-500" />
-                <h2 className="text-lg font-semibold">{REPORT_LABELS[reportType]} · {period}</h2>
+                <BarChart3 className="w-5 h-5 text-accent" />
+                <h2 className="font-sans font-bold text-base text-primary uppercase tracking-wider">{REPORT_LABELS[reportType]} · {period}</h2>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <KpiCard label="Total Revenue" value={`${sym}${totalRevenue.toLocaleString()}`} />
@@ -225,10 +226,10 @@ export default function SharedBusinessReport() {
           return (
             <>
               <div className="flex items-center gap-3">
-                <TrendingUp className="w-5 h-5 text-amber-500" />
-                <h2 className="text-lg font-semibold">{REPORT_LABELS[reportType]} · {periodLabel}</h2>
+                <TrendingUp className="w-5 h-5 text-accent" />
+                <h2 className="font-sans font-bold text-base text-primary uppercase tracking-wider">{REPORT_LABELS[reportType]} · {periodLabel}</h2>
                 {reportType === "employee" && (
-                  <span className="text-sm text-muted-foreground">
+                  <span className="text-xs text-muted-foreground font-sans ml-2">
                     — {(d as { memberName: string }).memberName}
                   </span>
                 )}
@@ -242,16 +243,16 @@ export default function SharedBusinessReport() {
               {entries.length > 0 ? (
                 <EodTable rows={entries} sym={sym} />
               ) : (
-                <div className="text-center py-12 text-muted-foreground rounded-xl border border-dashed border-border">
-                  <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
-                  <p>No entries found for this period.</p>
+                <div className="text-center py-12 text-muted-foreground rounded-none border border-dashed border-gray-200 bg-white">
+                  <Users className="w-8 h-8 mx-auto mb-2 opacity-40 text-accent" />
+                  <p className="font-sans text-xs uppercase tracking-wider">No entries found for this period.</p>
                 </div>
               )}
             </>
           );
         })()}
 
-        <p className="text-xs text-center text-muted-foreground pt-4 border-t border-border">
+        <p className="text-[10px] text-center text-muted-foreground pt-4 border-t border-gray-200 uppercase tracking-widest font-sans">
           Generated by DataInsights v2.0 · AI-Powered Business Analytics · Shared {new Date(createdAt).toLocaleDateString()}
         </p>
       </main>

@@ -44,10 +44,11 @@ interface AuthUser {
 function FYContextBadge() {
   const fy = getCurrentFY();
   return (
-    <Badge variant="secondary" className="text-xs font-normal gap-1.5" data-testid="badge-fy-context-data-import">
-      <span className="opacity-60">📅</span>
-      {fy.label} · Month {fy.monthInFY} of 12
-    </Badge>
+    <span className="flex items-center text-[10px] font-sans font-bold uppercase tracking-wider text-primary border border-gray-200 px-3 py-1.5 bg-white rounded-none shrink-0 shadow-sm" data-testid="badge-fy-context-data-import">
+      <span className="font-extrabold text-primary">FY {fy.label}</span>
+      <span className="text-gray-350 mx-2 font-light">|</span>
+      <span className="text-accent font-extrabold">Month {fy.monthInFY} of 12</span>
+    </span>
   );
 }
 
@@ -63,17 +64,17 @@ export default function DataImportSuitePage() {
   });
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-[#fbfaf7] flex">
       <BusinessSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+        <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
           <div className="px-6 py-4 flex items-center justify-between">
             <div>
-              <h1 className="font-bold text-lg leading-tight flex items-center gap-2">
-                <Upload className="w-5 h-5 text-amber-500" />
+              <h1 className="font-sans font-bold text-lg text-primary uppercase tracking-wider flex items-center gap-2">
+                <Upload className="w-5 h-5 text-accent" />
                 Data Import Suite
               </h1>
-              <p className="text-xs text-muted-foreground capitalize">
+              <p className="text-xs text-muted-foreground capitalize font-sans">
                 {profile?.name || "Business"} · {profile?.memberRole || "owner"}
               </p>
             </div>
@@ -81,12 +82,13 @@ export default function DataImportSuitePage() {
             <div className="flex items-center gap-2">
               <FYContextBadge />
               <Button
-                variant="ghost"
+                variant="outline"
                 size="sm"
                 onClick={() => navigate("/home")}
+                className="rounded-none border border-gray-200 text-muted-foreground hover:bg-gray-50 text-[10px] font-sans font-bold uppercase tracking-wider h-8 px-3"
                 data-testid="button-analytics-data-import"
               >
-                <BarChart3 className="w-4 h-4 mr-1" /> Analytics
+                <BarChart3 className="w-4 h-4 mr-1.5 text-accent" /> Analytics
               </Button>
               <ThemeToggle />
               <DropdownMenu>
@@ -94,49 +96,49 @@ export default function DataImportSuitePage() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-9 w-9 rounded-full border border-border/70 bg-card/80 hover:bg-muted/70"
+                    className="h-8 w-8 rounded-none border border-gray-200 bg-white hover:bg-gray-50 shadow-none shrink-0"
                     data-testid="button-business-profile-menu-data-import"
                   >
-                    <Avatar className="w-8 h-8 ring-1 ring-cyan-400/40">
+                    <Avatar className="w-7 h-7 rounded-none">
                       <AvatarImage src={user?.profileImageUrl ?? undefined} />
-                      <AvatarFallback className="bg-cyan-600 text-white font-semibold">
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs rounded-none">
                         {user?.firstName?.[0] ?? user?.email?.[0] ?? "U"}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/business/settings")} data-testid="menu-business-settings-data-import">
-                    <Settings className="w-4 h-4 mr-2" />
+                <DropdownMenuContent align="end" className="w-56 rounded-none border border-gray-200 bg-white font-sans text-xs">
+                  <DropdownMenuLabel className="font-sans font-bold text-primary text-[10px] uppercase tracking-wide px-3 py-2">My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-gray-100" />
+                  <DropdownMenuItem onClick={() => navigate("/business/settings")} className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-muted-foreground hover:text-primary" data-testid="menu-business-settings-data-import">
+                    <Settings className="w-4 h-4 mr-2 text-accent" />
                     Business Settings
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/business/team")} data-testid="menu-business-team-data-import">
-                    <User className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => navigate("/business/team")} className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-muted-foreground hover:text-primary" data-testid="menu-business-team-data-import">
+                    <User className="w-4 h-4 mr-2 text-accent" />
                     Manage Team
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/home")} data-testid="menu-analytics-data-import">
-                    <BarChart3 className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => navigate("/home")} className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-muted-foreground hover:text-primary" data-testid="menu-analytics-data-import">
+                    <BarChart3 className="w-4 h-4 mr-2 text-accent" />
                     Analytics Home
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem data-testid="menu-theme-data-import">
-                    <Palette className="w-4 h-4 mr-2" />
+                  <DropdownMenuSeparator className="bg-gray-100" />
+                  <DropdownMenuItem className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-muted-foreground hover:text-primary" data-testid="menu-theme-data-import">
+                    <Palette className="w-4 h-4 mr-2 text-accent" />
                     Appearance
                   </DropdownMenuItem>
-                  <DropdownMenuItem data-testid="menu-about-data-import">
-                    <Info className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-muted-foreground hover:text-primary" data-testid="menu-about-data-import">
+                    <Info className="w-4 h-4 mr-2 text-accent" />
                     About DataInsights
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-gray-100" />
                   <DropdownMenuItem
                     onClick={async () => {
                       await logOut();
                       window.location.href = "/";
                     }}
                     data-testid="menu-business-logout-data-import"
-                    className="text-destructive"
+                    className="hover:bg-gray-50 focus:bg-gray-50 rounded-none cursor-pointer text-xs font-sans py-2 px-3 text-destructive font-semibold"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
@@ -148,7 +150,7 @@ export default function DataImportSuitePage() {
         </header>
 
         <main className="max-w-5xl mx-auto px-6 py-8 w-full">
-          <SheetSelector onDashboardCreated={(dashboardId) => navigate(`/home`)} />
+          <SheetSelector onDashboardCreated={(dashboardId) => navigate(`/home?dashboardId=${dashboardId}`)} />
         </main>
       </div>
     </div>

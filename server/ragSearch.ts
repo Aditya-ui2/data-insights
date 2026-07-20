@@ -2,7 +2,7 @@
 import { db } from "./db";
 import { documentChunks } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
-import { embedText, embedBatch, cosineSimilarity, datasetToText } from "./embeddings";
+import { embedText, embedBatch, cosineSimilarity, datasetToText, chunkText } from "./embeddings";
 
 export interface RetrievedChunk {
   chunkText: string;
@@ -18,13 +18,19 @@ export async function indexDataset(
   datasetId: string,
   userId: string,
   headers: string[],
-  data: Record<string, any>[]
+  data: Record<string, any>[],
+  ragText?: string
 ): Promise<void> {
   try {
     // Delete old chunks for this dataset
     await db.delete(documentChunks).where(eq(documentChunks.datasetId, datasetId));
 
-    const texts = datasetToText(headers, data);
+    let texts: string[] = [];
+    if (ragText && ragText.trim()) {
+      texts = chunkText(ragText);
+    } else {
+      texts = datasetToText(headers, data);
+    }
     if (texts.length === 0) return;
 
     const embeddings = await embedBatch(texts);

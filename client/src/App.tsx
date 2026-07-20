@@ -1,9 +1,8 @@
 import { Switch, Route, Redirect } from "wouter";
-import { queryClient } from "./lib/queryClient";
+import { queryClient, apiRequest } from "./lib/queryClient";
 import { QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/components/theme-provider";
 import { AuthContext, useAuthState } from "@/hooks/useAuth";
 import { getIdToken } from "@/lib/firebase";
 import NotFound from "@/pages/not-found";
@@ -21,6 +20,7 @@ import BusinessTeam from "@/pages/business-team";
 import EmployeeEod from "@/pages/employee-eod";
 import OperationsDashboard from "@/pages/operations-dashboard";
 import AiStrategy from "@/pages/ai-strategy";
+import AiSuiteHub from "@/pages/ai-suite";
 import BusinessReports from "@/pages/business-reports";
 import SharedBusinessReport from "@/pages/shared-business-report";
 import DynamicHealthAudit from "@/components/DynamicHealthAudit";
@@ -30,26 +30,41 @@ import AdminFieldTrackingPage from "@/pages/admin-field-tracking";
 import BusinessTasksPage from "@/pages/business-tasks";
 import TrackingTemplatesPage from "@/pages/tracking-templates";
 import EmployeeDailyTrackingPage from "@/pages/employee-daily-tracking";
+import BusinessCustomersPage from "@/pages/business-customers";
+import BusinessGoalsPage from "@/pages/business-goals";
+import BusinessAlertsPage from "@/pages/business-alerts";
+import OAuthSimulator from "@/pages/oauth-simulator";
+import SheetViewPage from "@/pages/sheet-view";
 
 // Fetches the business profile returning null for 404 (no profile yet),
 // but re-throws on 5xx or network errors so backend issues aren't silently hidden.
-async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string } | null> {
-  // Standalone Mock Profile
-  return { id: "demo-biz-123", name: "NexGen Solutions Pvt Ltd" };
+async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string; memberRole?: string } | null> {
+  try {
+    const res = await apiRequest("GET", "/api/business/profile");
+    return await res.json();
+  } catch (err: any) {
+    if (err.message?.startsWith("404")) {
+      return null;
+    }
+    console.error("Error fetching business profile:", err);
+    return null;
+  }
 }
 
 // Smart default route: authenticated users with a Business Suite profile go to /business;
 // pure analytics users stay on the Analytics home.
-function DefaultHome({ isAuthenticated }: { isAuthenticated: boolean }) {
-  const { data: bizProfile, isLoading } = useQuery<{ id: string } | null>({
+function DefaultHome({ isAuthenticated, isLoading }: { isAuthenticated: boolean; isLoading: boolean }) {
+  const { data: bizProfile, isLoading: bizLoading } = useQuery<{ id: string } | null>({
     queryKey: ["/api/business/profile"],
     enabled: isAuthenticated,
     retry: false,
     queryFn: fetchBusinessProfileOrNull,
   });
 
-  if (!isAuthenticated) return <Redirect to="/login" />;
+  // While auth is still resolving, show nothing (prevents flash redirect to /login)
   if (isLoading) return null;
+  if (!isAuthenticated) return <Redirect to="/login" />;
+  if (bizLoading) return null;
   if (bizProfile?.id) return <Redirect to="/business" />;
   return <Home />;
 }
@@ -65,7 +80,7 @@ function Router() {
         </Route>
 
         <Route path="/login">
-          {auth.isAuthenticated ? <DefaultHome isAuthenticated={auth.isAuthenticated} /> : <Login />}
+          {auth.isLoading ? null : auth.isAuthenticated ? <DefaultHome isAuthenticated={auth.isAuthenticated} isLoading={auth.isLoading} /> : <Login />}
         </Route>
 
         <Route path="/get-started">
@@ -98,6 +113,14 @@ function Router() {
 
         <Route path="/business/ai-strategy">
           {auth.isLoading ? null : auth.isAuthenticated ? <AiStrategy /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/ai-suite/:page">
+          {auth.isLoading ? null : auth.isAuthenticated ? <AiSuiteHub /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/ai-suite">
+          {auth.isLoading ? null : auth.isAuthenticated ? <Redirect to="/business/ai-suite/next-best-action" /> : <Redirect to="/login" />}
         </Route>
 
         <Route path="/business/reports/shared/:token">
@@ -136,6 +159,18 @@ function Router() {
           {auth.isLoading ? null : auth.isAuthenticated ? <BusinessTasksPage /> : <Redirect to="/login" />}
         </Route>
 
+        <Route path="/business/customers">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessCustomersPage /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/goals">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessGoalsPage /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/alerts">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessAlertsPage /> : <Redirect to="/login" />}
+        </Route>
+
         <Route path="/business/verticals">
           {auth.isLoading ? null : auth.isAuthenticated ? <Redirect to="/business" /> : <Redirect to="/login" />}
         </Route>
@@ -146,13 +181,21 @@ function Router() {
 
         {/* /home always shows Analytics (no business suite redirect) */}
         <Route path="/home">
-          {auth.isLoading ? null : auth.isAuthenticated ? <Home /> : <Redirect to="/login" />}
+          <Home />
+        </Route>
+
+        {/* Dedicated Sheet View page */}
+        <Route path="/sheet/:id">
+          {auth.isLoading ? null : auth.isAuthenticated ? <SheetViewPage /> : <Redirect to="/login" />}
         </Route>
 
         {/* Dedicated Data Import page */}
         <Route path="/data-import">
           {auth.isLoading ? null : auth.isAuthenticated ? <DataImportPage /> : <Redirect to="/login" />}
         </Route>
+
+        {/* Sandbox OAuth Simulator */}
+        <Route path="/oauth/simulate/:provider" component={OAuthSimulator} />
 
         {/* Business-style dedicated Data Import Suite page */}
         <Route path="/data-import-suite">
@@ -173,12 +216,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
-      </ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Router />
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }

@@ -32,12 +32,12 @@ import type { BusinessMemberWithUser } from "@shared/schema";
 
 function RoleBadge({ role, status }: { role: string; status: string }) {
   if (status === "pending") {
-    return <Badge variant="outline" className="text-amber-500 border-amber-500/40 text-xs">Invite Pending</Badge>;
+    return <Badge variant="outline" className="text-accent border-accent/40 bg-accent/5 rounded-none text-xs">Invite Pending</Badge>;
   }
   const colors: Record<string, string> = {
-    owner: "text-amber-500 border-amber-500/40",
-    manager: "text-blue-500 border-blue-500/40",
-    employee: "text-muted-foreground",
+    owner: "text-accent border-accent/30 bg-accent/5 rounded-none",
+    manager: "text-primary border-primary/30 bg-primary/5 rounded-none",
+    employee: "text-muted-foreground border-gray-200 bg-gray-50/50 rounded-none",
   };
   return (
     <Badge variant="outline" className={`text-xs capitalize ${colors[role] ?? ""}`}>
@@ -132,69 +132,92 @@ export default function BusinessTeam() {
     setTimeout(() => setCopiedLink(null), 2000);
     toast({ title: "Invite link copied" });
   };
-
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-[#fbfaf7] flex">
       <BusinessSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="border-b border-border bg-card/60 backdrop-blur-sm sticky top-0 z-10">
+        <header className="border-b border-gray-200 bg-white sticky top-0 z-10">
           <div className="px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate("/business")} className="text-muted-foreground hover:text-foreground transition-colors" data-testid="button-back-business">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/business")}
+                className="text-muted-foreground hover:text-primary rounded-none"
+                data-testid="button-back-business"
+              >
                 <ArrowLeft className="w-5 h-5" />
-              </button>
+              </Button>
               <div>
-                <h1 className="font-bold text-lg leading-tight flex items-center gap-2">
-                  <Users className="w-5 h-5 text-amber-500" /> My Teams
+                <h1 className="font-sans font-bold text-lg text-primary uppercase tracking-wider flex items-center gap-2">
+                  <Users className="w-5 h-5 text-accent" /> My Teams
                 </h1>
-                <p className="text-xs text-muted-foreground">{profile?.name}</p>
+                <p className="text-xs text-muted-foreground">{profile?.name || "Business Suite"} · Member Roster & Access Control</p>
               </div>
             </div>
             <Button
-              className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
-              size="sm"
+              className="bg-primary hover:bg-primary/95 text-primary-foreground font-semibold rounded-none uppercase tracking-wider text-xs px-4 h-9 shadow-none flex items-center gap-1.5"
               onClick={() => setShowInvite(true)}
               data-testid="button-invite-member"
             >
-              <UserPlus className="w-4 h-4 mr-2" /> Invite Member
+              <UserPlus className="w-4 h-4" /> Invite Member
             </Button>
           </div>
         </header>
 
         <main className="max-w-3xl mx-auto px-6 py-8 w-full space-y-6">
         {/* What to do here — UX explainer */}
-        <div className="bg-muted/30 border border-border rounded-xl p-4">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">How My Teams works</p>
-          <div className="flex flex-col sm:flex-row gap-3 text-xs text-muted-foreground">
-            <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">1.</span>
-              <span><span className="font-medium text-foreground">Invite members</span> — send invite links to employees and managers. They create an account and join your business.</span>
+        <div className="bg-white border border-gray-200 rounded-none p-5 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-[3px] bg-accent/40"></div>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide mb-3">How My Teams works</p>
+          <div className="grid sm:grid-cols-3 gap-6 text-xs text-muted-foreground">
+            <div className="flex items-start gap-3">
+              <span className="text-accent font-bold text-sm leading-none mt-0.5">01</span>
+              <div>
+                <p className="font-semibold text-primary mb-1">Invite members</p>
+                <p className="leading-relaxed">Send invite links to employees and managers. They create an account and join your business.</p>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">2.</span>
-              <span><span className="font-medium text-foreground">They log daily EODs</span> — employees submit revenue, deals, units, and expenses via "Log My Day" every workday.</span>
+            <div className="flex items-start gap-3">
+              <span className="text-accent font-bold text-sm leading-none mt-0.5">02</span>
+              <div>
+                <p className="font-semibold text-primary mb-1">They log daily EODs</p>
+                <p className="leading-relaxed">Employees submit revenue, deals, units, and expenses via "Log My Day" every workday.</p>
+              </div>
             </div>
-            <div className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold mt-0.5">3.</span>
-              <span><span className="font-medium text-foreground">You review in Team View</span> — all submissions appear on the operations dashboard for tracking and review.</span>
+            <div className="flex items-start gap-3">
+              <span className="text-accent font-bold text-sm leading-none mt-0.5">03</span>
+              <div>
+                <p className="font-semibold text-primary mb-1">You review in Team View</p>
+                <p className="leading-relaxed">All submissions appear on the operations dashboard for tracking and review.</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Members list */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <Card>
+          <Card className="rounded-none border-gray-200 shadow-none bg-white">
             {isLoading ? (
               <div className="p-4 space-y-3">
-                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 rounded-lg" />)}
+                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-14 rounded-none" />)}
               </div>
             ) : members.length === 0 ? (
-              <div className="py-12 text-center">
-                <Users className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
-                <p className="font-medium mb-1">Your team is empty</p>
-                <p className="text-sm text-muted-foreground mb-3">Invite employees and managers so they can log their daily EOD reports and be tracked in the operations dashboard.</p>
-                <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-black font-semibold" onClick={() => setShowInvite(true)} data-testid="button-invite-first">
-                  <UserPlus className="w-3 h-3 mr-1" /> Invite First Member
+              <div className="py-16 text-center max-w-md mx-auto">
+                <div className="w-12 h-12 rounded-none bg-primary/5 flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-sans font-bold text-base text-primary uppercase tracking-wider mb-2">Your team is empty</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed mb-6">
+                  Invite employees and managers so they can log their daily EOD reports and be tracked in the operations dashboard.
+                </p>
+                <Button 
+                  size="sm" 
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold rounded-none uppercase tracking-wider text-xs px-5 h-9 shadow-none inline-flex items-center gap-1.5" 
+                  onClick={() => setShowInvite(true)} 
+                  data-testid="button-invite-first"
+                >
+                  <UserPlus className="w-3.5 h-3.5" /> Invite First Member
                 </Button>
               </div>
             ) : (
@@ -202,15 +225,15 @@ export default function BusinessTeam() {
                 {members.map((m) => (
                   <div
                     key={m.id}
-                    className="flex items-center justify-between px-5 py-3"
+                    className="flex items-center justify-between px-5 py-4"
                     data-testid={`row-member-${m.id}`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 font-semibold text-sm">
+                      <div className="w-9 h-9 rounded-none bg-primary/5 text-primary border border-primary/10 flex items-center justify-center font-semibold text-sm">
                         {(m.name || m.email || "?").charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-medium">{m.name || m.user?.firstName || m.email}</p>
+                        <p className="text-sm font-medium text-primary">{m.name || m.user?.firstName || m.email}</p>
                         <p className="text-xs text-muted-foreground">{m.email}</p>
                       </div>
                     </div>
@@ -220,7 +243,7 @@ export default function BusinessTeam() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7"
+                          className="h-8 w-8 rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-muted-foreground hover:text-primary"
                           title="Copy invite link"
                           onClick={() => copyInviteLink(m as BusinessMemberWithUser & { inviteToken?: string })}
                           data-testid={`button-copy-invite-${m.id}`}
@@ -236,7 +259,7 @@ export default function BusinessTeam() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-7 w-7 text-destructive hover:text-destructive"
+                          className="h-8 w-8 rounded-none border border-gray-200 bg-white hover:bg-gray-50 text-destructive hover:bg-destructive/5 hover:text-destructive"
                           onClick={() => removeMutation.mutate(m.id)}
                           disabled={removeMutation.isPending}
                           data-testid={`button-remove-member-${m.id}`}
@@ -254,49 +277,51 @@ export default function BusinessTeam() {
 
         {/* Invite Dialog */}
         <Dialog open={showInvite} onOpenChange={setShowInvite}>
-          <DialogContent data-testid="dialog-invite">
+          <DialogContent data-testid="dialog-invite" className="rounded-none border-gray-200 bg-white">
             <DialogHeader>
-              <DialogTitle>Invite Team Member</DialogTitle>
+              <DialogTitle className="font-sans font-bold uppercase tracking-wider text-sm text-primary">Invite Team Member</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 py-2">
-              <div>
-                <Label htmlFor="invite-email">Email *</Label>
+            <div className="space-y-4 py-2 text-xs">
+              <div className="space-y-1.5">
+                <Label htmlFor="invite-email" className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Email Address *</Label>
                 <Input
                   id="invite-email"
                   type="email"
                   placeholder="colleague@example.com"
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
+                  className="rounded-none border-gray-200 focus-visible:ring-1 focus-visible:ring-accent"
                   data-testid="input-invite-email"
                 />
               </div>
-              <div>
-                <Label htmlFor="invite-name">Name (optional)</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="invite-name" className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Name (optional)</Label>
                 <Input
                   id="invite-name"
                   placeholder="Full name"
                   value={inviteName}
                   onChange={(e) => setInviteName(e.target.value)}
+                  className="rounded-none border-gray-200 focus-visible:ring-1 focus-visible:ring-accent"
                   data-testid="input-invite-name"
                 />
               </div>
-              <div>
-                <Label>Role</Label>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">Role</Label>
                 <Select value={inviteRole} onValueChange={setInviteRole}>
-                  <SelectTrigger data-testid="select-invite-role">
+                  <SelectTrigger data-testid="select-invite-role" className="rounded-none border-gray-200 focus:ring-1 focus:ring-accent">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="employee">Employee</SelectItem>
-                    <SelectItem value="manager">Manager</SelectItem>
+                  <SelectContent className="rounded-none">
+                    <SelectItem value="employee" className="focus:bg-primary/5 focus:text-primary rounded-none">Employee</SelectItem>
+                    <SelectItem value="manager" className="focus:bg-primary/5 focus:text-primary rounded-none">Manager</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="ghost" onClick={() => setShowInvite(false)}>Cancel</Button>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="ghost" onClick={() => setShowInvite(false)} className="rounded-none text-xs uppercase tracking-wider font-semibold">Cancel</Button>
               <Button
-                className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+                className="bg-accent hover:bg-accent/90 text-accent-foreground font-bold rounded-none uppercase tracking-wider text-xs px-5 h-9 shadow-none"
                 onClick={() => inviteMutation.mutate()}
                 disabled={inviteMutation.isPending || !inviteEmail}
                 data-testid="button-send-invite"

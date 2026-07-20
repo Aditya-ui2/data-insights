@@ -1,0 +1,252 @@
+Date,Employee Name,Vertical,Revenue (INR),Units Sold,Deals Closed,Travel Expense (INR),Client Meet Expense (INR),Daily Notes
+2026-04-01,Aditya Singh,Sales & CRM,43000,12,2,1000,300,Closed premium client contract
+2026-04-01,Aditya Singh,Operations,25000,3,0,1100,1400,BKC office site check-in
+2026-04-02,Priya Verma,Sales & CRM,72000,12,3,1100,400,Assisted new lead onboardings
+2026-04-02,Priya Verma,Operations,10000,8,0,800,800,North hub logistics setup
+2026-04-02,Aditya Singh,Sales & CRM,18000,9,1,1200,500,Closed premium client contract
+2026-04-02,Aditya Singh,Operations,44000,2,0,600,800,North hub logistics setup
+2026-04-03,Aditya Singh,Sales & CRM,35000,8,1,200,1400,Closed premium client contract
+2026-04-03,Aditya Singh,Operations,22000,4,0,800,100,BKC office site check-in
+2026-04-03,Priya Verma,Sales & CRM,54000,5,4,500,1400,Client pricing negotiation
+2026-04-03,Priya Verma,Operations,11000,7,0,1200,0,North hub logistics setup
+2026-04-04,Rahul Sharma,Sales & CRM,21000,2,3,1200,400,Assisted new lead onboardings
+2026-04-04,Rahul Sharma,Operations,80000,5,0,200,400,BKC office site check-in
+2026-04-04,Priya Verma,Operations,22000,11,0,0,600,Maintenance log reviews
+2026-04-04,Aditya Singh,Operations,12000,6,0,1200,0,North hub logistics setup
+2026-04-05,Priya Verma,Sales & CRM,13000,2,3,1200,700,Assisted new lead onboardings
+2026-04-06,Rahul Sharma,Operations,16000,9,0,800,900,Maintenance log reviews
+2026-04-06,Aditya Singh,Operations,41000,10,0,400,500,Inventory stock audit
+2026-04-06,Priya Verma,Sales & CRM,70000,4,4,500,1000,Client pricing negotiation
+2026-04-06,Priya Verma,Operations,67000,8,0,600,300,BKC office site check-in
+2026-04-07,Rahul Sharma,Sales & CRM,28000,5,2,200,200,Client pricing negotiation
+2026-04-07,Rahul Sharma,Operations,65000,3,0,1100,400,Maintenance log reviews
+2026-04-07,Priya Verma,Sales & CRM,56000,11,4,600,1200,Assisted new lead onboardings
+2026-04-07,Priya Verma,Operations,75000,3,0,0,0,Inventory stock audit
+2026-04-08,Priya Verma,Sales & CRM,59000,7,4,100,1400,Assisted new lead onboardings
+2026-04-08,Priya Verma,Operations,23000,8,0,700,800,Inventory stock audit
+2026-04-09,Aditya Singh,Sales & CRM,24000,11,1,600,1300,Assisted new lead onboardings
+2026-04-09,Aditya Singh,Operations,47000,7,0,500,100,North hub logistics setup
+2026-04-09,Rahul Sharma,Sales & CRM,52000,7,4,200,900,Outreach campaign success
+2026-04-09,Rahul Sharma,Operations,80000,7,0,600,1200,Maintenance log reviews
+2026-04-10,Aditya Singh,Operations,73000,10,0,300,1000,Maintenance log reviews
+2026-04-10,Rahul Sharma,Sales & CRM,20000,4,3,400,1100,Assisted new lead onboardings
+2026-04-10,Rahul Sharma,Operations,39000,7,0,100,0,North hub logistics setup
+2026-04-11,Aditya Singh,Sales & CRM,34000,10,4,400,300,Closed premium client contract
+2026-04-11,Aditya Singh,Operations,58000,4,0,1000,1100,North hub logistics setup
+2026-04-11,Rahul Sharma,Sales & CRM,76000,9,3,200,600,Outreach campaign success
+2026-04-11,Priya Verma,Sales & CRM,11000,3,1,100,1500,Closed premium client contract
+2026-04-12,Priya Verma,Sales & CRM,56000,1,2,900,1300,Outreach campaign success
+2026-04-13,Rahul Sharma,Operations,64000,10,0,100,800,Maintenance log reviews
+2026-04-13,Priya Verma,Sales & CRM,58000,9,3,1100,100,Closed premium client contract
+2026-04-13,Priya Verma,Operations,73000,12,0,700,0,North hub logistics setup
+2026-04-14,Aditya Singh,Sales & CRM,53000,10,1,400,400,Assisted new lead onboardings
+2026-04-14,Aditya Singh,Operations,68000,11,0,1200,300,BKC office site check-in
+2026-04-14,Rahul Sharma,Sales & CRM,49000,8,3,800,700,Client pricing negotiation
+2026-04-14,Rahul Sharma,Operations,68000,4,0,500,1400,Inventory stock audit
+2026-04-15,Priya Verma,Sales & CRM,55000,11,3,100,500,Assisted new lead onboardings
+2026-04-15,Priya Verma,Operations,35000,1,0,400,400,Maintenance log reviews
+2026-04-15,Aditya Singh,Sales & CRM,57000,4,4,0,800,Client pricing negotiation
+2026-04-15,Aditya Singh,Operations,51000,7,0,100,800,Inventory stock audit
+2026-04-16,Rahul Sharma,Sales & CRM,62000,5,4,600,400,Closed premium client contract
+2026-04-16,Rahul Sharma,Operations,71000,9,0,800,1000,North hub logistics setup
+2026-04-16,Aditya Singh,Operations,79000,5,0,1100,1500,BKC office site check-in
+2026-04-16,Priya Verma,Sales & CRM,80000,1,2,0,200,Closed premium client contract
+2026-04-16,Priya Verma,Operations,73000,12,0,700,1400,North hub logistics setup
+2026-04-17,Aditya Singh,Sales & CRM,70000,1,3,300,200,Outreach campaign success
+2026-04-17,Aditya Singh,Operations,45000,1,0,600,100,BKC office site check-in
+2026-04-17,Priya Verma,Operations,13000,1,0,100,400,Maintenance log reviews
+2026-04-17,Rahul Sharma,Sales & CRM,44000,3,2,600,1000,Client pricing negotiation
+2026-04-18,Aditya Singh,Sales & CRM,47000,8,1,300,100,Outreach campaign success
+2026-04-18,Aditya Singh,Operations,21000,6,0,0,800,BKC office site check-in
+2026-04-19,Rahul Sharma,Sales & CRM,44000,10,4,0,100,Assisted new lead onboardings
+2026-04-19,Rahul Sharma,Operations,53000,9,0,0,1500,North hub logistics setup
+2026-04-19,Aditya Singh,Sales & CRM,69000,5,2,1200,1000,Client pricing negotiation
+2026-04-19,Aditya Singh,Operations,42000,8,0,100,1300,BKC office site check-in
+2026-04-19,Priya Verma,Sales & CRM,30000,6,4,300,300,Outreach campaign success
+2026-04-19,Priya Verma,Operations,13000,7,0,800,300,Inventory stock audit
+2026-04-20,Aditya Singh,Operations,16000,3,0,500,300,BKC office site check-in
+2026-04-20,Rahul Sharma,Sales & CRM,11000,5,2,300,1400,Closed premium client contract
+2026-04-21,Priya Verma,Sales & CRM,32000,5,2,800,100,Assisted new lead onboardings
+2026-04-21,Priya Verma,Operations,68000,7,0,900,1000,North hub logistics setup
+2026-04-21,Rahul Sharma,Sales & CRM,54000,9,1,200,300,Closed premium client contract
+2026-04-21,Rahul Sharma,Operations,11000,5,0,0,900,North hub logistics setup
+2026-04-22,Priya Verma,Sales & CRM,13000,3,1,600,1100,Assisted new lead onboardings
+2026-04-22,Priya Verma,Operations,29000,12,0,1100,1300,North hub logistics setup
+2026-04-23,Rahul Sharma,Sales & CRM,56000,6,3,300,200,Client pricing negotiation
+2026-04-23,Aditya Singh,Operations,65000,9,0,1200,1400,North hub logistics setup
+2026-04-24,Rahul Sharma,Sales & CRM,74000,7,4,1000,1100,Assisted new lead onboardings
+2026-04-24,Rahul Sharma,Operations,42000,11,0,1000,1300,North hub logistics setup
+2026-04-25,Rahul Sharma,Operations,23000,12,0,600,200,Inventory stock audit
+2026-04-26,Rahul Sharma,Sales & CRM,71000,10,4,800,700,Closed premium client contract
+2026-04-26,Rahul Sharma,Operations,63000,3,0,1100,1300,Inventory stock audit
+2026-04-26,Priya Verma,Operations,79000,1,0,600,0,Maintenance log reviews
+2026-04-27,Priya Verma,Sales & CRM,22000,12,4,1100,300,Client pricing negotiation
+2026-04-27,Priya Verma,Operations,75000,3,0,1200,1200,Inventory stock audit
+2026-04-28,Rahul Sharma,Sales & CRM,46000,6,1,400,300,Client pricing negotiation
+2026-04-28,Aditya Singh,Sales & CRM,14000,5,1,800,200,Assisted new lead onboardings
+2026-04-28,Aditya Singh,Operations,75000,8,0,700,800,BKC office site check-in
+2026-04-29,Rahul Sharma,Operations,52000,1,0,400,0,North hub logistics setup
+2026-04-30,Priya Verma,Operations,41000,1,0,500,200,Inventory stock audit
+2026-04-30,Rahul Sharma,Sales & CRM,46000,5,4,1000,800,Client pricing negotiation
+2026-04-30,Rahul Sharma,Operations,57000,11,0,600,1300,North hub logistics setup
+2026-05-01,Aditya Singh,Sales & CRM,22000,11,3,900,900,Assisted new lead onboardings
+2026-05-01,Aditya Singh,Operations,30000,3,0,200,600,BKC office site check-in
+2026-05-01,Priya Verma,Operations,58000,9,0,100,300,Maintenance log reviews
+2026-05-01,Rahul Sharma,Sales & CRM,64000,10,4,800,600,Assisted new lead onboardings
+2026-05-03,Aditya Singh,Sales & CRM,45000,2,1,700,800,Assisted new lead onboardings
+2026-05-03,Aditya Singh,Operations,39000,9,0,100,300,North hub logistics setup
+2026-05-04,Rahul Sharma,Sales & CRM,65000,7,3,200,600,Client pricing negotiation
+2026-05-04,Rahul Sharma,Operations,27000,11,0,1200,100,BKC office site check-in
+2026-05-05,Rahul Sharma,Sales & CRM,48000,9,2,1100,700,Outreach campaign success
+2026-05-05,Rahul Sharma,Operations,79000,9,0,0,0,Inventory stock audit
+2026-05-05,Priya Verma,Sales & CRM,13000,5,2,1000,200,Closed premium client contract
+2026-05-06,Aditya Singh,Operations,25000,4,0,700,1300,Inventory stock audit
+2026-05-06,Rahul Sharma,Operations,63000,3,0,900,1300,North hub logistics setup
+2026-05-06,Priya Verma,Operations,19000,12,0,600,700,Maintenance log reviews
+2026-05-07,Aditya Singh,Sales & CRM,77000,5,1,900,1200,Outreach campaign success
+2026-05-07,Aditya Singh,Operations,22000,1,0,400,1400,North hub logistics setup
+2026-05-08,Rahul Sharma,Sales & CRM,58000,11,1,300,0,Assisted new lead onboardings
+2026-05-08,Rahul Sharma,Operations,55000,7,0,200,1300,BKC office site check-in
+2026-05-08,Priya Verma,Sales & CRM,19000,10,2,1000,1200,Client pricing negotiation
+2026-05-08,Priya Verma,Operations,27000,9,0,200,300,BKC office site check-in
+2026-05-09,Priya Verma,Sales & CRM,28000,6,2,1200,1400,Assisted new lead onboardings
+2026-05-09,Priya Verma,Operations,33000,9,0,900,200,Maintenance log reviews
+2026-05-10,Aditya Singh,Sales & CRM,78000,12,4,900,1200,Client pricing negotiation
+2026-05-10,Aditya Singh,Operations,20000,5,0,700,200,North hub logistics setup
+2026-05-10,Rahul Sharma,Sales & CRM,77000,1,3,400,600,Assisted new lead onboardings
+2026-05-10,Rahul Sharma,Operations,69000,5,0,700,100,Inventory stock audit
+2026-05-10,Priya Verma,Sales & CRM,47000,10,3,0,1500,Client pricing negotiation
+2026-05-10,Priya Verma,Operations,26000,11,0,200,1400,Inventory stock audit
+2026-05-11,Priya Verma,Sales & CRM,66000,7,4,0,1300,Outreach campaign success
+2026-05-11,Priya Verma,Operations,43000,12,0,400,500,Maintenance log reviews
+2026-05-11,Rahul Sharma,Sales & CRM,79000,9,4,700,200,Assisted new lead onboardings
+2026-05-12,Priya Verma,Sales & CRM,34000,7,2,100,0,Assisted new lead onboardings
+2026-05-12,Priya Verma,Operations,32000,5,0,0,1200,BKC office site check-in
+2026-05-12,Rahul Sharma,Sales & CRM,28000,9,1,0,1100,Outreach campaign success
+2026-05-12,Rahul Sharma,Operations,75000,12,0,1200,800,BKC office site check-in
+2026-05-13,Rahul Sharma,Operations,70000,11,0,700,900,BKC office site check-in
+2026-05-14,Aditya Singh,Sales & CRM,35000,8,1,900,1300,Assisted new lead onboardings
+2026-05-14,Aditya Singh,Operations,12000,6,0,700,1000,Inventory stock audit
+2026-05-15,Rahul Sharma,Sales & CRM,30000,5,2,400,1500,Assisted new lead onboardings
+2026-05-15,Rahul Sharma,Operations,20000,7,0,200,1500,BKC office site check-in
+2026-05-16,Aditya Singh,Sales & CRM,21000,9,4,400,1400,Outreach campaign success
+2026-05-16,Aditya Singh,Operations,44000,1,0,400,1000,Inventory stock audit
+2026-05-16,Priya Verma,Sales & CRM,42000,3,3,600,1100,Closed premium client contract
+2026-05-16,Priya Verma,Operations,56000,7,0,1000,1300,Inventory stock audit
+2026-05-16,Rahul Sharma,Sales & CRM,43000,2,3,400,0,Closed premium client contract
+2026-05-16,Rahul Sharma,Operations,53000,10,0,1000,600,Maintenance log reviews
+2026-05-17,Priya Verma,Sales & CRM,31000,1,2,600,300,Closed premium client contract
+2026-05-17,Priya Verma,Operations,45000,1,0,100,300,North hub logistics setup
+2026-05-17,Aditya Singh,Sales & CRM,70000,5,4,600,400,Assisted new lead onboardings
+2026-05-17,Aditya Singh,Operations,46000,6,0,200,400,Maintenance log reviews
+2026-05-17,Rahul Sharma,Sales & CRM,15000,1,1,200,0,Closed premium client contract
+2026-05-17,Rahul Sharma,Operations,68000,8,0,1200,300,North hub logistics setup
+2026-05-18,Aditya Singh,Sales & CRM,69000,4,3,1200,100,Closed premium client contract
+2026-05-18,Aditya Singh,Operations,46000,9,0,1000,600,Maintenance log reviews
+2026-05-18,Priya Verma,Sales & CRM,49000,12,2,200,900,Client pricing negotiation
+2026-05-19,Rahul Sharma,Operations,16000,7,0,200,1000,North hub logistics setup
+2026-05-19,Aditya Singh,Operations,80000,10,0,0,1500,Inventory stock audit
+2026-05-20,Aditya Singh,Sales & CRM,11000,4,4,0,100,Client pricing negotiation
+2026-05-20,Aditya Singh,Operations,48000,1,0,200,400,Maintenance log reviews
+2026-05-20,Rahul Sharma,Sales & CRM,50000,12,2,400,1000,Outreach campaign success
+2026-05-20,Rahul Sharma,Operations,35000,11,0,200,400,Maintenance log reviews
+2026-05-20,Priya Verma,Sales & CRM,72000,2,2,400,1000,Closed premium client contract
+2026-05-20,Priya Verma,Operations,18000,9,0,0,600,Maintenance log reviews
+2026-05-21,Aditya Singh,Sales & CRM,45000,6,1,0,300,Client pricing negotiation
+2026-05-21,Aditya Singh,Operations,48000,2,0,200,0,North hub logistics setup
+2026-05-22,Priya Verma,Sales & CRM,40000,2,2,200,600,Assisted new lead onboardings
+2026-05-22,Priya Verma,Operations,12000,7,0,400,300,BKC office site check-in
+2026-05-22,Rahul Sharma,Sales & CRM,45000,4,2,700,1400,Assisted new lead onboardings
+2026-05-22,Rahul Sharma,Operations,49000,5,0,300,1200,BKC office site check-in
+2026-05-22,Aditya Singh,Sales & CRM,66000,8,2,800,100,Closed premium client contract
+2026-05-23,Aditya Singh,Operations,66000,3,0,700,500,Inventory stock audit
+2026-05-24,Rahul Sharma,Sales & CRM,63000,11,3,300,1400,Client pricing negotiation
+2026-05-24,Rahul Sharma,Operations,78000,10,0,1000,300,Inventory stock audit
+2026-05-24,Aditya Singh,Sales & CRM,68000,1,4,300,1500,Assisted new lead onboardings
+2026-05-24,Aditya Singh,Operations,10000,12,0,900,700,Inventory stock audit
+2026-05-25,Aditya Singh,Sales & CRM,67000,2,2,800,1200,Client pricing negotiation
+2026-05-25,Aditya Singh,Operations,49000,8,0,1200,900,Maintenance log reviews
+2026-05-26,Aditya Singh,Sales & CRM,21000,3,1,1200,1100,Outreach campaign success
+2026-05-27,Aditya Singh,Sales & CRM,46000,3,4,0,1200,Closed premium client contract
+2026-05-27,Rahul Sharma,Sales & CRM,30000,6,1,600,1200,Closed premium client contract
+2026-05-28,Priya Verma,Operations,55000,4,0,300,1100,North hub logistics setup
+2026-05-28,Aditya Singh,Sales & CRM,77000,11,4,1000,600,Outreach campaign success
+2026-05-28,Aditya Singh,Operations,54000,12,0,0,1200,BKC office site check-in
+2026-05-28,Rahul Sharma,Sales & CRM,10000,6,4,600,600,Closed premium client contract
+2026-05-28,Rahul Sharma,Operations,70000,4,0,600,1000,BKC office site check-in
+2026-05-29,Rahul Sharma,Sales & CRM,67000,2,1,0,700,Outreach campaign success
+2026-05-29,Rahul Sharma,Operations,63000,4,0,100,800,North hub logistics setup
+2026-05-29,Priya Verma,Sales & CRM,75000,2,1,800,500,Closed premium client contract
+2026-05-30,Rahul Sharma,Sales & CRM,15000,9,2,600,1500,Outreach campaign success
+2026-05-31,Aditya Singh,Sales & CRM,40000,1,1,900,1000,Closed premium client contract
+2026-05-31,Aditya Singh,Operations,34000,1,0,1100,1300,North hub logistics setup
+2026-06-01,Rahul Sharma,Sales & CRM,25000,4,4,700,1200,Outreach campaign success
+2026-06-01,Rahul Sharma,Operations,42000,10,0,1100,1100,Maintenance log reviews
+2026-06-02,Aditya Singh,Sales & CRM,51000,3,2,500,1000,Outreach campaign success
+2026-06-02,Aditya Singh,Operations,46000,8,0,700,1100,Inventory stock audit
+2026-06-03,Aditya Singh,Sales & CRM,79000,5,2,100,200,Client pricing negotiation
+2026-06-03,Priya Verma,Operations,28000,10,0,200,200,Maintenance log reviews
+2026-06-03,Rahul Sharma,Sales & CRM,56000,3,1,300,800,Client pricing negotiation
+2026-06-03,Rahul Sharma,Operations,15000,12,0,300,200,BKC office site check-in
+2026-06-04,Priya Verma,Operations,27000,5,0,400,200,BKC office site check-in
+2026-06-05,Priya Verma,Sales & CRM,77000,1,2,800,800,Client pricing negotiation
+2026-06-05,Priya Verma,Operations,78000,11,0,800,700,Inventory stock audit
+2026-06-06,Aditya Singh,Operations,45000,6,0,1200,800,BKC office site check-in
+2026-06-07,Rahul Sharma,Sales & CRM,36000,12,2,1100,1100,Assisted new lead onboardings
+2026-06-07,Rahul Sharma,Operations,54000,9,0,900,700,Maintenance log reviews
+2026-06-07,Priya Verma,Sales & CRM,21000,1,3,100,1400,Outreach campaign success
+2026-06-07,Aditya Singh,Sales & CRM,71000,8,2,1200,1400,Closed premium client contract
+2026-06-07,Aditya Singh,Operations,65000,2,0,800,200,Inventory stock audit
+2026-06-09,Aditya Singh,Sales & CRM,21000,5,4,1200,100,Outreach campaign success
+2026-06-09,Rahul Sharma,Operations,48000,7,0,800,200,Inventory stock audit
+2026-06-09,Priya Verma,Sales & CRM,18000,12,4,1200,1100,Outreach campaign success
+2026-06-09,Priya Verma,Operations,10000,6,0,100,800,Maintenance log reviews
+2026-06-10,Rahul Sharma,Sales & CRM,63000,10,4,1000,1500,Outreach campaign success
+2026-06-10,Rahul Sharma,Operations,64000,6,0,800,300,Maintenance log reviews
+2026-06-10,Priya Verma,Sales & CRM,25000,9,1,100,1400,Closed premium client contract
+2026-06-11,Rahul Sharma,Sales & CRM,72000,2,2,200,1400,Assisted new lead onboardings
+2026-06-11,Rahul Sharma,Operations,34000,3,0,800,1100,Maintenance log reviews
+2026-06-11,Priya Verma,Sales & CRM,62000,9,3,900,1200,Assisted new lead onboardings
+2026-06-12,Rahul Sharma,Sales & CRM,78000,3,3,500,500,Closed premium client contract
+2026-06-12,Rahul Sharma,Operations,78000,2,0,500,400,BKC office site check-in
+2026-06-13,Aditya Singh,Sales & CRM,37000,6,1,100,400,Outreach campaign success
+2026-06-13,Aditya Singh,Operations,15000,10,0,300,1000,BKC office site check-in
+2026-06-13,Priya Verma,Sales & CRM,38000,12,1,1200,1200,Outreach campaign success
+2026-06-13,Rahul Sharma,Sales & CRM,80000,10,3,800,0,Client pricing negotiation
+2026-06-13,Rahul Sharma,Operations,70000,1,0,700,600,North hub logistics setup
+2026-06-14,Rahul Sharma,Sales & CRM,51000,11,4,0,1500,Closed premium client contract
+2026-06-14,Rahul Sharma,Operations,47000,3,0,200,1100,BKC office site check-in
+2026-06-14,Priya Verma,Sales & CRM,44000,10,4,200,0,Closed premium client contract
+2026-06-14,Priya Verma,Operations,29000,12,0,100,700,Inventory stock audit
+2026-06-14,Aditya Singh,Sales & CRM,36000,4,4,100,500,Outreach campaign success
+2026-06-14,Aditya Singh,Operations,66000,12,0,300,1500,North hub logistics setup
+2026-06-15,Priya Verma,Sales & CRM,27000,1,4,100,1300,Outreach campaign success
+2026-06-15,Priya Verma,Operations,29000,1,0,1100,500,BKC office site check-in
+2026-06-16,Priya Verma,Sales & CRM,70000,4,3,100,0,Client pricing negotiation
+2026-06-16,Priya Verma,Operations,66000,3,0,800,900,Inventory stock audit
+2026-06-17,Rahul Sharma,Sales & CRM,10000,12,3,800,400,Outreach campaign success
+2026-06-17,Rahul Sharma,Operations,26000,1,0,1000,500,Inventory stock audit
+2026-06-17,Aditya Singh,Sales & CRM,48000,2,3,200,0,Assisted new lead onboardings
+2026-06-17,Aditya Singh,Operations,25000,6,0,900,900,BKC office site check-in
+2026-06-18,Priya Verma,Sales & CRM,58000,11,1,0,900,Outreach campaign success
+2026-06-18,Priya Verma,Operations,48000,7,0,800,400,Inventory stock audit
+2026-06-19,Priya Verma,Sales & CRM,57000,7,2,700,500,Outreach campaign success
+2026-06-19,Priya Verma,Operations,19000,9,0,600,1500,Maintenance log reviews
+2026-06-19,Aditya Singh,Sales & CRM,39000,4,3,1000,1100,Closed premium client contract
+2026-06-19,Aditya Singh,Operations,58000,1,0,400,1000,North hub logistics setup
+2026-06-19,Rahul Sharma,Sales & CRM,16000,11,2,600,200,Outreach campaign success
+2026-06-20,Priya Verma,Sales & CRM,79000,5,1,700,1000,Assisted new lead onboardings
+2026-06-20,Rahul Sharma,Operations,20000,5,0,700,1200,BKC office site check-in
+2026-06-20,Aditya Singh,Sales & CRM,58000,7,3,1200,1100,Client pricing negotiation
+2026-06-20,Aditya Singh,Operations,16000,11,0,1200,300,North hub logistics setup
+2026-06-21,Aditya Singh,Sales & CRM,65000,11,2,400,800,Assisted new lead onboardings
+2026-06-21,Aditya Singh,Operations,78000,2,0,1100,1400,Maintenance log reviews
+2026-06-21,Priya Verma,Sales & CRM,43000,3,1,600,500,Outreach campaign success
+2026-06-22,Priya Verma,Sales & CRM,39000,1,2,800,1200,Closed premium client contract
+2026-06-22,Priya Verma,Operations,69000,9,0,500,300,BKC office site check-in
+2026-06-23,Rahul Sharma,Operations,77000,12,0,200,1500,Maintenance log reviews
+2026-06-23,Priya Verma,Sales & CRM,30000,5,3,500,400,Client pricing negotiation
+2026-06-23,Aditya Singh,Sales & CRM,15000,5,4,1100,300,Outreach campaign success
+2026-06-23,Aditya Singh,Operations,23000,4,0,800,300,Inventory stock audit
+2026-06-24,Rahul Sharma,Sales & CRM,16000,2,1,200,1400,Outreach campaign success
+2026-06-24,Aditya Singh,Sales & CRM,68000,11,4,1200,900,Client pricing negotiation

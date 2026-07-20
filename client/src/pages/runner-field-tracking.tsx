@@ -105,12 +105,12 @@ export default function RunnerFieldTrackingPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen bg-black">
+      <div className="flex h-screen bg-background">
         <BusinessSidebar />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center bg-white">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-amber-400/30 border-t-amber-400 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-white/60">Loading field tracking...</p>
+            <div className="w-10 h-10 border-2 border-accent/20 border-t-accent rounded-none animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground text-xs uppercase tracking-wider font-semibold">Loading field tracking...</p>
           </div>
         </main>
       </div>
@@ -119,15 +119,16 @@ export default function RunnerFieldTrackingPage() {
 
   if (error || !businessId) {
     return (
-      <div className="flex h-screen bg-black">
+      <div className="flex h-screen bg-background">
         <BusinessSidebar />
-        <main className="flex-1 flex items-center justify-center p-4">
-          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6 max-w-md text-center">
-            <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-            <p className="text-red-300 mb-4">{error}</p>
+        <main className="flex-1 flex items-center justify-center p-4 bg-white">
+          <div className="bg-red-500/5 border border-red-500/20 rounded-none p-8 max-w-md text-center shadow-lg relative overflow-hidden">
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />
+            <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-3" />
+            <p className="text-sm font-sans text-red-700 mb-4">{error}</p>
             <Button
               onClick={() => navigate("/business")}
-              className="bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground border border-primary px-5 py-2 text-xs uppercase tracking-wider font-semibold rounded-none w-full"
             >
               Go to Dashboard
             </Button>
@@ -138,9 +139,9 @@ export default function RunnerFieldTrackingPage() {
   }
 
   return (
-    <div className="flex h-screen bg-black">
+    <div className="flex h-screen bg-background">
       <BusinessSidebar />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto bg-white">
         <RunnerFieldTracking
           businessId={businessId}
           memberId={memberId}
