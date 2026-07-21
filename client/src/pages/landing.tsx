@@ -997,7 +997,10 @@ export default function Landing() {
                 <h4 className="font-sans font-medium text-primary mb-4 text-sm">{col.heading}</h4>
                 <ul className="space-y-2.5">
                   {col.links.map((link, j) => {
-                    const href = link === "Privacy Policy" ? "/privacy" : link === "Terms of Service" ? "/terms" : "#";
+                    const href = 
+                      link === "Privacy Policy" ? "/privacy" : 
+                      link === "Terms of Service" ? "/terms" : 
+                      (link === "Help Center" || link === "Status") ? "/support" : "#";
                     return (
                       <li key={j}>
                         <a href={href} className="text-xs text-gray-500 hover:text-accent font-sans transition-colors">{link}</a>
