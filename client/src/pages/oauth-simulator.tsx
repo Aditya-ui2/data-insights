@@ -110,11 +110,11 @@ export default function OAuthSimulator() {
           <div className="p-6 border-b border-[#e1e3e5] flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center font-bold text-white text-2xl shadow-md">
-                DI
+                DV
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-[#202223]">DataInsights for Sheets & Excel</h1>
-                <p className="text-sm text-[#6d7175]">DataInsights - Data Exporter</p>
+                <h1 className="text-xl font-semibold text-[#202223]">DigitValues™ for Sheets</h1>
+                <p className="text-sm text-[#6d7175]">DigitValues - Data Exporter</p>
               </div>
             </div>
             <div className="text-xs font-semibold px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">

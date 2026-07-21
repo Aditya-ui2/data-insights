@@ -51,7 +51,7 @@ function DashboardMock() {
           <div className="w-2 h-2 bg-gray-300" />
           <div className="w-2 h-2 bg-gray-300" />
           <div className="w-2 h-2 bg-gray-300" />
-          <div className="ml-2 flex-1 h-5 bg-gray-50 border border-gray-100 text-[10px] text-gray-400 flex items-center px-2 font-mono">datainsights.app/dashboard</div>
+          <div className="ml-2 flex-1 h-5 bg-gray-50 border border-gray-100 text-[10px] text-gray-400 flex items-center px-2 font-mono">digitvalues.vercel.app/dashboard</div>
         </div>
 
         {/* KPI row */}
@@ -325,7 +325,7 @@ function ProductTour() {
                     <div className="w-2 h-2 bg-gray-300" />
                   </div>
                   <div className="flex-1 h-5 bg-white border border-gray-100 flex items-center px-2 text-[10px] text-gray-400 font-mono">
-                    datainsights.app
+                    digitvalues.vercel.app
                   </div>
                 </div>
 
@@ -491,7 +491,7 @@ function ProductTour() {
                       <div className="bg-gray-50 rounded-none p-4 border border-gray-100">
                         <div className="text-[9px] uppercase tracking-wider text-gray-400 mb-2 font-semibold">Shareable Link Generated</div>
                         <div className="flex items-center gap-2 bg-white rounded-none border border-gray-200 p-2">
-                          <span className="text-[10px] text-gray-500 flex-1 truncate font-mono">datainsights.app/shared/abc123...</span>
+                          <span className="text-[10px] text-gray-500 flex-1 truncate font-mono">digitvalues.vercel.app/shared/abc123...</span>
                           <motion.button
                             whileTap={{ scale: 0.95 }}
                             className="text-[9px] uppercase tracking-wider bg-primary text-primary-foreground px-2 py-1 rounded-none font-semibold"
@@ -793,7 +793,7 @@ export default function Landing() {
               <ElegantSub text="AI-Powered Analytics Platform" centered={true} />
 
               <h1 className="font-sans font-normal text-[2.5rem] md:text-[4rem] lg:text-[5rem] leading-[1.1] tracking-[-0.152rem] text-primary mb-8 max-w-4xl">
-                It's always personal when your business is involved. That's why leaders turn to DataInsights.
+                It's always personal when your business is involved. That's why leaders turn to DigitValues.
               </h1>
 
               <p className="text-base text-gray-600 mb-10 max-w-2xl leading-[1.7] font-sans tracking-[-0.01em]">
@@ -894,7 +894,7 @@ export default function Landing() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-base text-gray-500 font-sans max-w-xs md:text-right leading-[1.7] tracking-[-0.01em]"
             >
-              Thousands of businesses rely on DataInsights for <strong className="font-semibold text-primary">clear, actionable data</strong> every day.
+              Thousands of businesses rely on DigitValues for <strong className="font-semibold text-primary">clear, actionable data</strong> every day.
             </motion.p>
           </div>
 
@@ -957,7 +957,7 @@ export default function Landing() {
               Ready to Illuminate Your Data?
             </h2>
             <p className="text-gray-500 mb-10 max-w-xl mx-auto text-sm font-sans">
-              Join thousands of businesses using DataInsights. No credit card required. Upgrade anytime.
+              Join thousands of businesses using DigitValues. No credit card required. Upgrade anytime.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
