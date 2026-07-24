@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { 
   X, 
   Filter, 
@@ -74,7 +74,7 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Products Schema (80 Fields Selected)
+// Products Schema (Coefficient 80-Field Match)
 const PRODUCTS_SCHEMA: FieldNode[] = [
   {
     id: "category",
@@ -280,9 +280,9 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   { id: "vendor", label: "Vendor" }
 ];
 
-// Customers Schema (65 Fields Selected)
+// Customers Schema (65 Fields)
 const CUSTOMERS_SCHEMA: FieldNode[] = [
-  { id: "id", label: "Id (GraphQL GID)" },
+  { id: "id", label: "Id" },
   { id: "legacyResourceId", label: "Legacy Resource Id" },
   { id: "displayName", label: "Display Name" },
   { id: "email", label: "Email" },
@@ -321,19 +321,7 @@ const CUSTOMERS_SCHEMA: FieldNode[] = [
       { id: "defaultAddress.zip", label: "Zip / Postal Code" }
     ]
   },
-  {
-    id: "emailMarketingConsent",
-    label: "Email Marketing Consent",
-    isGroup: true,
-    selectedCount: 3,
-    children: [
-      { id: "emailMarketingConsent.consentUpdatedAt", label: "Consent Updated At" },
-      { id: "emailMarketingConsent.marketingOptInLevel", label: "Marketing Opt In Level" },
-      { id: "emailMarketingConsent.marketingState", label: "Marketing State" }
-    ]
-  },
   { id: "canDelete", label: "Can Delete" },
-  { id: "dataSaleOptOut", label: "Data Sale Opt Out" },
   { id: "locale", label: "Locale" },
   { id: "note", label: "Note" },
   { id: "state", label: "State" },
@@ -342,139 +330,230 @@ const CUSTOMERS_SCHEMA: FieldNode[] = [
   { id: "verifiedEmail", label: "Verified Email" }
 ];
 
-// Orders Schema (75 Fields Selected)
-const ORDERS_SCHEMA: FieldNode[] = [
-  { id: "id", label: "Id (GraphQL GID)" },
-  { id: "name", label: "Order Name (#1001)" },
-  { id: "legacyResourceId", label: "Legacy Resource Id" },
-  { id: "createdAt", label: "Created At" },
-  { id: "processedAt", label: "Processed At" },
-  { id: "displayFinancialStatus", label: "Financial Status" },
-  { id: "displayFulfillmentStatus", label: "Fulfillment Status" },
-  { id: "email", label: "Customer Email" },
-  { id: "phone", label: "Customer Phone" },
-  {
-    id: "totalPriceSet",
-    label: "Total Price Set",
-    isGroup: true,
-    selectedCount: 2,
-    children: [
-      { id: "totalPriceSet.shopMoney.amount", label: "Amount" },
-      { id: "totalPriceSet.shopMoney.currencyCode", label: "Currency Code" }
-    ]
-  },
-  {
-    id: "shippingAddress",
-    label: "Shipping Address",
-    isGroup: true,
-    selectedCount: 4,
-    children: [
-      { id: "shippingAddress.address1", label: "Address 1" },
-      { id: "shippingAddress.city", label: "City" },
-      { id: "shippingAddress.country", label: "Country" },
-      { id: "shippingAddress.zip", label: "Zip" }
-    ]
-  }
-];
-
 function getSchemaForObject(objName: string): FieldNode[] {
   if (objName === "Customers") return CUSTOMERS_SCHEMA;
-  if (objName === "Orders") return ORDERS_SCHEMA;
   return PRODUCTS_SCHEMA;
 }
 
-function getAllLeafIds(nodes: FieldNode[]): string[] {
-  let ids: string[] = [];
+// Flat list of all leaf fields with their human-readable labels
+function getLeafNodes(nodes: FieldNode[]): { id: string; label: string }[] {
+  let list: { id: string; label: string }[] = [];
   for (const node of nodes) {
     if (node.children && node.children.length > 0) {
-      ids = [...ids, ...getAllLeafIds(node.children)];
+      list = [...list, ...getLeafNodes(node.children)];
     } else {
-      ids.push(node.id);
+      list.push({ id: node.id, label: node.label });
     }
   }
-  return ids;
+  return list;
 }
 
-// Category Specific Table Rows & Columns Data
-interface TablePreviewData {
-  columns: { key: string; label: string }[];
-  rows: Record<string, string>[];
+function getAllLeafIds(nodes: FieldNode[]): string[] {
+  return getLeafNodes(nodes).map(n => n.id);
 }
 
-function getCategoryPreviewData(objName: string): TablePreviewData {
-  if (objName === "Customers") {
-    return {
-      columns: [
-        { key: "legacyResourceId", label: "Legacy Resource Id" },
-        { key: "displayName", label: "Display Name" },
-        { key: "email", label: "Email" },
-        { key: "amountSpent", label: "Amount Spent" },
-        { key: "defaultAddress", label: "Default Address" }
-      ],
-      rows: [
-        { legacyResourceId: "9494632", displayName: "Ayumu Hirano", email: "ayumu.hirano@example.com", amountSpent: "$140.00", defaultAddress: "105 Victoria St, Toronto" },
-        { legacyResourceId: "9494633", displayName: "Russell Winfield", email: "russel.winfield@example.com", amountSpent: "$290.50", defaultAddress: "Box 42 - 151 O'Connor St" },
-        { legacyResourceId: "9494634", displayName: "Karine Ruby", email: "karine.ruby@example.com", amountSpent: "$85.00", defaultAddress: "742 Evergreen Terrace" },
-        { legacyResourceId: "9494635", displayName: "Shaun White", email: "shaun.white@example.com", amountSpent: "$1,250.00", defaultAddress: "500 Alpine Way, Vail" },
-        { legacyResourceId: "9494636", displayName: "Chloe Kim", email: "chloe.kim@example.com", amountSpent: "$540.00", defaultAddress: "12 Mammoth Mountain Rd" }
-      ]
-    };
-  }
-
-  if (objName === "Orders") {
-    return {
-      columns: [
-        { key: "name", label: "Order Name" },
-        { key: "processedAt", label: "Processed At" },
-        { key: "email", label: "Customer Email" },
-        { key: "displayFinancialStatus", label: "Financial Status" },
-        { key: "totalPriceSet", label: "Total Price" }
-      ],
-      rows: [
-        { name: "#1001", processedAt: "2026-07-24 14:30:00", email: "ayumu.hirano@example.com", displayFinancialStatus: "PAID", totalPriceSet: "$140.00 USD" },
-        { name: "#1002", processedAt: "2026-07-24 15:10:00", email: "russel.winfield@example.com", displayFinancialStatus: "PAID", totalPriceSet: "$290.50 USD" },
-        { name: "#1003", processedAt: "2026-07-24 16:00:00", email: "karine.ruby@example.com", displayFinancialStatus: "AUTHORIZED", totalPriceSet: "$85.00 USD" },
-        { name: "#1004", processedAt: "2026-07-24 16:45:00", email: "shaun.white@example.com", displayFinancialStatus: "PENDING", totalPriceSet: "$1,250.00 USD" }
-      ]
-    };
-  }
-
-  // Default: Products (Coefficient 17 Rows Match 100%)
-  return {
-    columns: [
-      { key: "legacyResourceId", label: "Legacy Resource Id" },
-      { key: "description", label: "Description" },
-      { key: "title", label: "Title" },
-      { key: "productType", label: "Product Type" },
-      { key: "vendor", label: "Vendor" }
-    ],
-    rows: [
-      { legacyResourceId: "10087354892528", description: "—", title: "The Inventory Not Tracked Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087354925296", description: "This is a gift card for the store", title: "Gift Card", productType: "giftcard", vendor: "Snowboards" },
-      { legacyResourceId: "10087354958064", description: "—", title: "The Draft Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087354990832", description: "—", title: "The Archived Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087355023600", description: "—", title: "The Minimal Snowboard", productType: "—", vendor: "di-insights" },
-      { legacyResourceId: "10087355056368", description: "—", title: "Selling Plans Ski Wax", productType: "accessories", vendor: "di-insights" },
-      { legacyResourceId: "10087355089136", description: "—", title: "The Hidden Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087355121904", description: "—", title: "The Compare at Price Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087355154672", description: "—", title: "The Videographer Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087355187440", description: "This PREMIUM snowboard is super fast", title: "The Complete Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087355220208", description: "—", title: "The Out of Stock Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087355252976", description: "—", title: "The Collection Snowboard: Hybrid", productType: "snowboard", vendor: "Hydrogen" },
-      { legacyResourceId: "10087355285744", description: "—", title: "The Multi-location Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087355351280", description: "—", title: "The 3p Fulfilled Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087355384048", description: "—", title: "The Multi-managed Snowboard", productType: "snowboard", vendor: "Multi-managed" },
-      { legacyResourceId: "10087355416816", description: "—", title: "The Collection Snowboard: Original", productType: "snowboard", vendor: "Hydrogen" },
-      { legacyResourceId: "10087355482352", description: "—", title: "The Collection Snowboard: Lightweight", productType: "snowboard", vendor: "Hydrogen" }
-    ]
-  };
-}
+// Comprehensive Master Sample Row Data Map
+const MASTER_SAMPLE_DATA: Record<string, Record<string, string>[]> = {
+  Products: [
+    {
+      legacyResourceId: "10087354892528",
+      description: "—",
+      title: "The Inventory Not Tracked Snowboard",
+      productType: "snowboard",
+      vendor: "di-insights",
+      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+      "category.name": "Snowboards",
+      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+      "category.description": "All mountain snowboards",
+      "category.handle": "snowboards",
+      "category.level": "3",
+      "category.updatedAt": "2026-07-01 10:15:00",
+      combinedListingRole: "PARENT",
+      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "699.99",
+      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+      "compareAtPriceRange.minVariantCompareAtPrice.amount": "499.99",
+      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+      createdAt: "2026-07-01 10:15:00",
+      id: "gid://shopify/Product/10087354892528",
+      handle: "the-inventory-not-tracked-snowboard",
+      status: "ACTIVE",
+      totalInventory: "150",
+      totalVariants: "4"
+    },
+    {
+      legacyResourceId: "10087354925296",
+      description: "This is a gift card for the store",
+      title: "Gift Card",
+      productType: "giftcard",
+      vendor: "Snowboards",
+      "category.id": "gid://shopify/TaxonomyCategory/aa-2",
+      "category.name": "Gift Cards",
+      "category.fullName": "Arts & Entertainment > Party & Celebration > Gift Cards",
+      "category.description": "Digital gift certificates",
+      "category.handle": "gift-cards",
+      "category.level": "2",
+      "category.updatedAt": "2026-07-02 11:20:00",
+      combinedListingRole: "NONE",
+      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "100.00",
+      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+      "compareAtPriceRange.minVariantCompareAtPrice.amount": "25.00",
+      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+      createdAt: "2026-07-02 11:20:00",
+      id: "gid://shopify/Product/10087354925296",
+      handle: "gift-card",
+      status: "ACTIVE",
+      totalInventory: "999",
+      totalVariants: "1"
+    },
+    {
+      legacyResourceId: "10087354958064",
+      description: "—",
+      title: "The Draft Snowboard",
+      productType: "snowboard",
+      vendor: "Snowboards",
+      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+      "category.name": "Snowboards",
+      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+      "category.description": "Freestyle twin snowboard",
+      "category.handle": "snowboards",
+      "category.level": "3",
+      "category.updatedAt": "2026-07-03 14:00:00",
+      combinedListingRole: "NONE",
+      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "549.00",
+      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+      "compareAtPriceRange.minVariantCompareAtPrice.amount": "399.00",
+      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+      createdAt: "2026-07-03 14:00:00",
+      id: "gid://shopify/Product/10087354958064",
+      handle: "the-draft-snowboard",
+      status: "DRAFT",
+      totalInventory: "45",
+      totalVariants: "3"
+    },
+    {
+      legacyResourceId: "10087354990832",
+      description: "—",
+      title: "The Archived Snowboard",
+      productType: "snowboard",
+      vendor: "Snowboards",
+      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+      "category.name": "Snowboards",
+      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+      "category.description": "Vintage classic model",
+      "category.handle": "snowboards",
+      "category.level": "3",
+      "category.updatedAt": "2026-07-05 09:10:00",
+      combinedListingRole: "NONE",
+      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "450.00",
+      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+      "compareAtPriceRange.minVariantCompareAtPrice.amount": "299.00",
+      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+      createdAt: "2026-07-05 09:10:00",
+      id: "gid://shopify/Product/10087354990832",
+      handle: "the-archived-snowboard",
+      status: "ARCHIVED",
+      totalInventory: "0",
+      totalVariants: "2"
+    },
+    {
+      legacyResourceId: "10087355023600",
+      description: "—",
+      title: "The Minimal Snowboard",
+      productType: "accessories",
+      vendor: "di-insights",
+      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+      "category.name": "Snowboards",
+      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+      "category.description": "Sleek carbon stringers",
+      "category.handle": "snowboards",
+      "category.level": "3",
+      "category.updatedAt": "2026-07-06 16:45:00",
+      combinedListingRole: "CHILD",
+      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "799.00",
+      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+      "compareAtPriceRange.minVariantCompareAtPrice.amount": "649.00",
+      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+      createdAt: "2026-07-06 16:45:00",
+      id: "gid://shopify/Product/10087355023600",
+      handle: "the-minimal-snowboard",
+      status: "ACTIVE",
+      totalInventory: "88",
+      totalVariants: "4"
+    }
+  ],
+  Customers: [
+    {
+      id: "gid://shopify/Customer/9494632",
+      legacyResourceId: "9494632",
+      displayName: "Ayumu Hirano",
+      email: "ayumu.hirano@example.com",
+      firstName: "Ayumu",
+      lastName: "Hirano",
+      phone: "+1 416-555-0192",
+      createdAt: "2026-07-07 01:31:18",
+      updatedAt: "2026-07-24 12:00:00",
+      "amountSpent.amount": "140.00",
+      "amountSpent.currencyCode": "USD",
+      numberOfOrders: "14",
+      "defaultAddress.address1": "105 Victoria St",
+      "defaultAddress.address2": "Suite 400",
+      "defaultAddress.city": "Toronto",
+      "defaultAddress.company": "Snowboarding Inc",
+      "defaultAddress.country": "Canada",
+      "defaultAddress.countryCodeV2": "CA",
+      "defaultAddress.firstName": "Ayumu",
+      "defaultAddress.lastName": "Hirano",
+      "defaultAddress.phone": "+1 416-555-0192",
+      "defaultAddress.province": "Ontario",
+      "defaultAddress.zip": "M5C 3C4",
+      canDelete: "True",
+      locale: "en",
+      note: "VIP Snowboarder Customer",
+      state: "ENABLED",
+      tags: "VIP, Repeat Buyer",
+      taxExempt: "False",
+      verifiedEmail: "True"
+    },
+    {
+      id: "gid://shopify/Customer/9494633",
+      legacyResourceId: "9494633",
+      displayName: "Russell Winfield",
+      email: "russel.winfield@example.com",
+      firstName: "Russell",
+      lastName: "Winfield",
+      phone: "+1 613-555-0184",
+      createdAt: "2026-07-07 01:31:19",
+      updatedAt: "2026-07-24 14:15:00",
+      "amountSpent.amount": "290.50",
+      "amountSpent.currencyCode": "USD",
+      numberOfOrders: "28",
+      "defaultAddress.address1": "Box 42 - 151 O'Connor St",
+      "defaultAddress.address2": "Floor 12",
+      "defaultAddress.city": "Ottawa",
+      "defaultAddress.company": "Ottawa Trading",
+      "defaultAddress.country": "Canada",
+      "defaultAddress.countryCodeV2": "CA",
+      "defaultAddress.firstName": "Russell",
+      "defaultAddress.lastName": "Winfield",
+      "defaultAddress.phone": "+1 613-555-0184",
+      "defaultAddress.province": "Ontario",
+      "defaultAddress.zip": "K1P 5M7",
+      canDelete: "True",
+      locale: "en",
+      note: "Loyal customer",
+      state: "ENABLED",
+      tags: "Wholesale",
+      taxExempt: "False",
+      verifiedEmail: "True"
+    }
+  ]
+};
 
 export default function ImportPreviewPage() {
   const [selectedObject, setSelectedObject] = useState<string>("Products");
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Expanded Groups Set
   const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([
@@ -482,32 +561,22 @@ export default function ImportPreviewPage() {
   ]);
 
   const currentSchema = getSchemaForObject(selectedObject);
-  const previewData = getCategoryPreviewData(selectedObject);
+  const masterLeafNodes = useMemo(() => getLeafNodes(currentSchema), [currentSchema]);
 
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
 
+  // Initialize selected fields when switching object
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // When switching Category object: Reset selected fields to all fields of new category!
-  useEffect(() => {
-    setIsLoading(true);
-    const schema = getSchemaForObject(selectedObject);
-    const allLeafs = getAllLeafIds(schema);
+    const allLeafs = masterLeafNodes.map(n => n.id);
     setSelectedFieldIds(allLeafs);
-
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [selectedObject]);
+  }, [selectedObject, masterLeafNodes]);
 
   const handleSelectObject = (objName: string) => {
+    setIsLoading(true);
     setSelectedObject(objName);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 200);
   };
 
   const toggleGroupExpand = (groupId: string, e: React.MouseEvent) => {
@@ -534,8 +603,9 @@ export default function ImportPreviewPage() {
     }
   };
 
-  const toggleSelectAll = () => {
-    const allLeafs = getAllLeafIds(currentSchema);
+  const toggleSelectAll = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const allLeafs = masterLeafNodes.map(n => n.id);
     if (selectedFieldIds.length === allLeafs.length) {
       setSelectedFieldIds([]);
     } else {
@@ -547,7 +617,14 @@ export default function ImportPreviewPage() {
     objectSearchTerm === "" || o.toLowerCase().includes(objectSearchTerm.toLowerCase())
   );
 
-  const isAllSelected = selectedFieldIds.length === getAllLeafIds(currentSchema).length && currentSchema.length > 0;
+  const isAllSelected = selectedFieldIds.length === masterLeafNodes.length && masterLeafNodes.length > 0;
+
+  // DYNAMICALLY FILTER COLUMNS TO ONLY THOSE THAT ARE CHECKED!
+  const activeTableColumns = useMemo(() => {
+    return masterLeafNodes.filter(node => selectedFieldIds.includes(node.id));
+  }, [masterLeafNodes, selectedFieldIds]);
+
+  const activeRows = MASTER_SAMPLE_DATA[selectedObject] || MASTER_SAMPLE_DATA["Products"];
 
   const handleDoneClick = () => {
     try {
@@ -617,7 +694,7 @@ export default function ImportPreviewPage() {
               <input 
                 type="checkbox" 
                 checked={isChecked}
-                onChange={() => toggleFieldSelect(node)}
+                onChange={(e) => toggleFieldSelect(node, e as any)}
                 className="w-4 h-4 rounded text-[#2563eb] focus:ring-[#2563eb] accent-[#2563eb] cursor-pointer shrink-0"
               />
             )}
@@ -671,7 +748,7 @@ export default function ImportPreviewPage() {
                   <span>Sort</span>
                 </button>
                 
-                {/* Badge Updates Based on Selected Category */}
+                {/* Real-time Selected Fields Count Badge */}
                 <span className="text-xs text-gray-500 font-semibold px-2">
                   {selectedFieldIds.length} fields selected
                 </span>
@@ -703,7 +780,7 @@ export default function ImportPreviewPage() {
             </div>
             <div className="text-center space-y-1.5">
               <h3 className="text-sm font-bold text-[#13322b] animate-pulse">Loading {selectedObject}...</h3>
-              <p className="text-xs text-gray-500 font-medium">Updating Fields Tree & Live Preview Table</p>
+              <p className="text-xs text-gray-500 font-medium">Updating Dynamic Columns & Live Preview Table</p>
             </div>
             <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div className="w-full h-full bg-[#13322b] animate-pulse" />
@@ -768,13 +845,13 @@ export default function ImportPreviewPage() {
               <div className="flex-1 overflow-y-auto space-y-1 pr-1 border-t border-[#f0ede6] pt-2">
                 {/* Fully Interactive Select All Button */}
                 <div 
-                  onClick={toggleSelectAll}
+                  onClick={(e) => toggleSelectAll(e)}
                   className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-bold text-[#1d4ed8] cursor-pointer hover:bg-blue-50 transition-colors"
                 >
                   <input 
                     type="checkbox" 
                     checked={isAllSelected}
-                    onChange={toggleSelectAll}
+                    onChange={(e) => toggleSelectAll(e as any)}
                     className="w-4 h-4 rounded text-[#2563eb] accent-[#2563eb] cursor-pointer" 
                   />
                   <span>Select All</span>
@@ -783,35 +860,43 @@ export default function ImportPreviewPage() {
               </div>
             </div>
 
-            {/* COLUMN 3: Right Dynamic Live Table Preview Pane (Updates Dynamically per Category) */}
+            {/* COLUMN 3: Right Dynamic Live Table Preview Pane (DYNAMIC COLUMNS MATCHING CHECKED CHECKBOXES 100%!) */}
             <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
-              <div className="flex-1 overflow-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white">
-                <table className="w-full text-left border-collapse text-xs min-w-max">
-                  <thead>
-                    <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8]">
-                      {previewData.columns.map((col) => (
-                        <th key={col.key} className="p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8]">
-                          <div className="flex items-center justify-between gap-3">
-                            <span>{col.label}</span>
-                            <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#e5e2db]">
-                    {previewData.rows.map((row, rowIdx) => (
-                      <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                        {previewData.columns.map((col) => (
-                          <td key={col.key} className="p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800">
-                            {row[col.key] || "—"}
-                          </td>
+              {activeTableColumns.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
+                  <FileText className="w-12 h-12 text-gray-300 mb-3" />
+                  <h3 className="text-sm font-medium text-gray-600">No fields selected for preview</h3>
+                  <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white">
+                  <table className="w-full text-left border-collapse text-xs min-w-max">
+                    <thead>
+                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8]">
+                        {activeTableColumns.map((col) => (
+                          <th key={col.id} className="p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8]">
+                            <div className="flex items-center justify-between gap-3">
+                              <span>{col.label}</span>
+                              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                            </div>
+                          </th>
                         ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-[#e5e2db]">
+                      {activeRows.map((row, rowIdx) => (
+                        <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
+                          {activeTableColumns.map((col) => (
+                            <td key={col.id} className="p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800">
+                              {row[col.id] || row[col.id.split('.').pop()!] || "—"}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
           </div>
