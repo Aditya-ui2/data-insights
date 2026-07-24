@@ -324,11 +324,19 @@ export default function AddonSidebarPage() {
     const top = window.screen.height / 2 - height / 2;
     const oauthUrl = `/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStore)}`;
 
-    window.open(
+    const popup = window.open(
       oauthUrl,
       `oauth_shopify`,
       `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes`
     );
+
+    // Monitor popup window closure to reset loading state
+    const checkPopupTimer = setInterval(() => {
+      if (!popup || popup.closed) {
+        clearInterval(checkPopupTimer);
+        setIsAuthorizing(false);
+      }
+    }, 1000);
   };
 
   const handleConfirmImport = () => {
@@ -632,7 +640,7 @@ export default function AddonSidebarPage() {
 
       {/* VIEW 3: STEP 1 - CONNECT SCREEN */}
       {currentView === "connector-connect" && (
-        <div className="p-4 space-y-5 flex-1 overflow-y-auto bg-[#faf9f6] flex flex-col justify-between">
+        <div className="p-4 space-y-5 flex-1 overflow-y-auto bg-[#faf9f6] flex flex-col justify-between relative">
           
           <div className="space-y-6 pt-2">
             
@@ -701,6 +709,19 @@ export default function AddonSidebarPage() {
             <Lock className="w-3.5 h-3.5 text-[#13322b] shrink-0 mt-0.5" />
             <span>DigitValues encrypts your credentials and never stores raw data when importing.</span>
           </div>
+
+          {/* Sleek Overlay Loader when Authorizing */}
+          {isAuthorizing && (
+            <div className="absolute inset-0 bg-[#faf9f6]/80 backdrop-blur-[2px] flex flex-col items-center justify-center z-50 animate-in fade-in duration-200">
+              <div className="bg-white p-6 rounded-3xl border border-[#e5e2db] shadow-xl flex flex-col items-center gap-3.5 max-w-[240px] text-center">
+                <RefreshCw className="w-8 h-8 text-[#13322b] animate-spin" />
+                <div>
+                  <h3 className="font-bold text-xs text-[#13322b]">Connecting to {selectedConnector.name}</h3>
+                  <p className="text-[10px] text-[#8a8579] mt-1">Please complete the authorization in the popup window.</p>
+                </div>
+              </div>
+            </div>
+          )}
 
         </div>
       )}
