@@ -38,6 +38,7 @@ import SheetViewPage from "@/pages/sheet-view";
 import TermsOfService from "@/pages/terms";
 import PrivacyPolicy from "@/pages/privacy";
 import SupportPage from "@/pages/support";
+import AddonSidebarPage from "@/pages/addon-sidebar";
 
 // Fetches the business profile returning null for 404 (no profile yet),
 // but re-throws on 5xx or network errors so backend issues aren't silently hidden.
@@ -208,6 +209,7 @@ function Router() {
         <Route path="/terms" component={TermsOfService} />
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/support" component={SupportPage} />
+        <Route path="/addon-sidebar" component={AddonSidebarPage} />
 
         {/* Root route: always show the Landing marketing page */}
         <Route path="/">
