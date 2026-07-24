@@ -8,7 +8,8 @@ import {
   ChevronRight, 
   ChevronDown, 
   Info,
-  Check
+  Check,
+  Database
 } from "lucide-react";
 
 function OfficialBrandLogo({ id }: { id: string }) {
@@ -23,49 +24,252 @@ function OfficialBrandLogo({ id }: { id: string }) {
   );
 }
 
-interface ShopifyField {
+// Full 38 Official Shopify Objects List
+const ALL_SHOPIFY_OBJECTS = [
+  "Automatic Discount Nodes",
+  "Automatic Discount Saved Searches",
+  "Code Discount Nodes",
+  "Code Discount Saved Searches",
+  "Collection Saved Searches",
+  "Collections",
+  "Customers",
+  "Deletion Events",
+  "Delivery Profiles",
+  "Discount Redeem Code Saved Searches",
+  "Draft Order Saved Searches",
+  "Draft Orders",
+  "File Saved Searches",
+  "Files",
+  "Gift Cards",
+  "Inventory Items",
+  "Line Items",
+  "Locations",
+  "Locations Available For Delivery Profiles Connection",
+  "Market Catalogs",
+  "Market Catalogs Markets",
+  "Marketing Activities",
+  "Order Saved Searches",
+  "Orders",
+  "Price Lists",
+  "Product Saved Searches",
+  "Product Variants",
+  "Products",
+  "Script Tags",
+  "Segment Filters",
+  "Segment Migrations",
+  "Segments",
+  "Selling Plan Groups",
+  "Standard Metafield Definition Templates",
+  "Tender Transactions",
+  "Url Redirect Saved Searches",
+  "Url Redirects",
+  "Webhook Subscriptions"
+];
+
+interface FieldConfig {
   id: string;
   label: string;
   selectedCount?: number;
   isGroup?: boolean;
 }
 
-const INITIAL_SHOPIFY_FIELDS: ShopifyField[] = [
-  { id: "amount_spent", label: "Amount Spent", selectedCount: 2, isGroup: true },
-  { id: "can_delete", label: "Can Delete" },
-  { id: "created_at", label: "Created At (Last Order)" },
-  { id: "data_sale_opt_out", label: "Data Sale Opt Out" },
-  { id: "default_address", label: "Default Address (Address1)", selectedCount: 20, isGroup: true },
-  { id: "display_name", label: "Display Name" },
-  { id: "email", label: "Email" },
-  { id: "email_marketing_consent", label: "Email Marketing Consent", selectedCount: 3, isGroup: true },
-  { id: "first_name", label: "First Name" },
-  { id: "id", label: "Id" },
-  { id: "image", label: "Image", selectedCount: 5, isGroup: true },
-  { id: "last_name", label: "Last Name" },
-  { id: "last_order", label: "Last Order", selectedCount: 206, isGroup: true },
-  { id: "legacy_resource_id", label: "Legacy Resource Id" },
-  { id: "lifetime_duration", label: "Lifetime Duration" },
-  { id: "locale", label: "Locale" },
-  { id: "mergeable", label: "Mergeable", selectedCount: 5, isGroup: true },
-  { id: "multipass_identifier", label: "Multipass Identifier" },
-  { id: "note", label: "Note" },
-  { id: "number_of_orders", label: "Number Of Orders" },
-  { id: "phone", label: "Phone" },
-  { id: "state", label: "State" },
-  { id: "tags", label: "Tags" },
-  { id: "tax_exempt", label: "Tax Exempt" },
-  { id: "updated_at", label: "Updated At" },
-  { id: "verified_email", label: "Verified Email" },
-];
+// Field Schemas for Major Shopify Objects
+const OBJECT_SCHEMAS: Record<string, FieldConfig[]> = {
+  "Customers": [
+    { id: "id", label: "Id" },
+    { id: "display_name", label: "Display Name" },
+    { id: "email", label: "Email" },
+    { id: "created_at", label: "Created At" },
+    { id: "amount_spent", label: "Amount Spent", selectedCount: 2, isGroup: true },
+    { id: "number_of_orders", label: "Number Of Orders" },
+    { id: "default_address", label: "Default Address (Address1)", selectedCount: 20, isGroup: true },
+    { id: "can_delete", label: "Can Delete" },
+    { id: "data_sale_opt_out", label: "Data Sale Opt Out" },
+    { id: "first_name", label: "First Name" },
+    { id: "last_name", label: "Last Name" },
+    { id: "locale", label: "Locale" },
+    { id: "phone", label: "Phone" },
+    { id: "state", label: "State" },
+    { id: "tags", label: "Tags" },
+    { id: "tax_exempt", label: "Tax Exempt" },
+    { id: "verified_email", label: "Verified Email" }
+  ],
+  "Orders": [
+    { id: "id", label: "Id" },
+    { id: "name", label: "Order Name (#1001)" },
+    { id: "created_at", label: "Created At" },
+    { id: "email", label: "Customer Email" },
+    { id: "financial_status", label: "Financial Status" },
+    { id: "fulfillment_status", label: "Fulfillment Status" },
+    { id: "total_price", label: "Total Price" },
+    { id: "subtotal_price", label: "Subtotal Price" },
+    { id: "total_tax", label: "Total Tax" },
+    { id: "currency", label: "Currency Code" },
+    { id: "line_items_count", label: "Line Items Count" },
+    { id: "shipping_address", label: "Shipping Address", selectedCount: 15, isGroup: true },
+    { id: "billing_address", label: "Billing Address", selectedCount: 15, isGroup: true },
+    { id: "note", label: "Order Note" },
+    { id: "tags", label: "Order Tags" }
+  ],
+  "Products": [
+    { id: "id", label: "Id" },
+    { id: "title", label: "Product Title" },
+    { id: "vendor", label: "Vendor" },
+    { id: "product_type", label: "Product Type" },
+    { id: "status", label: "Status" },
+    { id: "total_inventory", label: "Total Inventory Quantity" },
+    { id: "price_min", label: "Price Min" },
+    { id: "price_max", label: "Price Max" },
+    { id: "handle", label: "Handle" },
+    { id: "created_at", label: "Created At" },
+    { id: "updated_at", label: "Updated At" },
+    { id: "variants_count", label: "Variants Count" },
+    { id: "options", label: "Product Options", selectedCount: 4, isGroup: true },
+    { id: "tags", label: "Product Tags" }
+  ],
+  "Product Variants": [
+    { id: "id", label: "Id" },
+    { id: "sku", label: "SKU" },
+    { id: "title", label: "Variant Title" },
+    { id: "price", label: "Price" },
+    { id: "compare_at_price", label: "Compare At Price" },
+    { id: "inventory_quantity", label: "Inventory Quantity" },
+    { id: "option1", label: "Option 1 (Size)" },
+    { id: "option2", label: "Option 2 (Color)" },
+    { id: "barcode", label: "Barcode / UPC" },
+    { id: "weight", label: "Weight (Grams)" },
+    { id: "requires_shipping", label: "Requires Shipping" }
+  ],
+  "Draft Orders": [
+    { id: "id", label: "Id" },
+    { id: "name", label: "Draft Order Name (#D101)" },
+    { id: "customer_name", label: "Customer Name" },
+    { id: "status", label: "Draft Status" },
+    { id: "total_price", label: "Total Price" },
+    { id: "subtotal_price", label: "Subtotal Price" },
+    { id: "applied_discount", label: "Applied Discount" },
+    { id: "created_at", label: "Created At" },
+    { id: "completed_at", label: "Completed At" }
+  ],
+  "Collections": [
+    { id: "id", label: "Id" },
+    { id: "title", label: "Collection Title" },
+    { id: "handle", label: "Handle" },
+    { id: "products_count", label: "Products Count" },
+    { id: "sort_order", label: "Sort Order" },
+    { id: "rule_set_type", label: "Rule Set Type" },
+    { id: "updated_at", label: "Updated At" }
+  ],
+  "Inventory Items": [
+    { id: "id", label: "Id" },
+    { id: "sku", label: "SKU" },
+    { id: "cost_price", label: "Unit Cost Price" },
+    { id: "tracked", label: "Inventory Tracked" },
+    { id: "requires_shipping", label: "Requires Shipping" },
+    { id: "country_code_of_origin", label: "Country of Origin" },
+    { id: "hs_code", label: "Harmonized System Code" },
+    { id: "updated_at", label: "Updated At" }
+  ],
+  "Gift Cards": [
+    { id: "id", label: "Id" },
+    { id: "code_masked", label: "Code (Masked)" },
+    { id: "initial_value", label: "Initial Value" },
+    { id: "balance", label: "Current Balance" },
+    { id: "enabled", label: "Enabled Status" },
+    { id: "expires_at", label: "Expires At" },
+    { id: "created_at", label: "Created At" },
+    { id: "customer_name", label: "Recipient Customer" }
+  ],
+  "Line Items": [
+    { id: "id", label: "Line Item Id" },
+    { id: "order_name", label: "Order Name" },
+    { id: "product_title", label: "Product Title" },
+    { id: "variant_sku", label: "Variant SKU" },
+    { id: "quantity", label: "Quantity" },
+    { id: "unit_price", label: "Unit Price" },
+    { id: "total_discount", label: "Total Discount" },
+    { id: "fulfillment_service", label: "Fulfillment Service" }
+  ],
+  "Locations": [
+    { id: "id", label: "Location Id" },
+    { id: "name", label: "Location Name" },
+    { id: "address1", label: "Address Line 1" },
+    { id: "city", label: "City" },
+    { id: "province", label: "Province / State" },
+    { id: "zip", label: "Postal / Zip Code" },
+    { id: "country", label: "Country" },
+    { id: "active", label: "Active Status" },
+    { id: "is_primary", label: "Is Primary Location" }
+  ]
+};
+
+// Generic Schema Generator for remaining Shopify objects
+function getSchemaForObject(objectName: string): FieldConfig[] {
+  if (OBJECT_SCHEMAS[objectName]) return OBJECT_SCHEMAS[objectName];
+  
+  return [
+    { id: "id", label: `${objectName} Id` },
+    { id: "title", label: `${objectName} Name / Title` },
+    { id: "status", label: "Status" },
+    { id: "created_at", label: "Created At" },
+    { id: "updated_at", label: "Updated At font-mono" },
+    { id: "metadata", label: "Metadata & Config", selectedCount: 8, isGroup: true }
+  ];
+}
+
+// Sample Live Preview Data Generator for any selected object
+function getSampleDataForObject(objectName: string): Record<string, string>[] {
+  switch (objectName) {
+    case "Customers":
+      return [
+        { id: "gid://shopify/Customer/9494632", display_name: "Ayumu Hirano", email: "ayumu.hirano@example.com", created_at: "2026-07-07 01:31:18", amount_spent: "$140.00", number_of_orders: "14", can_delete: "True", data_sale_opt_out: "False", default_address: "105 Victoria St, Toronto" },
+        { id: "gid://shopify/Customer/9494633", display_name: "Russell Winfield", email: "russel.winfield@example.com", created_at: "2026-07-07 01:31:19", amount_spent: "$290.50", number_of_orders: "28", can_delete: "True", data_sale_opt_out: "False", default_address: "Box 42 - 151 O'Connor St" },
+        { id: "gid://shopify/Customer/9494634", display_name: "Karine Ruby", email: "karine.ruby@example.com", created_at: "2026-07-07 01:31:19", amount_spent: "$85.00", number_of_orders: "9", can_delete: "False", data_sale_opt_out: "False", default_address: "742 Evergreen Terrace" },
+      ];
+    case "Orders":
+      return [
+        { id: "gid://shopify/Order/772101", name: "#1001", created_at: "2026-07-24 10:15:00", email: "ayumu.hirano@example.com", financial_status: "PAID", fulfillment_status: "FULFILLED", total_price: "$199.00", subtotal_price: "$180.00", total_tax: "$19.00", currency: "USD", line_items_count: "2" },
+        { id: "gid://shopify/Order/772102", name: "#1002", created_at: "2026-07-24 11:20:00", email: "russel.winfield@example.com", financial_status: "PAID", fulfillment_status: "UNFULFILLED", total_price: "$450.00", subtotal_price: "$420.00", total_tax: "$30.00", currency: "USD", line_items_count: "4" },
+        { id: "gid://shopify/Order/772103", name: "#1003", created_at: "2026-07-24 12:45:00", email: "karine.ruby@example.com", financial_status: "REFUNDED", fulfillment_status: "CANCELLED", total_price: "$89.99", subtotal_price: "$85.00", total_tax: "$4.99", currency: "USD", line_items_count: "1" },
+      ];
+    case "Products":
+      return [
+        { id: "gid://shopify/Product/55109", title: "Snowboard Pro Deck 158cm", vendor: "DigitValues Sports", product_type: "Snowboards", status: "ACTIVE", total_inventory: "45", price_min: "$599.00", price_max: "$649.00", handle: "snowboard-pro-deck", created_at: "2026-06-01" },
+        { id: "gid://shopify/Product/55110", title: "Alpine Thermal Ski Goggles", vendor: "DigitValues Sports", product_type: "Eyewear", status: "ACTIVE", total_inventory: "120", price_min: "$120.00", price_max: "$120.00", handle: "alpine-ski-goggles", created_at: "2026-06-05" },
+        { id: "gid://shopify/Product/55111", title: "Winter Extreme Fleece Hoodie", vendor: "Apparel Co", product_type: "Apparel", status: "DRAFT", total_inventory: "0", price_min: "$75.00", price_max: "$85.00", handle: "winter-fleece-hoodie", created_at: "2026-07-10" },
+      ];
+    default:
+      return [
+        { id: `gid://shopify/${objectName.replace(/\s+/g, '')}/101`, title: `${objectName} Standard Entry #1`, status: "ACTIVE", created_at: "2026-07-20 09:00:00", updated_at: "2026-07-24 14:00:00" },
+        { id: `gid://shopify/${objectName.replace(/\s+/g, '')}/102`, title: `${objectName} Primary Item #2`, status: "ENABLED", created_at: "2026-07-21 11:30:00", updated_at: "2026-07-24 14:15:00" },
+        { id: `gid://shopify/${objectName.replace(/\s+/g, '')}/103`, title: `${objectName} Archived System Entry #3`, status: "PENDING", created_at: "2026-07-22 16:45:00", updated_at: "2026-07-24 14:30:00" },
+      ];
+  }
+}
 
 export default function ImportPreviewPage() {
+  const [selectedObject, setSelectedObject] = useState("Customers");
+  const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
-  const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([
-    "id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"
-  ]);
 
-  const filteredFields = INITIAL_SHOPIFY_FIELDS.filter(f => 
+  const currentSchema = getSchemaForObject(selectedObject);
+  const currentSampleData = getSampleDataForObject(selectedObject);
+
+  const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>(
+    currentSchema.map(f => f.id)
+  );
+
+  const handleSelectObject = (objName: string) => {
+    setSelectedObject(objName);
+    const newSchema = getSchemaForObject(objName);
+    setSelectedFieldIds(newSchema.map(f => f.id));
+  };
+
+  const filteredObjects = ALL_SHOPIFY_OBJECTS.filter(o => 
+    objectSearchTerm === "" || o.toLowerCase().includes(objectSearchTerm.toLowerCase())
+  );
+
+  const filteredFields = currentSchema.filter(f => 
     fieldSearchTerm === "" || f.label.toLowerCase().includes(fieldSearchTerm.toLowerCase())
   );
 
@@ -76,10 +280,10 @@ export default function ImportPreviewPage() {
   };
 
   const toggleSelectAll = () => {
-    if (selectedFieldIds.length === INITIAL_SHOPIFY_FIELDS.length) {
+    if (selectedFieldIds.length === currentSchema.length) {
       setSelectedFieldIds([]);
     } else {
-      setSelectedFieldIds(INITIAL_SHOPIFY_FIELDS.map(f => f.id));
+      setSelectedFieldIds(currentSchema.map(f => f.id));
     }
   };
 
@@ -88,18 +292,18 @@ export default function ImportPreviewPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 md:p-8 font-sans select-none antialiased">
+    <div className="w-full min-h-screen bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 md:p-6 font-sans select-none antialiased">
       
       {/* Full-Screen Modal Dialog Container */}
-      <div className="bg-white rounded-3xl w-full max-w-6xl h-[90vh] shadow-2xl flex flex-col overflow-hidden border border-[#e5e2db] animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-3xl w-full max-w-7xl h-[92vh] shadow-2xl flex flex-col overflow-hidden border border-[#e5e2db] animate-in fade-in zoom-in duration-200">
         
         {/* Modal Header Bar */}
-        <div className="px-6 py-4 border-b border-[#e5e2db] flex items-center justify-between bg-white">
+        <div className="px-6 py-3.5 border-b border-[#e5e2db] flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-bold text-[#13322b]">Import Preview</h2>
+            <h2 className="text-base md:text-lg font-bold text-[#13322b]">Import Preview</h2>
             <div className="flex items-center gap-2 pl-3 border-l border-[#e5e2db]">
               <OfficialBrandLogo id="shopify" />
-              <span className="font-bold text-sm text-[#13322b]">Customers</span>
+              <span className="font-bold text-sm text-[#13322b]">{selectedObject}</span>
               <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
             </div>
           </div>
@@ -133,25 +337,63 @@ export default function ImportPreviewPage() {
           </div>
         </div>
 
-        {/* Modal Body: Left Field Tree Selector + Right Live Table */}
+        {/* Modal Body: Left Object Selector + Middle Field Tree Selector + Right Live Table */}
         <div className="flex-1 flex overflow-hidden">
           
-          {/* Left Field Tree Selector Pane */}
-          <div className="w-80 border-r border-[#e5e2db] p-4 space-y-3 bg-[#faf9f6] flex flex-col">
-            
-            <div className="flex items-center gap-2 font-bold text-sm text-[#13322b] px-1">
-              <Layers className="w-4 h-4 text-[#13322b]" />
-              <span>Customers</span>
+          {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
+          <div className="w-64 border-r border-[#e5e2db] p-3 space-y-3 bg-[#faf9f6] flex flex-col shrink-0">
+            <div className="flex items-center justify-between px-1">
+              <span className="text-xs font-bold text-[#13322b] uppercase tracking-wider">Shopify Objects ({ALL_SHOPIFY_OBJECTS.length})</span>
             </div>
 
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search 38 objects..."
+                value={objectSearchTerm}
+                onChange={(e) => setObjectSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] font-medium"
+              />
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-1 pr-1">
+              {filteredObjects.map((objName) => (
+                <button
+                  key={objName}
+                  onClick={() => handleSelectObject(objName)}
+                  className={`w-full px-3 py-2 text-left rounded-xl text-xs font-medium flex items-center justify-between transition-all ${
+                    selectedObject === objName 
+                      ? "bg-[#13322b] text-white font-bold shadow-sm" 
+                      : "text-[#635f54] hover:bg-white hover:text-[#13322b]"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 truncate">
+                    <Database className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                    <span className="truncate">{objName}</span>
+                  </div>
+                  {selectedObject === objName && <Check className="w-3.5 h-3.5 text-[#c59b43]" />}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* COLUMN 2: Field Tree Selector Pane for Current Object */}
+          <div className="w-72 border-r border-[#e5e2db] p-3.5 space-y-3 bg-[#ffffff] flex flex-col shrink-0">
+            
+            <div className="flex items-center gap-2 font-bold text-xs text-[#13322b] px-1">
+              <Layers className="w-4 h-4 text-[#13322b]" />
+              <span>{selectedObject} Fields</span>
+            </div>
+
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
               <input 
                 type="text" 
                 placeholder="Search fields"
                 value={fieldSearchTerm}
                 onChange={(e) => setFieldSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#2563eb] text-[#13322b] font-medium placeholder-gray-400"
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2563eb] text-[#13322b] font-medium placeholder-gray-400"
               />
             </div>
 
@@ -161,26 +403,26 @@ export default function ImportPreviewPage() {
               {/* Select All */}
               <div 
                 onClick={toggleSelectAll}
-                className="flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-white cursor-pointer text-xs font-bold text-[#2563eb]"
+                className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 cursor-pointer text-xs font-bold text-[#2563eb]"
               >
                 <input 
                   type="checkbox" 
-                  checked={selectedFieldIds.length === INITIAL_SHOPIFY_FIELDS.length}
+                  checked={selectedFieldIds.length === currentSchema.length}
                   onChange={toggleSelectAll}
                   className="w-4 h-4 rounded text-[#2563eb] focus:ring-[#2563eb] accent-[#2563eb] cursor-pointer"
                 />
                 <span>Select All</span>
               </div>
 
-              {/* All Shopify Fields List */}
+              {/* Object Specific Fields */}
               {filteredFields.map((field) => {
                 const isChecked = selectedFieldIds.includes(field.id);
                 return (
                   <div 
                     key={field.id}
                     onClick={() => toggleFieldSelection(field.id)}
-                    className={`flex items-center justify-between px-2.5 py-2 rounded-lg cursor-pointer text-xs font-medium transition-colors ${
-                      isChecked ? "bg-[#e8f0fe] text-[#1a73e8] font-semibold" : "hover:bg-white text-gray-700"
+                    className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium transition-colors ${
+                      isChecked ? "bg-[#e8f0fe] text-[#1a73e8] font-semibold" : "hover:bg-gray-50 text-gray-700"
                     }`}
                   >
                     <div className="flex items-center gap-2.5 truncate">
@@ -207,8 +449,8 @@ export default function ImportPreviewPage() {
 
           </div>
 
-          {/* Right Live Dynamic Table Preview Pane */}
-          <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden bg-white">
+          {/* COLUMN 3: Right Live Dynamic Table Preview Pane */}
+          <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden bg-[#ffffff]">
             
             <div className="flex-1 overflow-auto border border-[#e5e2db] rounded-2xl shadow-2xs">
               <table className="w-full text-left border-collapse text-xs min-w-max">
@@ -217,7 +459,7 @@ export default function ImportPreviewPage() {
                     <th className="p-3.5 border-r border-[#e5e2db] w-10 text-center">
                       <input type="checkbox" checked readOnly className="accent-[#2563eb]" />
                     </th>
-                    {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
+                    {currentSchema.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
                       <th key={field.id} className="p-3.5 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9]">
                         <div className="flex items-center justify-between gap-3">
                           <span>{field.label}</span>
@@ -228,57 +470,18 @@ export default function ImportPreviewPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#e5e2db]">
-                  <tr className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                    <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">1</td>
-                    {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                      <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
-                        {field.id === "id" && "gid://shopify/Customer/9494632"}
-                        {field.id === "created_at" && "2026-07-07 01:31:18"}
-                        {field.id === "can_delete" && "True"}
-                        {field.id === "data_sale_opt_out" && "False"}
-                        {field.id === "default_address" && "105 Victoria St, Toronto"}
-                        {field.id === "display_name" && "Ayumu Hirano"}
-                        {field.id === "email" && "ayumu.hirano@example.com"}
-                        {field.id === "last_name" && "Hirano"}
-                        {field.id === "number_of_orders" && "14"}
-                        {!["id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"].includes(field.id) && "—"}
+                  {currentSampleData.map((row, rowIdx) => (
+                    <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
+                      <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">
+                        {rowIdx + 1}
                       </td>
-                    ))}
-                  </tr>
-                  <tr className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                    <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">2</td>
-                    {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                      <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
-                        {field.id === "id" && "gid://shopify/Customer/9494633"}
-                        {field.id === "created_at" && "2026-07-07 01:31:19"}
-                        {field.id === "can_delete" && "True"}
-                        {field.id === "data_sale_opt_out" && "False"}
-                        {field.id === "default_address" && "Box 42 - 151 O'Connor St"}
-                        {field.id === "display_name" && "Russell Winfield"}
-                        {field.id === "email" && "russel.winfield@example.com"}
-                        {field.id === "last_name" && "Winfield"}
-                        {field.id === "number_of_orders" && "28"}
-                        {!["id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"].includes(field.id) && "—"}
-                      </td>
-                    ))}
-                  </tr>
-                  <tr className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                    <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">3</td>
-                    {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                      <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
-                        {field.id === "id" && "gid://shopify/Customer/9494634"}
-                        {field.id === "created_at" && "2026-07-07 01:31:19"}
-                        {field.id === "can_delete" && "False"}
-                        {field.id === "data_sale_opt_out" && "False"}
-                        {field.id === "default_address" && "742 Evergreen Terrace"}
-                        {field.id === "display_name" && "Karine Ruby"}
-                        {field.id === "email" && "karine.ruby@example.com"}
-                        {field.id === "last_name" && "Ruby"}
-                        {field.id === "number_of_orders" && "9"}
-                        {!["id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"].includes(field.id) && "—"}
-                      </td>
-                    ))}
-                  </tr>
+                      {currentSchema.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
+                        <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
+                          {row[field.id] || "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
