@@ -17,15 +17,7 @@ import {
   ArrowUpRight,
   ArrowLeft,
   Check,
-  FileSpreadsheet,
-  Database,
-  Cloud,
-  ShoppingBag,
-  CreditCard,
-  PieChart,
-  Megaphone,
-  Globe,
-  Share2
+  FileSpreadsheet
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DV_LOGO_BASE64 } from "./logo-base64";
@@ -42,67 +34,116 @@ function CustomDVLogo() {
   );
 }
 
-// Brand SVG Icons Component for Connectors
-function BrandLogo({ id }: { id: string }) {
+// Authentic Official Vector SVG Logos Component
+function OfficialBrandLogo({ id }: { id: string }) {
   switch (id) {
     case "shopify":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#95bf47]/15 border border-[#95bf47]/30 flex items-center justify-center text-[#5e8e3e]">
-          <ShoppingBag className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#f2f7ed] border border-[#95bf47]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Shopify Shopping Bag Icon */}
+            <path d="M78 28H66C66 18 58 10 48 10C38 10 30 18 30 28H18C15 28 13 30 13 33L22 85C22 88 25 90 28 90H68C71 90 74 88 74 85L83 33C83 30 81 28 78 28Z" fill="#95BF47" />
+            <path d="M48 16C53 16 58 21 59 28H37C38 21 43 16 48 16Z" fill="#5E8E3E" />
+            <path d="M44 42L35 60H43L41 78L58 52H48L53 42H44Z" fill="white" />
+          </svg>
         </div>
       );
     case "stripe":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#635bff]/15 border border-[#635bff]/30 flex items-center justify-center text-[#635bff]">
-          <CreditCard className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#f4f3ff] border border-[#635bff]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Stripe 'S' Logo */}
+            <path d="M85 41C85 24 72 15 52 15H15V85H52C75 85 85 71 85 55C85 46 80 43 85 41ZM52 35C60 35 64 38 64 43C64 48 58 50 49 53L35 57V35H52ZM52 65H35V45L49 41C61 38 67 43 67 52C67 60 61 65 52 65Z" fill="#635BFF" />
+          </svg>
         </div>
       );
     case "salesforce":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#00a1e0]/15 border border-[#00a1e0]/30 flex items-center justify-center text-[#00a1e0]">
-          <Cloud className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#eef9ff] border border-[#00a1e0]/30 flex items-center justify-center p-1 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Salesforce Cloud Logo */}
+            <path d="M38 32C41 23 49 16 60 16C72 16 82 25 84 37C90 38 95 44 95 52C95 61 88 68 79 68H24C14 68 6 60 6 50C6 41 12 34 21 33C25 24 33 19 43 19" fill="#00A1E0" />
+            <path d="M43 40C43 38 45 36 48 36H52C54 36 56 38 56 40V60C56 62 54 64 52 64H48C45 64 43 62 43 60V40Z" fill="white" />
+          </svg>
         </div>
       );
     case "postgres":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#336791]/15 border border-[#336791]/30 flex items-center justify-center text-[#336791]">
-          <Database className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#edf4f9] border border-[#336791]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* PostgreSQL Elephant Logo */}
+            <path d="M50 10C27 10 10 27 10 50C10 72 27 90 50 90C72 90 90 72 90 50C90 27 72 10 50 10Z" fill="#336791" />
+            <path d="M35 35C35 30 42 25 52 25C65 25 72 32 72 45C72 58 62 65 52 65H42V75H32V35H35ZM42 35V55H50C58 55 62 50 62 45C62 39 57 35 50 35H42Z" fill="white" />
+          </svg>
         </div>
       );
     case "ga4":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#f9ab00]/15 border border-[#f9ab00]/30 flex items-center justify-center text-[#e37400]">
-          <PieChart className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#fff9eb] border border-[#f9ab00]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* GA4 Logo */}
+            <rect x="15" y="55" width="20" height="30" rx="5" fill="#F9AB00" />
+            <rect x="40" y="35" width="20" height="50" rx="5" fill="#E37400" />
+            <rect x="65" y="15" width="20" height="70" rx="5" fill="#E37400" />
+            <circle cx="75" cy="25" r="10" fill="#EA4335" />
+          </svg>
         </div>
       );
     case "hubspot":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#ff7a59]/15 border border-[#ff7a59]/30 flex items-center justify-center text-[#ff7a59]">
-          <Share2 className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#fff1ed] border border-[#ff7a59]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* HubSpot Logo */}
+            <path d="M50 10L85 30V70L50 90L15 70V30L50 10Z" fill="#FF7A59" />
+            <circle cx="50" cy="50" r="16" fill="white" />
+            <circle cx="50" cy="50" r="8" fill="#FF7A59" />
+          </svg>
         </div>
       );
     case "meta_ads":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#0668e1]/15 border border-[#0668e1]/30 flex items-center justify-center text-[#0668e1]">
-          <Globe className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#edf5ff] border border-[#0668e1]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Meta Infinity Logo */}
+            <path d="M30 30C18 30 10 40 10 50C10 60 18 70 30 70C40 70 47 62 50 55C53 62 60 70 70 70C82 70 90 60 90 50C90 40 82 30 70 30C60 30 53 38 50 45C47 38 40 30 30 30Z" fill="#0668E1" />
+          </svg>
         </div>
       );
     case "google_ads":
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#4285f4]/15 border border-[#4285f4]/30 flex items-center justify-center text-[#4285f4]">
-          <Megaphone className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#eef4fe] border border-[#4285f4]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Google Ads 3-polygon logo */}
+            <polygon points="30,85 10,50 45,15 65,50" fill="#FBBC04" />
+            <polygon points="70,85 90,50 55,15 35,50" fill="#4285F4" />
+            <circle cx="75" cy="75" r="12" fill="#34A853" />
+          </svg>
+        </div>
+      );
+    case "mysql":
+      return (
+        <div className="w-8 h-8 rounded-xl bg-[#edf5f8] border border-[#00758f]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* MySQL Dolphin Logo */}
+            <path d="M20 70C30 40 50 20 85 20C75 40 60 65 30 80C25 82 20 75 20 70Z" fill="#00758F" />
+            <path d="M40 75C55 60 70 45 80 30C75 45 60 65 45 78" fill="#F29111" />
+          </svg>
         </div>
       );
     case "csv_upload":
       return (
-        <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
-          <FileSpreadsheet className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#ecf7f2] border border-[#107c41]/30 flex items-center justify-center p-1.5 shadow-2xs shrink-0">
+          <svg viewBox="0 0 100 100" fill="none" className="w-full h-full">
+            {/* Excel / CSV Document Logo */}
+            <rect x="20" y="15" width="60" height="70" rx="8" fill="#107C41" />
+            <path d="M35 38L47 50L35 62M65 38L53 50L65 62" stroke="white" strokeWidth="8" strokeLinecap="round" />
+          </svg>
         </div>
       );
     default:
       return (
-        <div className="w-8 h-8 rounded-lg bg-[#13322b]/10 border border-[#13322b]/20 flex items-center justify-center text-[#13322b]">
-          <Database className="w-4 h-4 stroke-[2.2]" />
+        <div className="w-8 h-8 rounded-xl bg-[#13322b]/10 border border-[#13322b]/20 flex items-center justify-center text-[#13322b] shrink-0">
+          <FileSpreadsheet className="w-4 h-4" />
         </div>
       );
   }
@@ -114,14 +155,13 @@ interface Connector {
   category: "E-Commerce" | "Payments" | "CRM" | "Databases" | "Marketing" | "Files";
   description: string;
   status: "Connected" | "Available";
-  isPopular?: boolean;
 }
 
 const CONNECTORS: Connector[] = [
-  { id: "shopify", name: "Shopify", category: "E-Commerce", description: "Orders, Inventory & Customer Analytics", status: "Connected", isPopular: true },
-  { id: "stripe", name: "Stripe", category: "Payments", description: "MRR, Subscriptions & Invoice Data", status: "Connected", isPopular: true },
-  { id: "ga4", name: "Google Analytics 4", category: "Marketing", description: "Traffic, Conversion & Funnels", status: "Connected", isPopular: true },
-  { id: "csv_upload", name: "CSV & Excel Files", category: "Files", description: "Upload local files or sheet ranges", status: "Connected", isPopular: true },
+  { id: "shopify", name: "Shopify", category: "E-Commerce", description: "Orders, Inventory & Customer Analytics", status: "Connected" },
+  { id: "stripe", name: "Stripe", category: "Payments", description: "MRR, Subscriptions & Invoice Data", status: "Connected" },
+  { id: "ga4", name: "Google Analytics 4", category: "Marketing", description: "Traffic, Conversion & Funnels", status: "Connected" },
+  { id: "csv_upload", name: "CSV & Excel Files", category: "Files", description: "Upload local files or sheet ranges", status: "Connected" },
   { id: "salesforce", name: "Salesforce", category: "CRM", description: "Leads, Opportunities & Accounts", status: "Available" },
   { id: "postgres", name: "PostgreSQL", category: "Databases", description: "Direct SQL Database Connection", status: "Available" },
   { id: "hubspot", name: "HubSpot", category: "CRM", description: "Contacts, Deals & Automation Logs", status: "Available" },
@@ -371,23 +411,14 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (UNIQUE DIGITVALUES LAYOUT) */}
+      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (NO CUSTOM API BUTTON + REAL OFFICIAL LOGOS) */}
       {currentView === "import-connectors" && (
         <div className="p-3.5 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
-          {/* Sub-Page Header */}
-          <div className="flex items-center justify-between pb-1 border-b border-[#e5e2db]">
-            <div>
-              <h2 className="text-sm font-bold text-[#13322b]">Import Data Sources</h2>
-              <p className="text-[10px] text-[#8a8579]">Connect live APIs & databases to Google Sheets™</p>
-            </div>
-            <button 
-              onClick={() => setCurrentView("connector-setup")}
-              className="px-2.5 py-1 bg-[#13322b] hover:bg-[#1a473d] text-white text-[10px] font-semibold rounded-lg shadow-2xs transition-all flex items-center gap-1"
-            >
-              <Plus className="w-3 h-3 text-[#c59b43]" />
-              <span>Custom API</span>
-            </button>
+          {/* Sub-Page Header (Custom API button removed!) */}
+          <div className="pb-1 border-b border-[#e5e2db]">
+            <h2 className="text-sm font-bold text-[#13322b]">Import Data Sources</h2>
+            <p className="text-[10px] text-[#8a8579] mt-0.5">Connect live APIs & databases directly to your Google Sheet</p>
           </div>
 
           {/* Search Input */}
@@ -420,7 +451,7 @@ export default function AddonSidebarPage() {
                     className="p-3 bg-white rounded-xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
                   >
                     <div className="flex items-center gap-3">
-                      <BrandLogo id={connector.id} />
+                      <OfficialBrandLogo id={connector.id} />
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
@@ -440,7 +471,7 @@ export default function AddonSidebarPage() {
             </div>
           )}
 
-          {/* SECTION 2: AVAILABLE & SUGGESTED SOURCES */}
+          {/* SECTION 2: AVAILABLE CONNECTORS */}
           <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold text-[#13322b] uppercase tracking-wider">Available Connectors</span>
@@ -455,7 +486,7 @@ export default function AddonSidebarPage() {
                   className="p-3 bg-white rounded-xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-3">
-                    <BrandLogo id={connector.id} />
+                    <OfficialBrandLogo id={connector.id} />
                     <div>
                       <span className="text-xs font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
                         {connector.name}
@@ -480,7 +511,7 @@ export default function AddonSidebarPage() {
           
           {/* Connector Banner */}
           <div className="p-4 bg-white rounded-xl border border-[#e5e2db] shadow-sm flex items-center gap-3.5">
-            <BrandLogo id={selectedConnector.id} />
+            <OfficialBrandLogo id={selectedConnector.id} />
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-[#13322b]">{selectedConnector.name}</h3>
