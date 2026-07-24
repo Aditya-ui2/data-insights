@@ -40,6 +40,7 @@ import PrivacyPolicy from "@/pages/privacy";
 import SupportPage from "@/pages/support";
 import AddonSidebarPage from "@/pages/addon-sidebar";
 import ShopifyAuthPage from "@/pages/shopify-auth";
+import ShopifyStoreErrorPage from "@/pages/shopify-error";
 import OAuthSuccessPage from "@/pages/oauth-success";
 import ImportPreviewPage from "@/pages/import-preview";
 
@@ -204,6 +205,7 @@ function Router() {
         <Route path="/support" component={SupportPage} />
         <Route path="/addon-sidebar" component={AddonSidebarPage} />
         <Route path="/shopify-auth" component={ShopifyAuthPage} />
+        <Route path="/shopify-error" component={ShopifyStoreErrorPage} />
         <Route path="/oauth_attempt" component={OAuthSuccessPage} />
         <Route path="/import-preview" component={ImportPreviewPage} />
 

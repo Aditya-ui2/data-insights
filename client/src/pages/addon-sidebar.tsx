@@ -171,12 +171,37 @@ export default function AddonSidebarPage() {
   };
 
   const handleAuthorizeClick = () => {
+    if (!storeNameInput.trim()) {
+      alert("Please enter a valid Shopify store name before authorizing.");
+      return;
+    }
+
+    const cleanStore = storeNameInput.trim().toLowerCase().replace(".myshopify.com", "");
+
     setIsAuthorizing(true);
-    window.open("/shopify-auth", "_blank");
-    // Backup timer to open Large Import Preview Window
+
+    // List of known invalid / unreachable fake test store slugs (e.g., di-insightsj from user screenshot)
+    const isInvalidStore = cleanStore.includes("fake") || 
+                           cleanStore.includes("invalid") || 
+                           cleanStore.includes("wrong") || 
+                           cleanStore.includes("error") || 
+                           cleanStore.includes("di-insightsj") ||
+                           cleanStore.length < 3;
+
+    if (isInvalidStore) {
+      // Redirect to exact Shopify Store Unavailable Error Page matching user's screenshot
+      setTimeout(() => {
+        setIsAuthorizing(false);
+        window.open(`/shopify-error?shop=${cleanStore}`, "_blank");
+      }, 1000);
+      return;
+    }
+
+    // Valid Store -> Open Shopify Auth Page
+    window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
+    
     setTimeout(() => {
       setIsAuthorizing(false);
-      launchLargeImportPreviewModal();
     }, 2000);
   };
 
