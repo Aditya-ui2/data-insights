@@ -318,11 +318,22 @@ export default function AddonSidebarPage() {
     }
 
     // Open the secure OAuth popup window to authorize the shop connection
+    const getBackendBaseUrl = (): string => {
+      if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+      }
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        return "http://localhost:3000";
+      }
+      return "https://data-insights-backend-1node.onrender.com";
+    };
+
+    const backendBase = getBackendBaseUrl();
     const width = 600;
     const height = 700;
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
-    const oauthUrl = `/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStore)}`;
+    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStore)}`;
 
     const popup = window.open(
       oauthUrl,
