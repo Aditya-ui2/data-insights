@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { 
   Sparkles, 
   Download, 
@@ -26,7 +26,7 @@ import {
   RefreshCw,
   Zap,
   Layers,
-  Database
+  Trash2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DV_LOGO_BASE64 } from "./logo-base64";
@@ -165,7 +165,7 @@ interface Connector {
   domainSuffix?: string;
 }
 
-const CONNECTORS: Connector[] = [
+const INITIAL_CONNECTORS: Connector[] = [
   { id: "shopify", name: "Shopify", category: "E-Commerce", status: "Connected", domainSuffix: ".myshopify.com" },
   { id: "stripe", name: "Stripe", category: "Payments", status: "Connected" },
   { id: "ga4", name: "Google Analytics 4", category: "Marketing", status: "Connected" },
@@ -179,8 +179,10 @@ const CONNECTORS: Connector[] = [
 ];
 
 export default function AddonSidebarPage() {
+  const [connectorsList, setConnectorsList] = useState<Connector[]>(INITIAL_CONNECTORS);
   const [currentView, setCurrentView] = useState<"home" | "import-connectors" | "connector-connect" | "importing-active">("home");
-  const [selectedConnector, setSelectedConnector] = useState<Connector>(CONNECTORS[0]);
+  const [selectedConnector, setSelectedConnector] = useState<Connector>(INITIAL_CONNECTORS[0]);
+  const [deleteTargetConnector, setDeleteTargetConnector] = useState<Connector | null>(null);
   const [storeNameInput, setStoreNameInput] = useState("");
   const [isAuthorizing, setIsAuthorizing] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -190,8 +192,8 @@ export default function AddonSidebarPage() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [isImportingProgress, setIsImportingProgress] = useState(false);
 
-  const connectedSources = CONNECTORS.filter((c) => c.status === "Connected");
-  const availableSources = CONNECTORS.filter((c) => c.status === "Available" && (searchTerm === "" || c.name.toLowerCase().includes(searchTerm.toLowerCase())));
+  const connectedSources = connectorsList.filter((c) => c.status === "Connected");
+  const availableSources = connectorsList.filter((c) => c.status === "Available" && (searchTerm === "" || c.name.toLowerCase().includes(searchTerm.toLowerCase())));
 
   const objectsList = [
     "Automatic Discount Nodes",
@@ -222,23 +224,20 @@ export default function AddonSidebarPage() {
     { id: "gid://shopify/Customer/9494636", name: "Chloe Kim", email: "chloe.kim@example.com", created: "2026-07-07 01:31:22", amount: "$310.00" },
   ];
 
-  // STEP 1: Click Connector -> Open Connect Screen (Image 1)
   const handleOpenConnector = (connector: Connector) => {
     setSelectedConnector(connector);
     setStoreNameInput("");
     setCurrentView("connector-connect");
   };
 
-  // STEP 2: Click Authorize -> Simulate Redirect & Open Preview Modal (Image 2 -> 3)
   const handleAuthorizeClick = () => {
     setIsAuthorizing(true);
     setTimeout(() => {
       setIsAuthorizing(false);
-      setShowPreviewModal(true); // Open Step 3 Import Preview Modal
+      setShowPreviewModal(true);
     }, 1200);
   };
 
-  // STEP 4: Click Import in Modal -> Close Modal & Show Live Syncing Card (Image 4 -> 5)
   const handleConfirmImport = () => {
     setShowPreviewModal(false);
     setCurrentView("importing-active");
@@ -246,6 +245,12 @@ export default function AddonSidebarPage() {
     setTimeout(() => {
       setIsImportingProgress(false);
     }, 3000);
+  };
+
+  // Disconnect Handler for Trash Button
+  const confirmDisconnect = (connectorId: string) => {
+    setConnectorsList(prev => prev.map(c => c.id === connectorId ? { ...c, status: "Available" } : c));
+    setDeleteTargetConnector(null);
   };
 
   return (
@@ -452,7 +457,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE */}
+      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (WITH DELETE TRASH BUTTON) */}
       {currentView === "import-connectors" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
@@ -468,7 +473,7 @@ export default function AddonSidebarPage() {
             />
           </div>
 
-          {/* SECTION 1: CONNECTED SOURCES */}
+          {/* SECTION 1: CONNECTED SOURCES (WITH TRASH DELETE BUTTON) */}
           {searchTerm === "" && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
@@ -494,7 +499,21 @@ export default function AddonSidebarPage() {
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-2xs" />
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                    
+                    {/* Trash Delete Action Button */}
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteTargetConnector(connector);
+                        }}
+                        className="p-1.5 hover:bg-rose-50 rounded-lg text-[#8a8579] hover:text-rose-600 transition-all"
+                        title={`Disconnect ${connector.name}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                      <ChevronRight className="w-5 h-5 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -529,7 +548,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 3: STEP 1 - CONNECT SCREEN (EXACT MATCH FOR IMAGE 1) */}
+      {/* VIEW 3: STEP 1 - CONNECT SCREEN */}
       {currentView === "connector-connect" && (
         <div className="p-4 space-y-5 flex-1 overflow-y-auto bg-[#faf9f6] flex flex-col justify-between">
           
@@ -604,7 +623,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 4: STEP 4 - IMPORTING ACTIVE SYNC CARD (EXACT MATCH FOR IMAGE 5) */}
+      {/* VIEW 4: STEP 4 - IMPORTING ACTIVE SYNC CARD */}
       {currentView === "importing-active" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
@@ -661,7 +680,38 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* STEP 3 & 4 OVERLAY MODAL: IMPORT PREVIEW MODAL DIALOG (EXACT MATCH FOR IMAGES 3 & 4) */}
+      {/* CONFIRMATION POPUP DIALOG FOR DISCONNECTING CONNECTED SOURCE */}
+      {deleteTargetConnector && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-5 max-w-xs w-full shadow-2xl border border-[#e5e2db] space-y-4 animate-in fade-in zoom-in duration-150">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto shadow-2xs">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            <div className="text-center space-y-1">
+              <h3 className="text-sm font-bold text-[#13322b]">Disconnect {deleteTargetConnector.name}?</h3>
+              <p className="text-[11px] text-[#8a8579] leading-relaxed">
+                Are you sure you want to disconnect this data source? Active auto-refresh schedules for this sheet will be paused.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 pt-1">
+              <button 
+                onClick={() => setDeleteTargetConnector(null)}
+                className="flex-1 py-2.5 bg-[#faf9f6] hover:bg-[#f3f0e8] text-[#13322b] text-xs font-bold rounded-xl border border-[#e5e2db] transition-all"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => confirmDisconnect(deleteTargetConnector.id)}
+                className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow-md transition-all"
+              >
+                Disconnect
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 3 & 4 OVERLAY MODAL: IMPORT PREVIEW MODAL DIALOG */}
       {showPreviewModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[85vh] shadow-2xl flex flex-col overflow-hidden border border-[#e5e2db] animate-in fade-in zoom-in duration-200">
