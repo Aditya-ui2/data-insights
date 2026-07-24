@@ -34,16 +34,16 @@ function CustomDVLogo() {
   );
 }
 
-// Exact Official Brand Logos in Round Circular Badges (Matching Real Logos)
+// Larger Official Brand Logos in Round Circular Badges
 function OfficialBrandLogo({ id }: { id: string }) {
   switch (id) {
     case "shopify":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/shopify/95BF47" 
             alt="Shopify" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
             onError={(e) => {
               e.currentTarget.src = "https://cdn.worldvectorlogo.com/logos/shopify.svg";
             }}
@@ -52,94 +52,94 @@ function OfficialBrandLogo({ id }: { id: string }) {
       );
     case "stripe":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#f0efff] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#f0efff] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/stripe/635BFF" 
             alt="Stripe" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "salesforce":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#e6f4fb] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#e6f4fb] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/salesforce/00A1E0" 
             alt="Salesforce" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "postgres":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#e8f1f7] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#e8f1f7] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/postgresql/4169E1" 
             alt="PostgreSQL" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "ga4":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#fff4e5] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#fff4e5] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/googleanalytics/E37400" 
             alt="GA4" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "hubspot":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#fff0eb] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#fff0eb] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/hubspot/FF7A59" 
             alt="HubSpot" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "meta_ads":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#e7f0ff] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#e7f0ff] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/meta/0668E1" 
             alt="Meta Ads" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "google_ads":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/googleads/4285F4" 
             alt="Google Ads" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "mysql":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#f0f4f7] flex items-center justify-center shrink-0 p-1.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-full bg-[#f0f4f7] flex items-center justify-center shrink-0 p-2 shadow-2xs">
           <img 
             src="https://cdn.simpleicons.org/mysql/4479A1" 
             alt="MySQL" 
-            className="w-5 h-5 object-contain"
+            className="w-6 h-6 object-contain"
           />
         </div>
       );
     case "csv_upload":
       return (
-        <div className="w-9 h-9 rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-1.5 shadow-2xs text-[#107c41]">
-          <FileSpreadsheet className="w-5 h-5 stroke-[2]" />
+        <div className="w-10 h-10 rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-2 shadow-2xs text-[#107c41]">
+          <FileSpreadsheet className="w-6 h-6 stroke-[2]" />
         </div>
       );
     default:
       return (
-        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-gray-600">
-          <FileSpreadsheet className="w-5 h-5" />
+        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-gray-600">
+          <FileSpreadsheet className="w-6 h-6" />
         </div>
       );
   }
@@ -149,21 +149,20 @@ interface Connector {
   id: string;
   name: string;
   category: "E-Commerce" | "Payments" | "CRM" | "Databases" | "Marketing" | "Files";
-  description: string;
   status: "Connected" | "Available";
 }
 
 const CONNECTORS: Connector[] = [
-  { id: "shopify", name: "Shopify", category: "E-Commerce", description: "Orders, Inventory & Customer Analytics", status: "Connected" },
-  { id: "stripe", name: "Stripe", category: "Payments", description: "MRR, Subscriptions & Invoice Data", status: "Connected" },
-  { id: "ga4", name: "Google Analytics 4", category: "Marketing", description: "Traffic, Conversion & Funnels", status: "Connected" },
-  { id: "csv_upload", name: "Files (CSV & Excel)", category: "Files", description: "Google Sheets, Excel & CSV files", status: "Connected" },
-  { id: "salesforce", name: "Salesforce", category: "CRM", description: "Leads, Opportunities & Accounts", status: "Available" },
-  { id: "postgres", name: "PostgreSQL", category: "Databases", description: "Direct SQL Database Connection", status: "Available" },
-  { id: "hubspot", name: "HubSpot", category: "CRM", description: "Contacts, Deals & Automation Logs", status: "Available" },
-  { id: "meta_ads", name: "Meta Ads (Facebook)", category: "Marketing", description: "Ad Spend, Impressions & ROAS", status: "Available" },
-  { id: "google_ads", name: "Google Ads", category: "Marketing", description: "PPC Campaigns & Keyword Metrics", status: "Available" },
-  { id: "mysql", name: "MySQL", category: "Databases", description: "Relational DB Sync & Auto-Queries", status: "Available" },
+  { id: "shopify", name: "Shopify", category: "E-Commerce", status: "Connected" },
+  { id: "stripe", name: "Stripe", category: "Payments", status: "Connected" },
+  { id: "ga4", name: "Google Analytics 4", category: "Marketing", status: "Connected" },
+  { id: "csv_upload", name: "Files (CSV & Excel)", category: "Files", status: "Connected" },
+  { id: "salesforce", name: "Salesforce", category: "CRM", status: "Available" },
+  { id: "postgres", name: "PostgreSQL", category: "Databases", status: "Available" },
+  { id: "hubspot", name: "HubSpot", category: "CRM", status: "Available" },
+  { id: "meta_ads", name: "Meta Ads (Facebook)", category: "Marketing", status: "Available" },
+  { id: "google_ads", name: "Google Ads", category: "Marketing", status: "Available" },
+  { id: "mysql", name: "MySQL", category: "Databases", status: "Available" },
 ];
 
 export default function AddonSidebarPage() {
@@ -190,11 +189,11 @@ export default function AddonSidebarPage() {
           {currentView !== "home" ? (
             <button 
               onClick={() => setCurrentView(currentView === "connector-setup" ? "import-connectors" : "home")}
-              className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b] transition-all flex items-center gap-1.5 font-semibold text-xs"
+              className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b] transition-all flex items-center gap-2 font-bold text-sm"
               title="Back"
             >
               <ArrowLeft className="w-4 h-4 text-[#13322b]" />
-              <span>Back to Menu</span>
+              <span>Import Data</span>
             </button>
           ) : (
             <>
@@ -407,92 +406,75 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (OFFICIAL BRAND LOGOS IN ROUND BADGES) */}
+      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (SUBTEXT REMOVED + LARGER BOLD TITLES) */}
       {currentView === "import-connectors" && (
-        <div className="p-3.5 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
+        <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
-          {/* Sub-Page Header */}
-          <div className="pb-1 border-b border-[#e5e2db]">
-            <h2 className="text-sm font-bold text-[#13322b]">Import Data Sources</h2>
-            <p className="text-[10px] text-[#8a8579] mt-0.5">Connect live APIs & databases directly to your Google Sheet</p>
-          </div>
-
           {/* Search Input */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8a8579]" />
+            <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#8a8579]" />
             <input 
               type="text" 
-              placeholder="Search data sources (e.g. Shopify, Stripe)..."
+              placeholder="Search data sources..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] placeholder-[#a39e92] shadow-2xs"
+              className="w-full pl-10 pr-4 py-2.5 text-xs bg-white border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] placeholder-[#a39e92] shadow-2xs font-medium"
             />
           </div>
 
           {/* SECTION 1: CONNECTED SOURCES */}
           {searchTerm === "" && (
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-[#13322b] uppercase tracking-wider">Connected Sources</span>
-                <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  4 Connected
-                </span>
+                <span className="text-xs font-bold text-[#13322b] tracking-wider uppercase">Connected Sources</span>
+                <button className="text-[11px] font-bold text-[#13322b] hover:text-[#c59b43] transition-colors">
+                  Add +
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-2.5">
                 {connectedSources.map((connector) => (
                   <div 
                     key={connector.id}
                     onClick={() => handleOpenConnector(connector)}
-                    className="p-3 bg-white rounded-xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
+                    className="p-3.5 bg-white rounded-2xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <OfficialBrandLogo id={connector.id} />
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
-                            {connector.name}
-                          </span>
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        </div>
-                        <p className="text-[10px] text-[#8a8579] mt-0.5 line-clamp-1">
-                          {connector.description}
-                        </p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
+                          {connector.name}
+                        </span>
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-2xs" />
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                    <ChevronRight className="w-5 h-5 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* SECTION 2: AVAILABLE CONNECTORS */}
-          <div className="space-y-2 pt-1">
+          {/* SECTION 2: SUGGESTED / AVAILABLE CONNECTORS */}
+          <div className="space-y-2.5 pt-1">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold text-[#13322b] uppercase tracking-wider">Suggested Sources</span>
-              <span className="text-[10px] text-[#8a8579]">Auto Sync Enabled</span>
+              <span className="text-xs font-bold text-[#13322b] tracking-wider uppercase">Suggested Sources</span>
             </div>
 
-            <div className="grid grid-cols-1 gap-2">
+            <div className="grid grid-cols-1 gap-2.5">
               {availableSources.map((connector) => (
                 <div 
                   key={connector.id}
                   onClick={() => handleOpenConnector(connector)}
-                  className="p-3 bg-white rounded-xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
+                  className="p-3.5 bg-white rounded-2xl border border-[#e5e2db] hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs hover:shadow-md flex items-center justify-between group"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3.5">
                     <OfficialBrandLogo id={connector.id} />
-                    <div>
-                      <span className="text-xs font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
-                        {connector.name}
-                      </span>
-                      <p className="text-[10px] text-[#8a8579] mt-0.5 line-clamp-1">
-                        {connector.description}
-                      </p>
-                    </div>
+                    <span className="text-sm font-bold text-[#13322b] group-hover:text-[#c59b43] transition-colors">
+                      {connector.name}
+                    </span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="w-5 h-5 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
                 </div>
               ))}
             </div>
@@ -513,7 +495,6 @@ export default function AddonSidebarPage() {
                 <h3 className="text-sm font-bold text-[#13322b]">{selectedConnector.name}</h3>
                 <Badge className="bg-emerald-100 text-emerald-800 text-[9px] border-0">{selectedConnector.status}</Badge>
               </div>
-              <p className="text-[10px] text-[#8a8579] mt-0.5">{selectedConnector.description}</p>
             </div>
           </div>
 
