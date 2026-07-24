@@ -37,7 +37,13 @@ import { parseDocument, indexKnowledgeBaseDocument, retrieveRelevantKbChunks } f
 import { queryBusinessData } from "./services/dataCopilot";
 import { orchestrateAgentAnalysis } from "./services/agentWorkspace";
 import { createCopilotAction, executeCopilotAction } from "./services/actionsCenter";
-import { saveIntegrationSource, testConnection } from "./services/integrationsHub";
+import { 
+  getShopifyGraphQLTypeName, 
+  introspectShopifyType, 
+  fetchShopifyMetafieldDefinitions, 
+  parseIntrospectionToFieldNodes 
+} from "./services/shopifySchemaFetcher";
+
 import { 
   knowledgeBaseDocuments as kbDocsTable, 
   knowledgeBaseChunks as kbChunksTable, 
@@ -235,6 +241,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           window.location.href = '/data-import-suite?google_error=true';
         }
       </script><p>Error connecting. You can close this window.</p></body></html>`);
+    }
+  });
+
+  app.post("/api/shopify/introspect-schema", async (req, res) => {
+    try {
+      const { shop, accessToken, object } = req.body;
+      const cleanShop = (shop || "di-insights").trim().toLowerCase().replace(".myshopify.com", "");
+      const token = accessToken || process.env.SHOPIFY_ACCESS_TOKEN || "";
+      const typeName = getShopifyGraphQLTypeName(object || "Products");
+
+      if (token) {
+        const fields = await introspectShopifyType(cleanShop, token, typeName);
+        const metafields = await fetchShopifyMetafieldDefinitions(cleanShop, token, typeName);
+        const nodes = parseIntrospectionToFieldNodes(fields, metafields);
+        return res.json({ success: true, isLive: true, nodes });
+      }
+
+      return res.json({
+        success: true,
+        isLive: false,
+        message: "Live introspection endpoint active."
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message });
     }
   });
 
