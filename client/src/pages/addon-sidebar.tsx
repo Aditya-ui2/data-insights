@@ -39,8 +39,8 @@ export default function AddonSidebarPage() {
       {/* Top Header Bar with Custom DV Logo */}
       <div className="bg-white/90 backdrop-blur-md border-b border-[#e5e2db] px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#e5e2db] shadow-sm flex items-center justify-center bg-black">
-            <img src="/dv-logo.png" alt="DigitValues" className="w-full h-full object-cover" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#13322b]/20 shadow-sm flex items-center justify-center bg-[#0d221e] shrink-0">
+            <img src="/dv-logo.png" alt="DigitValues Logo" className="w-full h-full object-contain p-0.5" />
           </div>
           <div className="flex flex-col">
             <span className="font-semibold text-[#13322b] text-sm tracking-tight leading-none">DigitValues</span>
