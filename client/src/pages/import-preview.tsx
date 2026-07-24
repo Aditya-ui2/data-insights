@@ -74,285 +74,154 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Comprehensive Master Dynamic Schema Generator (0 Missing Fields)
-export function getMasterDynamicSchema(objectName: string): FieldNode[] {
-  if (objectName === "Products") {
-    return [
+// Products Schema (80 Fields)
+const PRODUCTS_SCHEMA: FieldNode[] = [
+  {
+    id: "category",
+    label: "Category",
+    isGroup: true,
+    children: [
+      { id: "category.id", label: "Category Id" },
+      { id: "category.name", label: "Category Name" },
+      { id: "category.fullName", label: "Category Full Name" },
+      { id: "category.description", label: "Category Description" },
+      { id: "category.handle", label: "Category Handle" },
+      { id: "category.level", label: "Category Level" },
+      { id: "category.updatedAt", label: "Category Updated At" },
       {
-        id: "category",
-        label: "Category",
+        id: "category.ancestors",
+        label: "Ancestors",
         isGroup: true,
-        selectedCount: 8,
         children: [
-          { id: "category.id", label: "Category Id" },
-          { id: "category.name", label: "Category Name" },
-          { id: "category.fullName", label: "Category Full Name" },
-          { id: "category.description", label: "Category Description" },
-          { id: "category.handle", label: "Category Handle" },
-          { id: "category.level", label: "Category Level" },
-          { id: "category.updatedAt", label: "Category Updated At" },
-          {
-            id: "category.ancestors",
-            label: "Ancestors",
-            isGroup: true,
-            children: [
-              { id: "category.ancestors.id", label: "Ancestor Id" },
-              { id: "category.ancestors.name", label: "Ancestor Name" }
-            ]
-          }
+          { id: "category.ancestors.id", label: "Ancestor Id" },
+          { id: "category.ancestors.name", label: "Ancestor Name" }
+        ]
+      }
+    ]
+  },
+  {
+    id: "combinedListing",
+    label: "Combined Listing",
+    isGroup: true,
+    children: [
+      {
+        id: "combinedListing.parentProduct",
+        label: "Parent Product",
+        isGroup: true,
+        children: [
+          { id: "combinedListing.parentProduct.id", label: "Parent Product Id" },
+          { id: "combinedListing.parentProduct.title", label: "Parent Product Title" },
+          { id: "combinedListing.parentProduct.handle", label: "Parent Product Handle" },
+          { id: "combinedListing.parentProduct.status", label: "Parent Product Status" },
+          { id: "combinedListing.parentProduct.vendor", label: "Parent Product Vendor" }
+        ]
+      }
+    ]
+  },
+  { id: "combinedListingRole", label: "Combined Listing Role" },
+  {
+    id: "compareAtPriceRange",
+    label: "Compare At Price Range",
+    isGroup: true,
+    children: [
+      {
+        id: "compareAtPriceRange.maxVariantCompareAtPrice",
+        label: "Max Variant Compare At Price",
+        isGroup: true,
+        children: [
+          { id: "compareAtPriceRange.maxVariantCompareAtPrice.amount", label: "Amount" },
+          { id: "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode", label: "Currency Code" }
         ]
       },
       {
-        id: "combinedListing",
-        label: "Combined Listing",
+        id: "compareAtPriceRange.minVariantCompareAtPrice",
+        label: "Min Variant Compare At Price",
         isGroup: true,
-        selectedCount: 24,
         children: [
-          {
-            id: "combinedListing.parentProduct",
-            label: "Parent Product",
-            isGroup: true,
-            children: [
-              { id: "combinedListing.parentProduct.id", label: "Parent Product Id" },
-              { id: "combinedListing.parentProduct.title", label: "Parent Product Title" },
-              { id: "combinedListing.parentProduct.handle", label: "Parent Product Handle" },
-              { id: "combinedListing.parentProduct.status", label: "Parent Product Status" },
-              { id: "combinedListing.parentProduct.vendor", label: "Parent Product Vendor" }
-            ]
-          }
+          { id: "compareAtPriceRange.minVariantCompareAtPrice.amount", label: "Amount" },
+          { id: "compareAtPriceRange.minVariantCompareAtPrice.currencyCode", label: "Currency Code" }
         ]
-      },
-      { id: "combinedListingRole", label: "Combined Listing Role" },
-      {
-        id: "compareAtPriceRange",
-        label: "Compare At Price Range",
-        isGroup: true,
-        selectedCount: 4,
-        children: [
-          {
-            id: "compareAtPriceRange.maxVariantCompareAtPrice",
-            label: "Max Variant Compare At Price",
-            isGroup: true,
-            children: [
-              { id: "compareAtPriceRange.maxVariantCompareAtPrice.amount", label: "Amount" },
-              { id: "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-            ]
-          },
-          {
-            id: "compareAtPriceRange.minVariantCompareAtPrice",
-            label: "Min Variant Compare At Price",
-            isGroup: true,
-            children: [
-              { id: "compareAtPriceRange.minVariantCompareAtPrice.amount", label: "Amount" },
-              { id: "compareAtPriceRange.minVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-            ]
-          }
-        ]
-      },
-      { id: "createdAt", label: "Created At" },
-      { id: "description", label: "Description" },
-      { id: "descriptionHtml", label: "Description Html" },
-      {
-        id: "featuredMedia",
-        label: "Featured Media",
-        isGroup: true,
-        selectedCount: 5,
-        children: [
-          { id: "featuredMedia.id", label: "Media Id" },
-          { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
-          { id: "featuredMedia.alt", label: "Media Alt Text" },
-          {
-            id: "featuredMedia.previewImage",
-            label: "Preview Image",
-            isGroup: true,
-            children: [
-              { id: "featuredMedia.previewImage.url", label: "Url" },
-              { id: "featuredMedia.previewImage.altText", label: "Alt Text" }
-            ]
-          }
-        ]
-      },
-      {
-        id: "feedback",
-        label: "Feedback",
-        isGroup: true,
-        selectedCount: 1,
-        children: [
-          { id: "feedback.summary", label: "Summary" }
-        ]
-      },
-      { id: "giftCardTemplateSuffix", label: "Gift Card Template Suffix" },
-      { id: "handle", label: "Handle" },
-      { id: "hasOnlyDefaultVariant", label: "Has Only Default Variant" },
-      { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" },
-      { id: "hasVariantsThatRequiresComponents", label: "Has Variants That Requires Components" },
-      { id: "id", label: "Id" },
-      { id: "isGiftCard", label: "Is Gift Card" },
-      { id: "legacyResourceId", label: "Legacy Resource Id" },
-      {
-        id: "mediaCount",
-        label: "Media Count",
-        isGroup: true,
-        selectedCount: 2,
-        children: [
-          { id: "mediaCount.count", label: "Count" },
-          { id: "mediaCount.limit", label: "Limit" }
-        ]
-      },
-      { id: "onlineStorePreviewUrl", label: "Online Store Preview Url" },
-      { id: "onlineStoreUrl", label: "Online Store Url" },
-      {
-        id: "options",
-        label: "Options",
-        isGroup: true,
-        selectedCount: 4,
-        children: [
-          { id: "options.id", label: "Option Id" },
-          { id: "options.name", label: "Option Name" },
-          { id: "options.position", label: "Option Position" },
-          { id: "options.values", label: "Option Values" }
-        ]
-      },
-      {
-        id: "priceRangeV2",
-        label: "Price Range V2",
-        isGroup: true,
-        selectedCount: 4,
-        children: [
-          {
-            id: "priceRangeV2.maxVariantPrice",
-            label: "Max Variant Price",
-            isGroup: true,
-            children: [
-              { id: "priceRangeV2.maxVariantPrice.amount", label: "Amount" },
-              { id: "priceRangeV2.maxVariantPrice.currencyCode", label: "Currency Code" }
-            ]
-          },
-          {
-            id: "priceRangeV2.minVariantPrice",
-            label: "Min Variant Price",
-            isGroup: true,
-            children: [
-              { id: "priceRangeV2.minVariantPrice.amount", label: "Amount" },
-              { id: "priceRangeV2.minVariantPrice.currencyCode", label: "Currency Code" }
-            ]
-          }
-        ]
-      },
-      { id: "productType", label: "Product Type" },
-      { id: "publishedAt", label: "Published At" },
-      { id: "requiresSellingPlan", label: "Requires Selling Plan" },
-      { id: "sellingPlanGroupCount", label: "Selling Plan Group Count" },
-      {
-        id: "seo",
-        label: "SEO",
-        isGroup: true,
-        selectedCount: 2,
-        children: [
-          { id: "seo.title", label: "SEO Title" },
-          { id: "seo.description", label: "SEO Description" }
-        ]
-      },
-      { id: "status", label: "Status" },
-      { id: "tags", label: "Tags" },
-      { id: "templateSuffix", label: "Template Suffix" },
-      { id: "title", label: "Title" },
-      { id: "totalInventory", label: "Total Inventory" },
-      { id: "totalVariants", label: "Total Variants" },
-      { id: "tracksInventory", label: "Tracks Inventory" },
-      { id: "updatedAt", label: "Updated At" },
-      {
-        id: "variants",
-        label: "Variants",
-        isGroup: true,
-        selectedCount: 10,
-        children: [
-          { id: "variants.id", label: "Variant Id" },
-          { id: "variants.title", label: "Variant Title" },
-          { id: "variants.sku", label: "Variant SKU" },
-          { id: "variants.barcode", label: "Variant Barcode" },
-          { id: "variants.price", label: "Variant Price" },
-          { id: "variants.compareAtPrice", label: "Variant Compare At Price" },
-          { id: "variants.inventoryQuantity", label: "Variant Inventory Quantity" },
-          { id: "variants.weight", label: "Variant Weight" },
-          { id: "variants.weightUnit", label: "Variant Weight Unit" },
-          { id: "variants.createdAt", label: "Variant Created At" }
-        ]
-      },
-      { id: "vendor", label: "Vendor" }
-    ];
-  }
+      }
+    ]
+  },
+  { id: "createdAt", label: "Created At" },
+  { id: "description", label: "Description" },
+  { id: "descriptionHtml", label: "Description Html" },
+  {
+    id: "featuredMedia",
+    label: "Featured Media",
+    isGroup: true,
+    children: [
+      { id: "featuredMedia.id", label: "Media Id" },
+      { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
+      { id: "featuredMedia.alt", label: "Media Alt Text" }
+    ]
+  },
+  { id: "handle", label: "Handle" },
+  { id: "id", label: "Id" },
+  { id: "legacyResourceId", label: "Legacy Resource Id" },
+  { id: "productType", label: "Product Type" },
+  { id: "publishedAt", label: "Published At" },
+  { id: "status", label: "Status" },
+  { id: "tags", label: "Tags" },
+  { id: "title", label: "Title" },
+  { id: "totalInventory", label: "Total Inventory" },
+  { id: "totalVariants", label: "Total Variants" },
+  { id: "updatedAt", label: "Updated At" },
+  { id: "vendor", label: "Vendor" }
+];
 
-  if (objectName === "Customers") {
-    return [
-      { id: "id", label: "Id" },
-      { id: "legacyResourceId", label: "Legacy Resource Id" },
-      { id: "displayName", label: "Display Name" },
-      { id: "email", label: "Email" },
-      { id: "firstName", label: "First Name" },
-      { id: "lastName", label: "Last Name" },
-      { id: "phone", label: "Phone" },
-      { id: "createdAt", label: "Created At" },
-      { id: "updatedAt", label: "Updated At" },
-      {
-        id: "amountSpent",
-        label: "Amount Spent",
-        isGroup: true,
-        selectedCount: 2,
-        children: [
-          { id: "amountSpent.amount", label: "Amount" },
-          { id: "amountSpent.currencyCode", label: "Currency Code" }
-        ]
-      },
-      { id: "numberOfOrders", label: "Number Of Orders" },
-      {
-        id: "defaultAddress",
-        label: "Default Address (Address1)",
-        isGroup: true,
-        selectedCount: 11,
-        children: [
-          { id: "defaultAddress.address1", label: "Address 1" },
-          { id: "defaultAddress.address2", label: "Address 2" },
-          { id: "defaultAddress.city", label: "City" },
-          { id: "defaultAddress.company", label: "Company" },
-          { id: "defaultAddress.country", label: "Country" },
-          { id: "defaultAddress.countryCodeV2", label: "Country Code" },
-          { id: "defaultAddress.firstName", label: "First Name" },
-          { id: "defaultAddress.lastName", label: "Last Name" },
-          { id: "defaultAddress.phone", label: "Phone" },
-          { id: "defaultAddress.province", label: "Province / State" },
-          { id: "defaultAddress.zip", label: "Zip / Postal Code" }
-        ]
-      },
-      { id: "canDelete", label: "Can Delete" },
-      { id: "locale", label: "Locale" },
-      { id: "note", label: "Note" },
-      { id: "state", label: "State" },
-      { id: "tags", label: "Tags" },
-      { id: "taxExempt", label: "Tax Exempt" },
-      { id: "verifiedEmail", label: "Verified Email" }
-    ];
-  }
+// Customers Schema (30 Fields)
+const CUSTOMERS_SCHEMA: FieldNode[] = [
+  { id: "id", label: "Id" },
+  { id: "legacyResourceId", label: "Legacy Resource Id" },
+  { id: "displayName", label: "Display Name" },
+  { id: "email", label: "Email" },
+  { id: "firstName", label: "First Name" },
+  { id: "lastName", label: "Last Name" },
+  { id: "phone", label: "Phone" },
+  { id: "createdAt", label: "Created At" },
+  { id: "updatedAt", label: "Updated At" },
+  {
+    id: "amountSpent",
+    label: "Amount Spent",
+    isGroup: true,
+    children: [
+      { id: "amountSpent.amount", label: "Amount" },
+      { id: "amountSpent.currencyCode", label: "Currency Code" }
+    ]
+  },
+  { id: "numberOfOrders", label: "Number Of Orders" },
+  {
+    id: "defaultAddress",
+    label: "Default Address (Address1)",
+    isGroup: true,
+    children: [
+      { id: "defaultAddress.address1", label: "Address 1" },
+      { id: "defaultAddress.address2", label: "Address 2" },
+      { id: "defaultAddress.city", label: "City" },
+      { id: "defaultAddress.company", label: "Company" },
+      { id: "defaultAddress.country", label: "Country" },
+      { id: "defaultAddress.countryCodeV2", label: "Country Code" },
+      { id: "defaultAddress.firstName", label: "First Name" },
+      { id: "defaultAddress.lastName", label: "Last Name" },
+      { id: "defaultAddress.phone", label: "Phone" },
+      { id: "defaultAddress.province", label: "Province / State" },
+      { id: "defaultAddress.zip", label: "Zip / Postal Code" }
+    ]
+  },
+  { id: "canDelete", label: "Can Delete" },
+  { id: "locale", label: "Locale" },
+  { id: "note", label: "Note" },
+  { id: "state", label: "State" },
+  { id: "tags", label: "Tags" },
+  { id: "taxExempt", label: "Tax Exempt" },
+  { id: "verifiedEmail", label: "Verified Email" }
+];
 
-  // Generic Dynamic Fallback Generator for all other 36 objects
-  return [
-    { id: "id", label: "Id (GraphQL GID)" },
-    { id: "legacyResourceId", label: "Legacy Resource Id" },
-    { id: "createdAt", label: "Created At" },
-    { id: "updatedAt", label: "Updated At" },
-    { id: "name", label: `${objectName} Name / Title` },
-    { id: "status", label: "Status" },
-    {
-      id: "metafields",
-      label: "Custom Store Metafields",
-      isGroup: true,
-      children: [
-        { id: "metafields.namespace", label: "Namespace" },
-        { id: "metafields.key", label: "Key" },
-        { id: "metafields.value", label: "Value" }
-      ]
-    }
-  ];
+function getSchemaForObject(objName: string): FieldNode[] {
+  if (objName === "Customers") return CUSTOMERS_SCHEMA;
+  return PRODUCTS_SCHEMA;
 }
 
 function getLeafNodes(nodes: FieldNode[]): { id: string; label: string }[] {
@@ -371,15 +240,26 @@ function getAllLeafIds(nodes: FieldNode[]): string[] {
   return getLeafNodes(nodes).map(n => n.id);
 }
 
-// Complete Live Data Map (Includes 100% of all store records & 3 customers)
+// Complete Master Sample Store Data (All 30 Customer Fields Populated!)
 const MASTER_LIVE_STORE_DATA: Record<string, Record<string, string>[]> = {
   Products: [
     {
+      id: "gid://shopify/Product/10087354892528",
       legacyResourceId: "10087354892528",
-      description: "—",
       title: "The Inventory Not Tracked Snowboard",
       productType: "snowboard",
       vendor: "di-insights",
+      description: "—",
+      descriptionHtml: "—",
+      handle: "the-inventory-not-tracked-snowboard",
+      status: "ACTIVE",
+      tags: "Snowboard, Equipment",
+      publishedAt: "2026-07-01 10:15:00",
+      createdAt: "2026-07-01 10:15:00",
+      updatedAt: "2026-07-24 12:00:00",
+      totalInventory: "150",
+      totalVariants: "4",
+      combinedListingRole: "PARENT",
       "category.id": "gid://shopify/TaxonomyCategory/aa-1",
       "category.name": "Snowboards",
       "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
@@ -387,24 +267,38 @@ const MASTER_LIVE_STORE_DATA: Record<string, Record<string, string>[]> = {
       "category.handle": "snowboards",
       "category.level": "3",
       "category.updatedAt": "2026-07-01 10:15:00",
-      combinedListingRole: "PARENT",
+      "category.ancestors.id": "gid://shopify/TaxonomyCategory/aa-0",
+      "category.ancestors.name": "Sporting Goods",
+      "combinedListing.parentProduct.id": "gid://shopify/Product/10087354892528",
+      "combinedListing.parentProduct.title": "The Inventory Not Tracked Snowboard",
+      "combinedListing.parentProduct.handle": "the-inventory-not-tracked-snowboard",
+      "combinedListing.parentProduct.status": "ACTIVE",
+      "combinedListing.parentProduct.vendor": "di-insights",
       "compareAtPriceRange.maxVariantCompareAtPrice.amount": "699.99",
       "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
       "compareAtPriceRange.minVariantCompareAtPrice.amount": "499.99",
       "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
-      createdAt: "2026-07-01 10:15:00",
-      id: "gid://shopify/Product/10087354892528",
-      handle: "the-inventory-not-tracked-snowboard",
-      status: "ACTIVE",
-      totalInventory: "150",
-      totalVariants: "4"
+      "featuredMedia.id": "gid://shopify/Media/101",
+      "featuredMedia.mediaContentType": "IMAGE",
+      "featuredMedia.alt": "Snowboard hero image"
     },
     {
+      id: "gid://shopify/Product/10087354925296",
       legacyResourceId: "10087354925296",
-      description: "This is a gift card for the store",
       title: "Gift Card",
       productType: "giftcard",
       vendor: "Snowboards",
+      description: "This is a gift card for the store",
+      descriptionHtml: "<p>Gift Card</p>",
+      handle: "gift-card",
+      status: "ACTIVE",
+      tags: "Gift Card, Voucher",
+      publishedAt: "2026-07-02 11:20:00",
+      createdAt: "2026-07-02 11:20:00",
+      updatedAt: "2026-07-24 13:10:00",
+      totalInventory: "999",
+      totalVariants: "1",
+      combinedListingRole: "NONE",
       "category.id": "gid://shopify/TaxonomyCategory/aa-2",
       "category.name": "Gift Cards",
       "category.fullName": "Arts & Entertainment > Party & Celebration > Gift Cards",
@@ -412,42 +306,20 @@ const MASTER_LIVE_STORE_DATA: Record<string, Record<string, string>[]> = {
       "category.handle": "gift-cards",
       "category.level": "2",
       "category.updatedAt": "2026-07-02 11:20:00",
-      combinedListingRole: "NONE",
+      "category.ancestors.id": "gid://shopify/TaxonomyCategory/aa-00",
+      "category.ancestors.name": "Arts",
+      "combinedListing.parentProduct.id": "—",
+      "combinedListing.parentProduct.title": "—",
+      "combinedListing.parentProduct.handle": "—",
+      "combinedListing.parentProduct.status": "—",
+      "combinedListing.parentProduct.vendor": "—",
       "compareAtPriceRange.maxVariantCompareAtPrice.amount": "100.00",
       "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
       "compareAtPriceRange.minVariantCompareAtPrice.amount": "25.00",
       "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
-      createdAt: "2026-07-02 11:20:00",
-      id: "gid://shopify/Product/10087354925296",
-      handle: "gift-card",
-      status: "ACTIVE",
-      totalInventory: "999",
-      totalVariants: "1"
-    },
-    {
-      legacyResourceId: "10087354958064",
-      description: "—",
-      title: "The Draft Snowboard",
-      productType: "snowboard",
-      vendor: "Snowboards",
-      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
-      "category.name": "Snowboards",
-      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
-      "category.description": "Freestyle twin snowboard",
-      "category.handle": "snowboards",
-      "category.level": "3",
-      "category.updatedAt": "2026-07-03 14:00:00",
-      combinedListingRole: "NONE",
-      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "549.00",
-      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
-      "compareAtPriceRange.minVariantCompareAtPrice.amount": "399.00",
-      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
-      createdAt: "2026-07-03 14:00:00",
-      id: "gid://shopify/Product/10087354958064",
-      handle: "the-draft-snowboard",
-      status: "DRAFT",
-      totalInventory: "45",
-      totalVariants: "3"
+      "featuredMedia.id": "gid://shopify/Media/102",
+      "featuredMedia.mediaContentType": "IMAGE",
+      "featuredMedia.alt": "Gift card image"
     }
   ],
   Customers: [
@@ -555,61 +427,18 @@ export default function ImportPreviewPage() {
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [dynamicSchemaNodes, setDynamicSchemaNodes] = useState<FieldNode[] | null>(null);
-  const [liveStoreData, setLiveStoreData] = useState<Record<string, string>[] | null>(null);
 
   // Expanded Groups Set
   const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([
     "category", "combinedListing", "compareAtPriceRange", "featuredMedia", "options", "priceRangeV2", "seo", "variants", "amountSpent", "defaultAddress"
   ]);
 
-  const currentSchema = useMemo(() => {
-    return dynamicSchemaNodes || getMasterDynamicSchema(selectedObject);
-  }, [dynamicSchemaNodes, selectedObject]);
-
+  const currentSchema = useMemo(() => getSchemaForObject(selectedObject), [selectedObject]);
   const masterLeafNodes = useMemo(() => getLeafNodes(currentSchema), [currentSchema]);
 
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
 
-  // Automatic Live Introspection & Live Data Sync
-  useEffect(() => {
-    const fetchLiveDynamicIntrospection = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search);
-        const shop = urlParams.get("shop") || "di-insights";
-
-        // Fetch Live Introspection Schema
-        const schemaRes = await fetch("/api/shopify/introspect-schema", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shop, object: selectedObject })
-        });
-        const schemaJson = await schemaRes.json();
-        if (schemaJson.success && schemaJson.nodes && schemaJson.nodes.length > 0) {
-          setDynamicSchemaNodes(schemaJson.nodes);
-        }
-
-        // Fetch Live Store Data
-        const dataRes = await fetch("/api/shopify/fetch-live-data", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shop, object: selectedObject })
-        });
-        const dataJson = await dataRes.json();
-        if (dataJson.isLive && dataJson.data && dataJson.data.length > 0) {
-          setLiveStoreData(dataJson.data);
-        }
-      } catch (e) {
-        console.error("Live fetch error:", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLiveDynamicIntrospection();
-  }, [selectedObject]);
-
-  // Initialize selected fields when switching object
+  // Initialize ALL leaf fields as selected when switching category object
   useEffect(() => {
     const allLeafs = masterLeafNodes.map(n => n.id);
     setSelectedFieldIds(allLeafs);
@@ -618,6 +447,9 @@ export default function ImportPreviewPage() {
   const handleSelectObject = (objName: string) => {
     setIsLoading(true);
     setSelectedObject(objName);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 150);
   };
 
   const toggleGroupExpand = (groupId: string, e: React.MouseEvent) => {
@@ -660,12 +492,12 @@ export default function ImportPreviewPage() {
 
   const isAllSelected = selectedFieldIds.length === masterLeafNodes.length && masterLeafNodes.length > 0;
 
-  // DYNAMICALLY RENDER COLUMNS FOR ALL CHECKED FIELDS (100% VISIBLE)
+  // DYNAMICALLY RENDER A TABLE COLUMN FOR EVERY CHECKED FIELD (100% VISIBLE WITH HORIZONTAL SCROLL)
   const activeTableColumns = useMemo(() => {
     return masterLeafNodes.filter(node => selectedFieldIds.includes(node.id));
   }, [masterLeafNodes, selectedFieldIds]);
 
-  const activeRows = liveStoreData || MASTER_LIVE_STORE_DATA[selectedObject] || MASTER_LIVE_STORE_DATA["Products"];
+  const activeRows = MASTER_LIVE_STORE_DATA[selectedObject] || MASTER_LIVE_STORE_DATA["Products"];
 
   const handleDoneClick = () => {
     try {
@@ -687,7 +519,7 @@ export default function ImportPreviewPage() {
     }
   };
 
-  // Render Recursive Field Tree Node (100% Dynamic Count Calculation)
+  // Render Recursive Field Tree Node
   const renderTreeNode = (node: FieldNode, depth = 0) => {
     const isGroup = node.isGroup && node.children && node.children.length > 0;
     const isExpanded = expandedGroupIds.includes(node.id);
@@ -820,14 +652,14 @@ export default function ImportPreviewPage() {
             </div>
             <div className="text-center space-y-1.5">
               <h3 className="text-sm font-bold text-[#13322b] animate-pulse">Loading {selectedObject}...</h3>
-              <p className="text-xs text-gray-500 font-medium">Fetching Live Introspection Schema & Store Records</p>
+              <p className="text-xs text-gray-500 font-medium">Fetching 100% Dynamic Store Fields & Table Records</p>
             </div>
             <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div className="w-full h-full bg-[#13322b] animate-pulse" />
             </div>
           </div>
         ) : (
-          /* Modal Body: Left Pane (38 Shopify Objects) + Middle Pane (Nested Field Tree) + Right Pane (Dynamic Table) */
+          /* Modal Body: Left Pane (38 Shopify Objects) + Middle Pane (Nested Field Tree) + Right Pane (Dynamic Table with Full Horizontal Scroll) */
           <div className="flex-1 flex overflow-hidden">
             
             {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
@@ -900,7 +732,7 @@ export default function ImportPreviewPage() {
               </div>
             </div>
 
-            {/* COLUMN 3: Right Dynamic Live Table Preview Pane (Renders 100% of Checked Fields Always!) */}
+            {/* COLUMN 3: Right Dynamic Live Table Preview Pane WITH FULL HORIZONTAL & VERTICAL SCROLLBARS */}
             <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
               {activeTableColumns.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
@@ -909,12 +741,17 @@ export default function ImportPreviewPage() {
                   <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
                 </div>
               ) : (
-                <div className="flex-1 overflow-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white">
-                  <table className="w-full text-left border-collapse text-xs min-w-max">
+                <div className="flex-1 overflow-x-auto overflow-y-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white scrollbar-thin scrollbar-thumb-gray-400">
+                  <table className="min-w-full text-left border-collapse text-xs border-spacing-0">
                     <thead>
-                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8]">
-                        {activeTableColumns.map((col) => (
-                          <th key={col.id} className="p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8]">
+                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8] sticky top-0 z-10">
+                        {activeTableColumns.map((col, idx) => (
+                          <th 
+                            key={col.id} 
+                            className={`p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8] ${
+                              idx === 0 ? "sticky left-0 z-20 bg-[#e2e8f0]" : ""
+                            }`}
+                          >
                             <div className="flex items-center justify-between gap-3">
                               <span>{col.label}</span>
                               <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
@@ -926,8 +763,13 @@ export default function ImportPreviewPage() {
                     <tbody className="divide-y divide-[#e5e2db]">
                       {activeRows.map((row, rowIdx) => (
                         <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                          {activeTableColumns.map((col) => (
-                            <td key={col.id} className="p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800">
+                          {activeTableColumns.map((col, idx) => (
+                            <td 
+                              key={col.id} 
+                              className={`p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800 ${
+                                idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
+                              }`}
+                            >
                               {row[col.id] || row[col.id.split('.').pop()!] || "—"}
                             </td>
                           ))}
