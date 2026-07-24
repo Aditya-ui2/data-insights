@@ -38,7 +38,8 @@ if (typeof window !== "undefined") {
         urlString.includes("/conversations") ||
         urlString.includes("/export/") ||
         urlString.includes("/copilot/integrations") ||
-        urlString.includes("/oauth/")
+        urlString.includes("/oauth/") ||
+        urlString.includes("/shopify/")
       ) {
         console.log("[Fetch Pass-Through] Directing to backend server:", urlString);
         return originalFetch(url, options);
