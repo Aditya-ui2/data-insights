@@ -290,21 +290,12 @@ export default function AddonSidebarPage() {
 
     setIsAuthorizing(true);
 
-    // Official Direct Shopify OAuth URL
-    const clientAppId = "dv_shopify_connector_v2"; // Replace with your registered Shopify Client ID
-    const scopes = "read_customers,read_orders,read_products,read_inventory,read_discounts";
-    const redirectUri = encodeURIComponent("https://digitvalues.vercel.app/oauth_attempt");
-    
-    // Direct Official Shopify Endpoint URL
-    const officialShopifyOAuthUrl = `https://${cleanStore}.myshopify.com/admin/oauth/authorize?client_id=${clientAppId}&scope=${scopes}&redirect_uri=${redirectUri}&state=dv_live_session`;
+    // Open Shopify Security Auth page passing the shop query param
+    window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
 
-    // Open Official Shopify OAuth URL in new tab
-    const authWindow = window.open(officialShopifyOAuthUrl, "_blank");
-
-    // Fallback handler if store is unreachable or test fallback needed
     setTimeout(() => {
       setIsAuthorizing(false);
-    }, 2000);
+    }, 1500);
   };
 
   const handleConfirmImport = () => {
