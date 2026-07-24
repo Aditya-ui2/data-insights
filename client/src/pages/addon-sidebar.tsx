@@ -21,6 +21,26 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+function CustomDVLogo() {
+  return (
+    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/30 shadow-md flex items-center justify-center bg-[#0d221e] shrink-0 relative group">
+      <img 
+        src="/dv-logo.png" 
+        alt="DV Logo" 
+        className="w-full h-full object-cover"
+        onError={(e) => {
+          // Fallback to vector SVG if image is blocked/cached
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+      <svg className="w-6 h-6 absolute inset-0 m-auto pointer-events-none hidden group-has-[:invalid]:block" viewBox="0 0 100 100" fill="none">
+        <path d="M 25 25 L 50 25 C 65 25, 65 55, 50 55 L 25 55 Z" stroke="#eab308" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M 45 45 L 60 75 L 75 35" stroke="#10b981" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  );
+}
+
 export default function AddonSidebarPage() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
@@ -39,9 +59,7 @@ export default function AddonSidebarPage() {
       {/* Top Header Bar with Custom DV Logo */}
       <div className="bg-white/90 backdrop-blur-md border-b border-[#e5e2db] px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#13322b]/20 shadow-sm flex items-center justify-center bg-[#0d221e] shrink-0">
-            <img src="/dv-logo.png" alt="DigitValues Logo" className="w-full h-full object-contain p-0.5" />
-          </div>
+          <CustomDVLogo />
           <div className="flex flex-col">
             <span className="font-semibold text-[#13322b] text-sm tracking-tight leading-none">DigitValues</span>
             <span className="text-[10px] text-[#8a8579] font-medium tracking-wide uppercase mt-0.5">Spreadsheet AI</span>
