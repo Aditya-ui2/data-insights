@@ -24,7 +24,7 @@ function OfficialBrandLogo({ id }: { id: string }) {
   );
 }
 
-// All 38 Official Shopify Objects
+// All 38 Official Shopify Objects (Query Target Selector)
 const ALL_SHOPIFY_OBJECTS = [
   "Automatic Discount Nodes",
   "Automatic Discount Saved Searches",
@@ -74,156 +74,7 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Products Schema (80 Fields)
-const PRODUCTS_SCHEMA: FieldNode[] = [
-  {
-    id: "category",
-    label: "Category",
-    isGroup: true,
-    children: [
-      { id: "category.id", label: "Category Id" },
-      { id: "category.name", label: "Category Name" },
-      { id: "category.fullName", label: "Category Full Name" },
-      { id: "category.description", label: "Category Description" },
-      { id: "category.handle", label: "Category Handle" },
-      { id: "category.level", label: "Category Level" },
-      { id: "category.updatedAt", label: "Category Updated At" },
-      {
-        id: "category.ancestors",
-        label: "Ancestors",
-        isGroup: true,
-        children: [
-          { id: "category.ancestors.id", label: "Ancestor Id" },
-          { id: "category.ancestors.name", label: "Ancestor Name" }
-        ]
-      }
-    ]
-  },
-  {
-    id: "combinedListing",
-    label: "Combined Listing",
-    isGroup: true,
-    children: [
-      {
-        id: "combinedListing.parentProduct",
-        label: "Parent Product",
-        isGroup: true,
-        children: [
-          { id: "combinedListing.parentProduct.id", label: "Parent Product Id" },
-          { id: "combinedListing.parentProduct.title", label: "Parent Product Title" },
-          { id: "combinedListing.parentProduct.handle", label: "Parent Product Handle" },
-          { id: "combinedListing.parentProduct.status", label: "Parent Product Status" },
-          { id: "combinedListing.parentProduct.vendor", label: "Parent Product Vendor" }
-        ]
-      }
-    ]
-  },
-  { id: "combinedListingRole", label: "Combined Listing Role" },
-  {
-    id: "compareAtPriceRange",
-    label: "Compare At Price Range",
-    isGroup: true,
-    children: [
-      {
-        id: "compareAtPriceRange.maxVariantCompareAtPrice",
-        label: "Max Variant Compare At Price",
-        isGroup: true,
-        children: [
-          { id: "compareAtPriceRange.maxVariantCompareAtPrice.amount", label: "Amount" },
-          { id: "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-        ]
-      },
-      {
-        id: "compareAtPriceRange.minVariantCompareAtPrice",
-        label: "Min Variant Compare At Price",
-        isGroup: true,
-        children: [
-          { id: "compareAtPriceRange.minVariantCompareAtPrice.amount", label: "Amount" },
-          { id: "compareAtPriceRange.minVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-        ]
-      }
-    ]
-  },
-  { id: "createdAt", label: "Created At" },
-  { id: "description", label: "Description" },
-  { id: "descriptionHtml", label: "Description Html" },
-  {
-    id: "featuredMedia",
-    label: "Featured Media",
-    isGroup: true,
-    children: [
-      { id: "featuredMedia.id", label: "Media Id" },
-      { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
-      { id: "featuredMedia.alt", label: "Media Alt Text" }
-    ]
-  },
-  { id: "handle", label: "Handle" },
-  { id: "id", label: "Id" },
-  { id: "legacyResourceId", label: "Legacy Resource Id" },
-  { id: "productType", label: "Product Type" },
-  { id: "publishedAt", label: "Published At" },
-  { id: "status", label: "Status" },
-  { id: "tags", label: "Tags" },
-  { id: "title", label: "Title" },
-  { id: "totalInventory", label: "Total Inventory" },
-  { id: "totalVariants", label: "Total Variants" },
-  { id: "updatedAt", label: "Updated At" },
-  { id: "vendor", label: "Vendor" }
-];
-
-// Customers Schema (30 Fields)
-const CUSTOMERS_SCHEMA: FieldNode[] = [
-  { id: "id", label: "Id" },
-  { id: "legacyResourceId", label: "Legacy Resource Id" },
-  { id: "displayName", label: "Display Name" },
-  { id: "email", label: "Email" },
-  { id: "firstName", label: "First Name" },
-  { id: "lastName", label: "Last Name" },
-  { id: "phone", label: "Phone" },
-  { id: "createdAt", label: "Created At" },
-  { id: "updatedAt", label: "Updated At" },
-  {
-    id: "amountSpent",
-    label: "Amount Spent",
-    isGroup: true,
-    children: [
-      { id: "amountSpent.amount", label: "Amount" },
-      { id: "amountSpent.currencyCode", label: "Currency Code" }
-    ]
-  },
-  { id: "numberOfOrders", label: "Number Of Orders" },
-  {
-    id: "defaultAddress",
-    label: "Default Address (Address1)",
-    isGroup: true,
-    children: [
-      { id: "defaultAddress.address1", label: "Address 1" },
-      { id: "defaultAddress.address2", label: "Address 2" },
-      { id: "defaultAddress.city", label: "City" },
-      { id: "defaultAddress.company", label: "Company" },
-      { id: "defaultAddress.country", label: "Country" },
-      { id: "defaultAddress.countryCodeV2", label: "Country Code" },
-      { id: "defaultAddress.firstName", label: "First Name" },
-      { id: "defaultAddress.lastName", label: "Last Name" },
-      { id: "defaultAddress.phone", label: "Phone" },
-      { id: "defaultAddress.province", label: "Province / State" },
-      { id: "defaultAddress.zip", label: "Zip / Postal Code" }
-    ]
-  },
-  { id: "canDelete", label: "Can Delete" },
-  { id: "locale", label: "Locale" },
-  { id: "note", label: "Note" },
-  { id: "state", label: "State" },
-  { id: "tags", label: "Tags" },
-  { id: "taxExempt", label: "Tax Exempt" },
-  { id: "verifiedEmail", label: "Verified Email" }
-];
-
-function getSchemaForObject(objName: string): FieldNode[] {
-  if (objName === "Customers") return CUSTOMERS_SCHEMA;
-  return PRODUCTS_SCHEMA;
-}
-
+// Pure Dynamic Helper to extract all leaf node IDs from any dynamic JSON schema tree
 function getLeafNodes(nodes: FieldNode[]): { id: string; label: string }[] {
   let list: { id: string; label: string }[] = [];
   for (const node of nodes) {
@@ -240,216 +91,76 @@ function getAllLeafIds(nodes: FieldNode[]): string[] {
   return getLeafNodes(nodes).map(n => n.id);
 }
 
-// Complete Master Sample Store Data (All 30 Customer Fields Populated!)
-const MASTER_LIVE_STORE_DATA: Record<string, Record<string, string>[]> = {
-  Products: [
-    {
-      id: "gid://shopify/Product/10087354892528",
-      legacyResourceId: "10087354892528",
-      title: "The Inventory Not Tracked Snowboard",
-      productType: "snowboard",
-      vendor: "di-insights",
-      description: "—",
-      descriptionHtml: "—",
-      handle: "the-inventory-not-tracked-snowboard",
-      status: "ACTIVE",
-      tags: "Snowboard, Equipment",
-      publishedAt: "2026-07-01 10:15:00",
-      createdAt: "2026-07-01 10:15:00",
-      updatedAt: "2026-07-24 12:00:00",
-      totalInventory: "150",
-      totalVariants: "4",
-      combinedListingRole: "PARENT",
-      "category.id": "gid://shopify/TaxonomyCategory/aa-1",
-      "category.name": "Snowboards",
-      "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
-      "category.description": "All mountain snowboards",
-      "category.handle": "snowboards",
-      "category.level": "3",
-      "category.updatedAt": "2026-07-01 10:15:00",
-      "category.ancestors.id": "gid://shopify/TaxonomyCategory/aa-0",
-      "category.ancestors.name": "Sporting Goods",
-      "combinedListing.parentProduct.id": "gid://shopify/Product/10087354892528",
-      "combinedListing.parentProduct.title": "The Inventory Not Tracked Snowboard",
-      "combinedListing.parentProduct.handle": "the-inventory-not-tracked-snowboard",
-      "combinedListing.parentProduct.status": "ACTIVE",
-      "combinedListing.parentProduct.vendor": "di-insights",
-      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "699.99",
-      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
-      "compareAtPriceRange.minVariantCompareAtPrice.amount": "499.99",
-      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
-      "featuredMedia.id": "gid://shopify/Media/101",
-      "featuredMedia.mediaContentType": "IMAGE",
-      "featuredMedia.alt": "Snowboard hero image"
-    },
-    {
-      id: "gid://shopify/Product/10087354925296",
-      legacyResourceId: "10087354925296",
-      title: "Gift Card",
-      productType: "giftcard",
-      vendor: "Snowboards",
-      description: "This is a gift card for the store",
-      descriptionHtml: "<p>Gift Card</p>",
-      handle: "gift-card",
-      status: "ACTIVE",
-      tags: "Gift Card, Voucher",
-      publishedAt: "2026-07-02 11:20:00",
-      createdAt: "2026-07-02 11:20:00",
-      updatedAt: "2026-07-24 13:10:00",
-      totalInventory: "999",
-      totalVariants: "1",
-      combinedListingRole: "NONE",
-      "category.id": "gid://shopify/TaxonomyCategory/aa-2",
-      "category.name": "Gift Cards",
-      "category.fullName": "Arts & Entertainment > Party & Celebration > Gift Cards",
-      "category.description": "Digital gift certificates",
-      "category.handle": "gift-cards",
-      "category.level": "2",
-      "category.updatedAt": "2026-07-02 11:20:00",
-      "category.ancestors.id": "gid://shopify/TaxonomyCategory/aa-00",
-      "category.ancestors.name": "Arts",
-      "combinedListing.parentProduct.id": "—",
-      "combinedListing.parentProduct.title": "—",
-      "combinedListing.parentProduct.handle": "—",
-      "combinedListing.parentProduct.status": "—",
-      "combinedListing.parentProduct.vendor": "—",
-      "compareAtPriceRange.maxVariantCompareAtPrice.amount": "100.00",
-      "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
-      "compareAtPriceRange.minVariantCompareAtPrice.amount": "25.00",
-      "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
-      "featuredMedia.id": "gid://shopify/Media/102",
-      "featuredMedia.mediaContentType": "IMAGE",
-      "featuredMedia.alt": "Gift card image"
-    }
-  ],
-  Customers: [
-    {
-      id: "gid://shopify/Customer/9494632",
-      legacyResourceId: "9494632",
-      displayName: "Ayumu Hirano",
-      email: "ayumu.hirano@example.com",
-      firstName: "Ayumu",
-      lastName: "Hirano",
-      phone: "+1 416-555-0192",
-      createdAt: "2026-07-07 01:31:18",
-      updatedAt: "2026-07-24 12:00:00",
-      "amountSpent.amount": "140.00",
-      "amountSpent.currencyCode": "USD",
-      numberOfOrders: "14",
-      "defaultAddress.address1": "105 Victoria St",
-      "defaultAddress.address2": "Suite 400",
-      "defaultAddress.city": "Toronto",
-      "defaultAddress.company": "Snowboarding Inc",
-      "defaultAddress.country": "Canada",
-      "defaultAddress.countryCodeV2": "CA",
-      "defaultAddress.firstName": "Ayumu",
-      "defaultAddress.lastName": "Hirano",
-      "defaultAddress.phone": "+1 416-555-0192",
-      "defaultAddress.province": "Ontario",
-      "defaultAddress.zip": "M5C 3C4",
-      canDelete: "True",
-      locale: "en",
-      note: "VIP Customer",
-      state: "ENABLED",
-      tags: "VIP, Repeat Buyer",
-      taxExempt: "False",
-      verifiedEmail: "True"
-    },
-    {
-      id: "gid://shopify/Customer/9494633",
-      legacyResourceId: "9494633",
-      displayName: "Russell Winfield",
-      email: "russel.winfield@example.com",
-      firstName: "Russell",
-      lastName: "Winfield",
-      phone: "+1 613-555-0184",
-      createdAt: "2026-07-07 01:31:19",
-      updatedAt: "2026-07-24 14:15:00",
-      "amountSpent.amount": "290.50",
-      "amountSpent.currencyCode": "USD",
-      numberOfOrders: "28",
-      "defaultAddress.address1": "Box 42 - 151 O'Connor St",
-      "defaultAddress.address2": "Floor 12",
-      "defaultAddress.city": "Ottawa",
-      "defaultAddress.company": "Ottawa Trading",
-      "defaultAddress.country": "Canada",
-      "defaultAddress.countryCodeV2": "CA",
-      "defaultAddress.firstName": "Russell",
-      "defaultAddress.lastName": "Winfield",
-      "defaultAddress.phone": "+1 613-555-0184",
-      "defaultAddress.province": "Ontario",
-      "defaultAddress.zip": "K1P 5M7",
-      canDelete: "True",
-      locale: "en",
-      note: "Wholesale Partner",
-      state: "ENABLED",
-      tags: "Wholesale",
-      taxExempt: "False",
-      verifiedEmail: "True"
-    },
-    {
-      id: "gid://shopify/Customer/9494634",
-      legacyResourceId: "9494634",
-      displayName: "Karine Ruby",
-      email: "karine.ruby@example.com",
-      firstName: "Karine",
-      lastName: "Ruby",
-      phone: "+1 514-555-0177",
-      createdAt: "2026-07-08 04:12:00",
-      updatedAt: "2026-07-24 15:30:00",
-      "amountSpent.amount": "85.00",
-      "amountSpent.currencyCode": "USD",
-      numberOfOrders: "3",
-      "defaultAddress.address1": "742 Evergreen Terrace",
-      "defaultAddress.address2": "Apt 2B",
-      "defaultAddress.city": "Montreal",
-      "defaultAddress.company": "Ruby Alpine",
-      "defaultAddress.country": "Canada",
-      "defaultAddress.countryCodeV2": "CA",
-      "defaultAddress.firstName": "Karine",
-      "defaultAddress.lastName": "Ruby",
-      "defaultAddress.phone": "+1 514-555-0177",
-      "defaultAddress.province": "Quebec",
-      "defaultAddress.zip": "H2X 1Y5",
-      canDelete: "True",
-      locale: "fr",
-      note: "Alpine Snowboarder",
-      state: "ENABLED",
-      tags: "Pro-Staff",
-      taxExempt: "False",
-      verifiedEmail: "True"
-    }
-  ]
-};
-
 export default function ImportPreviewPage() {
   const [selectedObject, setSelectedObject] = useState<string>("Products");
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Expanded Groups Set
-  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([
-    "category", "combinedListing", "compareAtPriceRange", "featuredMedia", "options", "priceRangeV2", "seo", "variants", "amountSpent", "defaultAddress"
-  ]);
-
-  const currentSchema = useMemo(() => getSchemaForObject(selectedObject), [selectedObject]);
-  const masterLeafNodes = useMemo(() => getLeafNodes(currentSchema), [currentSchema]);
-
+  // 100% Dynamic State (Zero Static Hardcoded Arrays)
+  const [dynamicSchemaTree, setDynamicSchemaTree] = useState<FieldNode[]>([]);
+  const [dynamicStoreRows, setDynamicStoreRows] = useState<Record<string, string>[]>([]);
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
+  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([]);
 
-  // Initialize ALL leaf fields as selected when switching category object
+  // 100% Runtime Dynamic Schema & Data Sync Engine
   useEffect(() => {
-    const allLeafs = masterLeafNodes.map(n => n.id);
-    setSelectedFieldIds(allLeafs);
-  }, [selectedObject, masterLeafNodes]);
+    let isMounted = true;
+    setIsLoading(true);
+
+    const fetchDynamicShopifyData = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shop = urlParams.get("shop") || "di-insights";
+
+        // 1. Fetch Live Store Records
+        const dataRes = await fetch("/api/shopify/fetch-live-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ shop, object: selectedObject })
+        });
+        const dataJson = await dataRes.json();
+        const rawRecords = dataJson.data || [];
+
+        // 2. Pass Raw Records to Pure Dynamic Runtime Inspection Engine
+        const inspectRes = await fetch("/api/shopify/inspect-dynamic-json", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ rawRecords })
+        });
+        const inspectJson = await inspectRes.json();
+
+        if (isMounted && inspectJson.success) {
+          const schemaTree: FieldNode[] = inspectJson.schemaTree || [];
+          const flatRows: Record<string, string>[] = inspectJson.flatRows || [];
+          const leafIds = inspectJson.allKeys || [];
+
+          setDynamicSchemaTree(schemaTree);
+          setDynamicStoreRows(flatRows);
+          setSelectedFieldIds(leafIds);
+
+          // Automatically expand top-level groups
+          const groupIds = schemaTree.filter(n => n.isGroup).map(n => n.id);
+          setExpandedGroupIds(groupIds);
+        }
+      } catch (e) {
+        console.error("Dynamic sync error:", e);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchDynamicShopifyData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedObject]);
+
+  const masterLeafNodes = useMemo(() => getLeafNodes(dynamicSchemaTree), [dynamicSchemaTree]);
 
   const handleSelectObject = (objName: string) => {
-    setIsLoading(true);
     setSelectedObject(objName);
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 150);
   };
 
   const toggleGroupExpand = (groupId: string, e: React.MouseEvent) => {
@@ -492,12 +203,10 @@ export default function ImportPreviewPage() {
 
   const isAllSelected = selectedFieldIds.length === masterLeafNodes.length && masterLeafNodes.length > 0;
 
-  // DYNAMICALLY RENDER A TABLE COLUMN FOR EVERY CHECKED FIELD (100% VISIBLE WITH HORIZONTAL SCROLL)
+  // DYNAMICALLY RENDER COLUMNS FOR ALL CHECKED FIELDS (ZERO HARDCODED MAPPINGS)
   const activeTableColumns = useMemo(() => {
     return masterLeafNodes.filter(node => selectedFieldIds.includes(node.id));
   }, [masterLeafNodes, selectedFieldIds]);
-
-  const activeRows = MASTER_LIVE_STORE_DATA[selectedObject] || MASTER_LIVE_STORE_DATA["Products"];
 
   const handleDoneClick = () => {
     try {
@@ -519,7 +228,7 @@ export default function ImportPreviewPage() {
     }
   };
 
-  // Render Recursive Field Tree Node
+  // Render Recursive Field Tree Node (100% Dynamic Count Calculation)
   const renderTreeNode = (node: FieldNode, depth = 0) => {
     const isGroup = node.isGroup && node.children && node.children.length > 0;
     const isExpanded = expandedGroupIds.includes(node.id);
@@ -652,14 +361,14 @@ export default function ImportPreviewPage() {
             </div>
             <div className="text-center space-y-1.5">
               <h3 className="text-sm font-bold text-[#13322b] animate-pulse">Loading {selectedObject}...</h3>
-              <p className="text-xs text-gray-500 font-medium">Fetching 100% Dynamic Store Fields & Table Records</p>
+              <p className="text-xs text-gray-500 font-medium">Inspecting Pure Dynamic JSON & Store Records</p>
             </div>
             <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
               <div className="w-full h-full bg-[#13322b] animate-pulse" />
             </div>
           </div>
         ) : (
-          /* Modal Body: Left Pane (38 Shopify Objects) + Middle Pane (Nested Field Tree) + Right Pane (Dynamic Table with Full Horizontal Scroll) */
+          /* Modal Body: Left Pane (38 Shopify Objects) + Middle Pane (Nested Field Tree) + Right Pane (Dynamic Table) */
           <div className="flex-1 flex overflow-hidden">
             
             {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
@@ -696,7 +405,7 @@ export default function ImportPreviewPage() {
               </div>
             </div>
 
-            {/* COLUMN 2: Nested Expandable Field Tree Pane */}
+            {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
             <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
               <div className="flex items-center justify-between px-1">
                 <span className="font-bold text-xs text-[#13322b]">{selectedObject}</span>
@@ -728,11 +437,11 @@ export default function ImportPreviewPage() {
                   />
                   <span>Select All</span>
                 </div>
-                {currentSchema.map(node => renderTreeNode(node, 0))}
+                {dynamicSchemaTree.map(node => renderTreeNode(node, 0))}
               </div>
             </div>
 
-            {/* COLUMN 3: Right Dynamic Live Table Preview Pane WITH FULL HORIZONTAL & VERTICAL SCROLLBARS */}
+            {/* COLUMN 3: Right Dynamic Table Preview Pane (Pure Dynamic Runtime Binding) */}
             <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
               {activeTableColumns.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
@@ -761,7 +470,7 @@ export default function ImportPreviewPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#e5e2db]">
-                      {activeRows.map((row, rowIdx) => (
+                      {dynamicStoreRows.map((row, rowIdx) => (
                         <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
                           {activeTableColumns.map((col, idx) => (
                             <td 
@@ -770,7 +479,7 @@ export default function ImportPreviewPage() {
                                 idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
                               }`}
                             >
-                              {row[col.id] || row[col.id.split('.').pop()!] || "—"}
+                              {row[col.id] || "—"}
                             </td>
                           ))}
                         </tr>
