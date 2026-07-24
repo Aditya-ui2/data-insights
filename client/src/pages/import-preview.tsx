@@ -9,7 +9,8 @@ import {
   Info,
   Check,
   Table,
-  FileText
+  FileText,
+  Loader2
 } from "lucide-react";
 
 function OfficialBrandLogo({ id }: { id: string }) {
@@ -74,7 +75,7 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Pure Dynamic Helper to extract all leaf node IDs from any dynamic JSON schema tree
+// Extract all leaf node IDs from any dynamic JSON schema tree
 function getLeafNodes(nodes: FieldNode[]): { id: string; label: string }[] {
   let list: { id: string; label: string }[] = [];
   for (const node of nodes) {
@@ -97,13 +98,13 @@ export default function ImportPreviewPage() {
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // 100% Dynamic State (Zero Static Hardcoded Arrays)
+  // 100% Dynamic State (Zero Hardcoded Arrays)
   const [dynamicSchemaTree, setDynamicSchemaTree] = useState<FieldNode[]>([]);
   const [dynamicStoreRows, setDynamicStoreRows] = useState<Record<string, string>[]>([]);
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
   const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([]);
 
-  // 100% Runtime Dynamic Schema & Data Sync Engine
+  // 100% Runtime Dynamic Schema & Data Sync Engine per Selected Category Object
   useEffect(() => {
     let isMounted = true;
     setIsLoading(true);
@@ -113,7 +114,7 @@ export default function ImportPreviewPage() {
         const urlParams = new URLSearchParams(window.location.search);
         const shop = urlParams.get("shop") || "di-insights";
 
-        // 1. Fetch Live Store Records
+        // 1. Fetch Live Store Records for selected category
         const dataRes = await fetch("/api/shopify/fetch-live-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -160,7 +161,9 @@ export default function ImportPreviewPage() {
   const masterLeafNodes = useMemo(() => getLeafNodes(dynamicSchemaTree), [dynamicSchemaTree]);
 
   const handleSelectObject = (objName: string) => {
-    setSelectedObject(objName);
+    if (objName !== selectedObject) {
+      setSelectedObject(objName);
+    }
   };
 
   const toggleGroupExpand = (groupId: string, e: React.MouseEvent) => {
@@ -203,7 +206,7 @@ export default function ImportPreviewPage() {
 
   const isAllSelected = selectedFieldIds.length === masterLeafNodes.length && masterLeafNodes.length > 0;
 
-  // DYNAMICALLY RENDER COLUMNS FOR ALL CHECKED FIELDS (ZERO HARDCODED MAPPINGS)
+  // DYNAMICALLY RENDER COLUMNS FOR ALL CHECKED FIELDS
   const activeTableColumns = useMemo(() => {
     return masterLeafNodes.filter(node => selectedFieldIds.includes(node.id));
   }, [masterLeafNodes, selectedFieldIds]);
@@ -228,7 +231,7 @@ export default function ImportPreviewPage() {
     }
   };
 
-  // Render Recursive Field Tree Node (100% Dynamic Count Calculation)
+  // Render Recursive Field Tree Node
   const renderTreeNode = (node: FieldNode, depth = 0) => {
     const isGroup = node.isGroup && node.children && node.children.length > 0;
     const isExpanded = expandedGroupIds.includes(node.id);
@@ -353,44 +356,31 @@ export default function ImportPreviewPage() {
           </div>
         </div>
 
-        {/* Loading Overlay */}
-        {isLoading ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white space-y-4">
-            <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
-              <OfficialBrandLogo id="shopify" />
+        {/* Modal Body */}
+        <div className="flex-1 flex overflow-hidden">
+          
+          {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
+          <div className="w-64 border-r border-[#e5e2db] p-3.5 space-y-3 bg-[#faf9f6] flex flex-col shrink-0">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search"
+                value={objectSearchTerm}
+                onChange={(e) => setObjectSearchTerm(e.target.value)}
+                className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] font-medium"
+              />
             </div>
-            <div className="text-center space-y-1.5">
-              <h3 className="text-sm font-bold text-[#13322b] animate-pulse">Loading {selectedObject}...</h3>
-              <p className="text-xs text-gray-500 font-medium">Inspecting Pure Dynamic JSON & Store Records</p>
-            </div>
-            <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="w-full h-full bg-[#13322b] animate-pulse" />
-            </div>
-          </div>
-        ) : (
-          /* Modal Body: Left Pane (38 Shopify Objects) + Middle Pane (Nested Field Tree) + Right Pane (Dynamic Table) */
-          <div className="flex-1 flex overflow-hidden">
-            
-            {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
-            <div className="w-64 border-r border-[#e5e2db] p-3.5 space-y-3 bg-[#faf9f6] flex flex-col shrink-0">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Search"
-                  value={objectSearchTerm}
-                  onChange={(e) => setObjectSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] font-medium"
-                />
-              </div>
 
-              <div className="flex-1 overflow-y-auto space-y-1 pr-1">
-                {filteredObjects.map((objName) => (
+            <div className="flex-1 overflow-y-auto space-y-1 pr-1">
+              {filteredObjects.map((objName) => {
+                const isSelected = selectedObject === objName;
+                return (
                   <button
                     key={objName}
                     onClick={() => handleSelectObject(objName)}
                     className={`w-full px-3 py-2 text-left rounded-xl text-xs font-semibold flex items-center justify-between transition-all cursor-pointer ${
-                      selectedObject === objName 
+                      isSelected 
                         ? "bg-[#13322b] text-white font-bold shadow-xs" 
                         : "text-[#635f54] hover:bg-white hover:text-[#13322b]"
                     }`}
@@ -399,11 +389,41 @@ export default function ImportPreviewPage() {
                       <Table className="w-4 h-4 shrink-0 opacity-70" />
                       <span className="truncate">{objName}</span>
                     </div>
-                    {selectedObject === objName && <Check className="w-4 h-4 text-[#c59b43]" />}
+                    {isSelected && (
+                      isLoading ? (
+                        <Loader2 className="w-3.5 h-3.5 text-[#c59b43] animate-spin shrink-0" />
+                      ) : (
+                        <Check className="w-4 h-4 text-[#c59b43] shrink-0" />
+                      )
+                    )}
                   </button>
-                ))}
-              </div>
+                );
+              })}
             </div>
+          </div>
+
+          {/* COLUMN 2 & 3 CONTAINER WITH COEFFICIENT LOADER OVERLAY */}
+          <div className="flex-1 flex overflow-hidden relative bg-[#faf9f6]">
+            
+            {/* Coefficient Loader Overlay when clicking any category section */}
+            {isLoading ? (
+              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-white/95 backdrop-blur-xs space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
+                  <OfficialBrandLogo id="shopify" />
+                </div>
+                <div className="text-center space-y-1.5">
+                  <h3 className="text-sm font-bold text-[#13322b] animate-pulse">
+                    Loading {selectedObject}...
+                  </h3>
+                  <p className="text-xs text-gray-500 font-medium">
+                    Fetching 100% Dynamic Schema & Store Records Live
+                  </p>
+                </div>
+                <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="w-full h-full bg-[#13322b] animate-pulse" />
+                </div>
+              </div>
+            ) : null}
 
             {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
             <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
@@ -441,7 +461,7 @@ export default function ImportPreviewPage() {
               </div>
             </div>
 
-            {/* COLUMN 3: Right Dynamic Table Preview Pane (Pure Dynamic Runtime Binding) */}
+            {/* COLUMN 3: Right Dynamic Table Preview Pane */}
             <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
               {activeTableColumns.length === 0 ? (
                 <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
@@ -491,7 +511,8 @@ export default function ImportPreviewPage() {
             </div>
 
           </div>
-        )}
+
+        </div>
 
       </div>
     </div>
