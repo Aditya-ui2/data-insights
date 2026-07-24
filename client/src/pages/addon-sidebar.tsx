@@ -248,9 +248,8 @@ export default function AddonSidebarPage() {
                         <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
                           <Download className="w-4 h-4" />
                         </div>
-                        <div className="text-xs font-bold text-[#13322b] flex items-center gap-1.5">
+                        <div className="text-xs font-bold text-[#13322b]">
                           <span>Import Data</span>
-                          <span className="text-[9px] bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded font-bold uppercase">10+ Sources</span>
                         </div>
                       </div>
                       <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
