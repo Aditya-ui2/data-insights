@@ -317,12 +317,18 @@ export default function AddonSidebarPage() {
       console.error(e);
     }
 
-    setTimeout(() => {
-      setIsAuthorizing(false);
-      if ((window as any).google?.script?.run?.showImportPreviewModal) {
-        (window as any).google.script.run.showImportPreviewModal();
-      }
-    }, 400);
+    // Open the secure OAuth popup window to authorize the shop connection
+    const width = 600;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    const oauthUrl = `/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStore)}`;
+
+    window.open(
+      oauthUrl,
+      `oauth_shopify`,
+      `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes`
+    );
   };
 
   const handleConfirmImport = () => {
