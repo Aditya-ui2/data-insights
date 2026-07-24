@@ -28,8 +28,7 @@ import {
   Layers,
   Trash2,
   Info,
-  ChevronRight as ChevronRightIcon,
-  Database
+  Maximize2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DV_LOGO_BASE64 } from "./logo-base64";
@@ -52,7 +51,6 @@ function CustomDVLogo() {
   );
 }
 
-// Circular Brand Logos SVG Component
 function OfficialBrandLogo({ id, size = "w-10 h-10" }: { id: string; size?: string }) {
   switch (id) {
     case "shopify":
@@ -85,72 +83,6 @@ function OfficialBrandLogo({ id, size = "w-10 h-10" }: { id: string; size?: stri
           />
         </div>
       );
-    case "postgres":
-      return (
-        <div className={`${size} rounded-full bg-[#e8f1f7] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/postgresql/4169E1" 
-            alt="PostgreSQL" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "ga4":
-      return (
-        <div className={`${size} rounded-full bg-[#fff4e5] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/googleanalytics/E37400" 
-            alt="GA4" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "hubspot":
-      return (
-        <div className={`${size} rounded-full bg-[#fff0eb] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/hubspot/FF7A59" 
-            alt="HubSpot" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "meta_ads":
-      return (
-        <div className={`${size} rounded-full bg-[#e7f0ff] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/meta/0668E1" 
-            alt="Meta Ads" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "google_ads":
-      return (
-        <div className={`${size} rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/googleads/4285F4" 
-            alt="Google Ads" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "mysql":
-      return (
-        <div className={`${size} rounded-full bg-[#f0f4f7] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
-          <img 
-            src="https://cdn.simpleicons.org/mysql/4479A1" 
-            alt="MySQL" 
-            className="w-full h-full object-contain"
-          />
-        </div>
-      );
-    case "csv_upload":
-      return (
-        <div className={`${size} rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-2 shadow-2xs text-[#107c41]`}>
-          <FileSpreadsheet className="w-full h-full stroke-[2]" />
-        </div>
-      );
     default:
       return (
         <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-gray-600`}>
@@ -168,83 +100,6 @@ interface Connector {
   domainSuffix?: string;
 }
 
-const ALL_SHOPIFY_OBJECTS = [
-  "Automatic Discount Nodes",
-  "Automatic Discount Saved Searches",
-  "Code Discount Nodes",
-  "Code Discount Saved Searches",
-  "Collection Saved Searches",
-  "Collections",
-  "Customers",
-  "Deletion Events",
-  "Delivery Profiles",
-  "Discount Redeem Code Saved Searches",
-  "Draft Order Saved Searches",
-  "Draft Orders",
-  "File Saved Searches",
-  "Files",
-  "Gift Cards",
-  "Inventory Items",
-  "Line Items",
-  "Locations",
-  "Locations Available For Delivery Profiles Connection",
-  "Market Catalogs",
-  "Market Catalogs Markets",
-  "Marketing Activities",
-  "Order Saved Searches",
-  "Orders",
-  "Price Lists",
-  "Product Saved Searches",
-  "Product Variants",
-  "Products",
-  "Script Tags",
-  "Segment Filters",
-  "Segment Migrations",
-  "Segments",
-  "Selling Plan Groups",
-  "Standard Metafield Definition Templates",
-  "Tender Transactions",
-  "Url Redirect Saved Searches",
-  "Url Redirects",
-  "Webhook Subscriptions"
-];
-
-interface ShopifyField {
-  id: string;
-  label: string;
-  selectedCount?: number;
-  isGroup?: boolean;
-}
-
-const INITIAL_SHOPIFY_FIELDS: ShopifyField[] = [
-  { id: "amount_spent", label: "Amount Spent", selectedCount: 2, isGroup: true },
-  { id: "can_delete", label: "Can Delete" },
-  { id: "created_at", label: "Created At (Last Order)" },
-  { id: "data_sale_opt_out", label: "Data Sale Opt Out" },
-  { id: "default_address", label: "Default Address (Address1)", selectedCount: 20, isGroup: true },
-  { id: "display_name", label: "Display Name" },
-  { id: "email", label: "Email" },
-  { id: "email_marketing_consent", label: "Email Marketing Consent", selectedCount: 3, isGroup: true },
-  { id: "first_name", label: "First Name" },
-  { id: "id", label: "Id" },
-  { id: "image", label: "Image", selectedCount: 5, isGroup: true },
-  { id: "last_name", label: "Last Name" },
-  { id: "last_order", label: "Last Order", selectedCount: 206, isGroup: true },
-  { id: "legacy_resource_id", label: "Legacy Resource Id" },
-  { id: "lifetime_duration", label: "Lifetime Duration" },
-  { id: "locale", label: "Locale" },
-  { id: "mergeable", label: "Mergeable", selectedCount: 5, isGroup: true },
-  { id: "multipass_identifier", label: "Multipass Identifier" },
-  { id: "note", label: "Note" },
-  { id: "number_of_orders", label: "Number Of Orders" },
-  { id: "phone", label: "Phone" },
-  { id: "state", label: "State" },
-  { id: "tags", label: "Tags" },
-  { id: "tax_exempt", label: "Tax Exempt" },
-  { id: "updated_at", label: "Updated At" },
-  { id: "verified_email", label: "Verified Email" },
-];
-
 const INITIAL_CONNECTORS: Connector[] = [
   { id: "shopify", name: "Shopify", category: "E-Commerce", status: "Connected", domainSuffix: ".myshopify.com" },
   { id: "stripe", name: "Stripe", category: "Payments", status: "Connected" },
@@ -253,9 +108,6 @@ const INITIAL_CONNECTORS: Connector[] = [
   { id: "salesforce", name: "Salesforce", category: "CRM", status: "Available" },
   { id: "postgres", name: "PostgreSQL", category: "Databases", status: "Available" },
   { id: "hubspot", name: "HubSpot", category: "CRM", status: "Available" },
-  { id: "meta_ads", name: "Meta Ads (Facebook)", category: "Marketing", status: "Available" },
-  { id: "google_ads", name: "Google Ads", category: "Marketing", status: "Available" },
-  { id: "mysql", name: "MySQL", category: "Databases", status: "Available" },
 ];
 
 export default function AddonSidebarPage() {
@@ -265,59 +117,45 @@ export default function AddonSidebarPage() {
   const [deleteTargetConnector, setDeleteTargetConnector] = useState<Connector | null>(null);
   const [storeNameInput, setStoreNameInput] = useState("");
   const [isAuthorizing, setIsAuthorizing] = useState(false);
-  const [showPreviewModal, setShowPreviewModal] = useState(false);
-  const [selectedObject, setSelectedObject] = useState("Customers");
   const [isAgentExpanded, setIsAgentExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [objectSearchTerm, setObjectSearchTerm] = useState("");
-  const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [showWelcome, setShowWelcome] = useState(true);
   const [isImportingProgress, setIsImportingProgress] = useState(false);
-
-  // Field selection state
-  const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([
-    "can_delete", "created_at", "data_sale_opt_out", "display_name", "email", "id"
-  ]);
 
   const connectedSources = connectorsList.filter((c) => c.status === "Connected");
   const availableSources = connectorsList.filter((c) => c.status === "Available" && (searchTerm === "" || c.name.toLowerCase().includes(searchTerm.toLowerCase())));
 
-  const filteredObjects = ALL_SHOPIFY_OBJECTS.filter(o => 
-    objectSearchTerm === "" || o.toLowerCase().includes(objectSearchTerm.toLowerCase())
-  );
-
-  const filteredFields = INITIAL_SHOPIFY_FIELDS.filter(f => 
-    fieldSearchTerm === "" || f.label.toLowerCase().includes(fieldSearchTerm.toLowerCase())
-  );
-
-  const toggleFieldSelection = (fieldId: string) => {
-    setSelectedFieldIds(prev => 
-      prev.includes(fieldId) ? prev.filter(id => id !== fieldId) : [...prev, fieldId]
-    );
+  // Launch Large 1200px Modal Window
+  const launchLargeImportPreviewModal = () => {
+    window.open("/import-preview", "DVImportPreviewModal", "width=1200,height=800,top=60,left=120");
   };
 
-  const toggleSelectAll = () => {
-    if (selectedFieldIds.length === INITIAL_SHOPIFY_FIELDS.length) {
-      setSelectedFieldIds([]);
-    } else {
-      setSelectedFieldIds(INITIAL_SHOPIFY_FIELDS.map(f => f.id));
-    }
-  };
-
-  // Listen for OAuth completion signal from the new tab -> Opens Large Modal Dialog
+  // Listen for OAuth approval AND Import Preview completion
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data === "dv_shopify_authorized") {
         setIsAuthorizing(false);
-        setShowPreviewModal(true);
+        launchLargeImportPreviewModal();
+      }
+      if (event.data?.type === "dv_import_preview_done" || event.data === "dv_import_preview_done") {
+        setCurrentView("importing-active");
+        setIsImportingProgress(true);
+        setTimeout(() => setIsImportingProgress(false), 3000);
       }
     };
+
     const handleStorage = (event: StorageEvent) => {
       if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
         setIsAuthorizing(false);
-        setShowPreviewModal(true);
+        launchLargeImportPreviewModal();
+      }
+      if (event.key === "dv_import_preview_done") {
+        setCurrentView("importing-active");
+        setIsImportingProgress(true);
+        setTimeout(() => setIsImportingProgress(false), 3000);
       }
     };
+
     window.addEventListener("message", handleMessage);
     window.addEventListener("storage", handleStorage);
     return () => {
@@ -335,20 +173,11 @@ export default function AddonSidebarPage() {
   const handleAuthorizeClick = () => {
     setIsAuthorizing(true);
     window.open("/shopify-auth", "_blank");
-    // Opens the Large Modal Window over Google Sheets
+    // Backup timer to open Large Import Preview Window
     setTimeout(() => {
       setIsAuthorizing(false);
-      setShowPreviewModal(true);
+      launchLargeImportPreviewModal();
     }, 2000);
-  };
-
-  const handleConfirmImport = () => {
-    setShowPreviewModal(false);
-    setCurrentView("importing-active");
-    setIsImportingProgress(true);
-    setTimeout(() => {
-      setIsImportingProgress(false);
-    }, 3000);
   };
 
   const confirmDisconnect = (connectorId: string) => {
@@ -434,9 +263,7 @@ export default function AddonSidebarPage() {
 
                 {/* Item 2: Export Data */}
                 <div>
-                  <button 
-                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
+                  <button className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
                         <Upload className="w-4 h-4" />
@@ -449,9 +276,7 @@ export default function AddonSidebarPage() {
 
                 {/* Item 3: Monitor & Alerts */}
                 <div>
-                  <button 
-                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
+                  <button className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
                         <Bell className="w-4 h-4" />
@@ -467,9 +292,7 @@ export default function AddonSidebarPage() {
 
                 {/* Item 4: Sheet Assistant */}
                 <div>
-                  <button 
-                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
+                  <button className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
                         <Bot className="w-4 h-4" />
@@ -482,9 +305,7 @@ export default function AddonSidebarPage() {
 
                 {/* Item 5: Snapshots */}
                 <div>
-                  <button 
-                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
+                  <button className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
                         <Camera className="w-4 h-4" />
@@ -497,9 +318,7 @@ export default function AddonSidebarPage() {
 
                 {/* Item 6: Web Dashboards */}
                 <div>
-                  <button 
-                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
+                  <button className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
                         <BarChart3 className="w-4 h-4" />
@@ -702,7 +521,7 @@ export default function AddonSidebarPage() {
               <button 
                 onClick={handleAuthorizeClick}
                 disabled={isAuthorizing}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 {isAuthorizing ? (
                   <>
@@ -712,6 +531,15 @@ export default function AddonSidebarPage() {
                 ) : (
                   <span>Authorize</span>
                 )}
+              </button>
+
+              {/* Manual Button to re-trigger Large Import Preview Modal */}
+              <button
+                onClick={launchLargeImportPreviewModal}
+                className="w-full py-2 bg-white hover:bg-[#faf9f6] border border-[#e5e2db] text-[#13322b] font-bold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5 mt-1 cursor-pointer"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-[#2563eb]" />
+                <span>Open Large Import Preview Window (1200px)</span>
               </button>
             </div>
 
@@ -726,7 +554,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 5: STEP 4 - IMPORTING ACTIVE SYNC CARD */}
+      {/* VIEW 4: STEP 4 - IMPORTING ACTIVE SYNC CARD */}
       {currentView === "importing-active" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
@@ -742,18 +570,6 @@ export default function AddonSidebarPage() {
               </span>
             </div>
 
-            {/* Selected Config Summary */}
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between text-[#8a8579]">
-                <span>Objects:</span>
-                <span className="font-bold text-[#13322b]">{selectedObject}</span>
-              </div>
-              <div className="flex items-center justify-between text-[#8a8579]">
-                <span>Selected Fields:</span>
-                <span className="font-medium text-[#13322b]">{selectedFieldIds.length} fields selected</span>
-              </div>
-            </div>
-
             {/* Live Sync Graphic Animation */}
             <div className="p-4 bg-[#fcfbf9] rounded-xl border border-[#e5e2db] text-center space-y-3">
               <div className="flex items-center justify-center gap-3">
@@ -761,12 +577,10 @@ export default function AddonSidebarPage() {
                 <div className="flex items-center gap-1 text-[#c59b43]">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping" />
                   <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping delay-100" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping delay-200" />
                 </div>
                 <CustomDVLogo />
                 <div className="flex items-center gap-1 text-emerald-600">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping delay-100" />
                 </div>
                 <div className="w-9 h-9 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shadow-2xs">
                   <FileSpreadsheet className="w-5 h-5" />
@@ -780,230 +594,6 @@ export default function AddonSidebarPage() {
             </div>
           </div>
 
-        </div>
-      )}
-
-      {/* LARGE FULL-SCREEN MODAL WINDOW OVERLAYING GOOGLE SHEETS (EXACT MATCH FOR IMAGE 2 COEFFICIENT) */}
-      {showPreviewModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-3 md:p-8 animate-in fade-in zoom-in duration-150">
-          <div className="bg-white rounded-3xl w-full max-w-6xl h-[88vh] shadow-2xl flex flex-col overflow-hidden border border-[#e5e2db]">
-            
-            {/* Modal Header Bar */}
-            <div className="px-6 py-4 border-b border-[#e5e2db] flex items-center justify-between bg-white shrink-0">
-              <div className="flex items-center gap-3">
-                <h2 className="text-lg font-bold text-[#13322b]">Import Preview</h2>
-                <div className="flex items-center gap-2 pl-3 border-l border-[#e5e2db]">
-                  <OfficialBrandLogo id="shopify" size="w-7 h-7" />
-                  <span className="font-bold text-sm text-[#13322b]">{selectedObject}</span>
-                  <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button className="px-3.5 py-1.5 bg-white border border-[#e5e2db] rounded-lg text-xs font-semibold text-[#13322b] flex items-center gap-1.5 hover:bg-[#f3f0e8] shadow-2xs">
-                  <Filter className="w-3.5 h-3.5" />
-                  <span>Filter</span>
-                </button>
-                <button className="px-3.5 py-1.5 bg-white border border-[#e5e2db] rounded-lg text-xs font-semibold text-[#13322b] flex items-center gap-1.5 hover:bg-[#f3f0e8] shadow-2xs">
-                  <ArrowUpDown className="w-3.5 h-3.5" />
-                  <span>Sort</span>
-                </button>
-                
-                <span className="text-xs text-gray-500 font-medium px-2">{selectedFieldIds.length * 21} fields selected</span>
-
-                <button 
-                  onClick={handleConfirmImport}
-                  className="px-7 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] active:bg-[#1e40af] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5"
-                >
-                  <span>Done</span>
-                </button>
-
-                <button 
-                  onClick={() => setShowPreviewModal(false)}
-                  className="p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-700 transition-all ml-1"
-                  title="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body: Left Object Selector + Middle Field Tree + Right Live Table */}
-            <div className="flex-1 flex overflow-hidden">
-              
-              {/* COLUMN 1: All 38 Shopify Objects Selector Pane */}
-              <div className="w-64 border-r border-[#e5e2db] p-3.5 space-y-3 bg-[#faf9f6] flex flex-col shrink-0">
-                <div className="flex items-center justify-between px-1">
-                  <span className="text-xs font-bold text-[#13322b] uppercase tracking-wider">Shopify Objects ({ALL_SHOPIFY_OBJECTS.length})</span>
-                </div>
-
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Search 38 objects..."
-                    value={objectSearchTerm}
-                    onChange={(e) => setObjectSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b] font-medium"
-                  />
-                </div>
-
-                <div className="flex-1 overflow-y-auto space-y-1 pr-1">
-                  {filteredObjects.map((objName) => (
-                    <button
-                      key={objName}
-                      onClick={() => setSelectedObject(objName)}
-                      className={`w-full px-3 py-2 text-left rounded-xl text-xs font-medium flex items-center justify-between transition-all ${
-                        selectedObject === objName 
-                          ? "bg-[#13322b] text-white font-bold shadow-sm" 
-                          : "text-[#635f54] hover:bg-white hover:text-[#13322b]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 truncate">
-                        <Database className="w-3.5 h-3.5 shrink-0 opacity-70" />
-                        <span className="truncate">{objName}</span>
-                      </div>
-                      {selectedObject === objName && <Check className="w-3.5 h-3.5 text-[#c59b43]" />}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* COLUMN 2: Field Tree Selector Pane for Selected Object */}
-              <div className="w-72 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
-                
-                <div className="flex items-center gap-2 font-bold text-xs text-[#13322b] px-1">
-                  <Layers className="w-4 h-4 text-[#13322b]" />
-                  <span>{selectedObject} Fields</span>
-                </div>
-
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Search fields"
-                    value={fieldSearchTerm}
-                    onChange={(e) => setFieldSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#2563eb] text-[#13322b] font-medium placeholder-gray-400"
-                  />
-                </div>
-
-                {/* Checkbox List */}
-                <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
-                  
-                  {/* Select All */}
-                  <div 
-                    onClick={toggleSelectAll}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-50 cursor-pointer text-xs font-bold text-[#2563eb]"
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={selectedFieldIds.length === INITIAL_SHOPIFY_FIELDS.length}
-                      onChange={toggleSelectAll}
-                      className="w-4 h-4 rounded text-[#2563eb] focus:ring-[#2563eb] accent-[#2563eb] cursor-pointer"
-                    />
-                    <span>Select All</span>
-                  </div>
-
-                  {/* Fields */}
-                  {filteredFields.map((field) => {
-                    const isChecked = selectedFieldIds.includes(field.id);
-                    return (
-                      <div 
-                        key={field.id}
-                        onClick={() => toggleFieldSelection(field.id)}
-                        className={`flex items-center justify-between px-2.5 py-1.5 rounded-lg cursor-pointer text-xs font-medium transition-colors ${
-                          isChecked ? "bg-[#e8f0fe] text-[#1a73e8] font-semibold" : "hover:bg-gray-50 text-gray-700"
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5 truncate">
-                          {field.isGroup ? (
-                            <ChevronRightIcon className="w-3.5 h-3.5 text-gray-400 shrink-0" />
-                          ) : (
-                            <input 
-                              type="checkbox" 
-                              checked={isChecked}
-                              onChange={() => toggleFieldSelection(field.id)}
-                              className="w-4 h-4 rounded text-[#2563eb] focus:ring-[#2563eb] accent-[#2563eb] cursor-pointer"
-                            />
-                          )}
-                          <span className="truncate">{field.label}</span>
-                        </div>
-                        {field.selectedCount && (
-                          <span className="text-[10px] text-[#2563eb] font-bold shrink-0">{field.selectedCount} selected</span>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                </div>
-
-              </div>
-
-              {/* COLUMN 3: Right Live Dynamic Table Preview Pane */}
-              <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden bg-white">
-                
-                <div className="flex-1 overflow-auto border border-[#e5e2db] rounded-2xl shadow-2xs">
-                  <table className="w-full text-left border-collapse text-xs min-w-max">
-                    <thead>
-                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8]">
-                        <th className="p-3.5 border-r border-[#e5e2db] w-10 text-center">
-                          <input type="checkbox" checked readOnly className="accent-[#2563eb]" />
-                        </th>
-                        {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                          <th key={field.id} className="p-3.5 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9]">
-                            <div className="flex items-center justify-between gap-3">
-                              <span>{field.label}</span>
-                              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#e5e2db]">
-                      <tr className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                        <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">1</td>
-                        {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                          <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
-                            {field.id === "id" && "gid://shopify/Customer/9494632"}
-                            {field.id === "created_at" && "2026-07-07 01:31:18"}
-                            {field.id === "can_delete" && "True"}
-                            {field.id === "data_sale_opt_out" && "False"}
-                            {field.id === "default_address" && "105 Victoria St, Toronto"}
-                            {field.id === "display_name" && "Ayumu Hirano"}
-                            {field.id === "email" && "ayumu.hirano@example.com"}
-                            {field.id === "last_name" && "Hirano"}
-                            {field.id === "number_of_orders" && "14"}
-                            {!["id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"].includes(field.id) && "—"}
-                          </td>
-                        ))}
-                      </tr>
-                      <tr className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                        <td className="p-3.5 border-r border-[#e5e2db] bg-[#fafafa] font-semibold text-center text-gray-400">2</td>
-                        {INITIAL_SHOPIFY_FIELDS.filter(f => selectedFieldIds.includes(f.id)).map((field) => (
-                          <td key={field.id} className="p-3.5 border-r border-[#e5e2db] whitespace-nowrap">
-                            {field.id === "id" && "gid://shopify/Customer/9494633"}
-                            {field.id === "created_at" && "2026-07-07 01:31:19"}
-                            {field.id === "can_delete" && "True"}
-                            {field.id === "data_sale_opt_out" && "False"}
-                            {field.id === "default_address" && "Box 42 - 151 O'Connor St"}
-                            {field.id === "display_name" && "Russell Winfield"}
-                            {field.id === "email" && "russel.winfield@example.com"}
-                            {field.id === "last_name" && "Winfield"}
-                            {field.id === "number_of_orders" && "28"}
-                            {!["id", "created_at", "can_delete", "data_sale_opt_out", "default_address", "display_name", "email", "last_name", "number_of_orders"].includes(field.id) && "—"}
-                          </td>
-                        ))}
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
         </div>
       )}
 
