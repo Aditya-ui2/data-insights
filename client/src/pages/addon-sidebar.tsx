@@ -266,29 +266,35 @@ export default function AddonSidebarPage() {
 
   const handleAuthorizeClick = () => {
     if (!storeNameInput.trim()) {
-      alert("Please enter a valid Shopify store name before authorizing.");
+      alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    const cleanStore = storeNameInput.trim().toLowerCase().replace(".myshopify.com", "");
+    // Clean store name
+    const cleanStore = storeNameInput
+      .trim()
+      .toLowerCase()
+      .replace("https://", "")
+      .replace("http://", "")
+      .replace(".myshopify.com", "")
+      .split("/")[0];
 
     setIsAuthorizing(true);
 
-    if (cleanStore === "error" || cleanStore === "invalid") {
-      setTimeout(() => {
-        setIsAuthorizing(false);
-        window.open(`/shopify-error?shop=${cleanStore}`, "_blank");
-      }, 1000);
-      return;
-    }
-
-    // Valid Real Store -> Open Shopify Security Auth Screen
-    window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
+    // Official Direct Shopify OAuth URL
+    const clientAppId = "dv_shopify_connector_v2"; // Replace with your registered Shopify Client ID
+    const scopes = "read_customers,read_orders,read_products,read_inventory,read_discounts";
+    const redirectUri = encodeURIComponent("https://digitvalues.vercel.app/oauth_attempt");
     
-    // Backup timer to open Large Modal if signal delayed
+    // Direct Official Shopify Endpoint URL
+    const officialShopifyOAuthUrl = `https://${cleanStore}.myshopify.com/admin/oauth/authorize?client_id=${clientAppId}&scope=${scopes}&redirect_uri=${redirectUri}&state=dv_live_session`;
+
+    // Open Official Shopify OAuth URL in new tab
+    const authWindow = window.open(officialShopifyOAuthUrl, "_blank");
+
+    // Fallback handler if store is unreachable or test fallback needed
     setTimeout(() => {
       setIsAuthorizing(false);
-      setShowPreviewModal(true);
     }, 2000);
   };
 
