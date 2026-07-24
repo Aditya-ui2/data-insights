@@ -22,7 +22,6 @@ export default function OAuthSuccessPage() {
   const [countdown, setCountdown] = useState(1);
 
   useEffect(() => {
-    // Notify parent window (Google Sheets sidebar)
     try {
       localStorage.setItem("dv_shopify_auth_status", "approved_" + Date.now());
       if (window.opener) {
@@ -34,7 +33,8 @@ export default function OAuthSuccessPage() {
 
     const timer = setTimeout(() => {
       setCountdown(0);
-      window.close();
+      // Redirect to full-screen Import Preview page
+      window.location.href = "/import-preview";
     }, 1200);
 
     return () => clearTimeout(timer);
@@ -51,11 +51,11 @@ export default function OAuthSuccessPage() {
           <span className="text-xl font-bold text-[#13322b] tracking-tight">DigitValues</span>
         </div>
 
-        {/* Exact Coefficient Success Text */}
+        {/* Coefficient Success Text */}
         <div className="space-y-1 pt-2">
           <h1 className="text-base font-bold text-gray-900">Your connection was successful!</h1>
           <p className="text-xs text-gray-500 font-normal">
-            This page will automatically close in <span className="font-semibold text-gray-700">{countdown} second</span>.
+            Opening Import Preview in <span className="font-semibold text-gray-700">{countdown} second</span>...
           </p>
         </div>
 
