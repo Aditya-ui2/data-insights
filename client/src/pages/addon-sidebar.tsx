@@ -11,14 +11,14 @@ import {
   SlidersHorizontal,
   ChevronRight,
   ChevronDown,
-  HelpCircle,
-  Database,
   Search,
   CheckCircle2,
-  RefreshCw,
-  Plus
+  Plus,
+  Zap,
+  ShieldCheck,
+  ExternalLink,
+  ArrowUpRight
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 export default function AddonSidebarPage() {
@@ -27,94 +27,100 @@ export default function AddonSidebarPage() {
   const [searchTerm, setSearchTerm] = useState("");
 
   const integrations = [
-    { name: "Shopify", category: "E-Commerce", status: "Connected", color: "bg-emerald-500" },
-    { name: "Stripe", category: "Payments", status: "Connected", color: "bg-indigo-500" },
-    { name: "Salesforce", category: "CRM", status: "Available", color: "bg-blue-500" },
-    { name: "PostgreSQL", category: "Database", status: "Available", color: "bg-sky-600" },
-    { name: "Google Analytics 4", category: "Analytics", status: "Connected", color: "bg-amber-500" },
+    { name: "Shopify", category: "E-Commerce", status: "Connected", color: "bg-emerald-600" },
+    { name: "Stripe", category: "Payments", status: "Connected", color: "bg-[#c59b43]" },
+    { name: "Salesforce", category: "CRM", status: "Available", color: "bg-[#13322b]" },
+    { name: "PostgreSQL", category: "Database", status: "Available", color: "bg-sky-700" },
+    { name: "Google Analytics 4", category: "Analytics", status: "Connected", color: "bg-amber-600" },
   ];
 
   return (
-    <div className="w-full min-h-screen bg-[#f8fafc] text-slate-800 font-sans flex flex-col justify-between select-none">
-      {/* Top Header Bar */}
-      <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center font-bold text-white text-xs shadow-sm">
-            DV
+    <div className="w-full min-h-screen bg-[#faf9f6] text-[#13322b] font-sans flex flex-col justify-between select-none antialiased">
+      {/* Top Header Bar with Custom DV Logo */}
+      <div className="bg-white/90 backdrop-blur-md border-b border-[#e5e2db] px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#e5e2db] shadow-sm flex items-center justify-center bg-black">
+            <img src="/dv-logo.png" alt="DigitValues" className="w-full h-full object-cover" />
           </div>
-          <span className="font-bold text-slate-900 text-sm tracking-tight">DigitValues</span>
+          <div className="flex flex-col">
+            <span className="font-semibold text-[#13322b] text-sm tracking-tight leading-none">DigitValues</span>
+            <span className="text-[10px] text-[#8a8579] font-medium tracking-wide uppercase mt-0.5">Spreadsheet AI</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-colors" title="AI Chat Assistant">
+        <div className="flex items-center gap-1.5">
+          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="AI Assistant">
             <MessageSquare className="w-4 h-4" />
           </button>
-          <button className="p-1.5 hover:bg-slate-100 rounded-md text-slate-500 transition-colors" title="Settings">
+          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Settings">
             <SlidersHorizontal className="w-4 h-4" />
           </button>
         </div>
       </div>
 
-      {/* Main Content Body */}
-      <div className="p-3.5 space-y-3 flex-1 overflow-y-auto">
+      {/* Main Content Area */}
+      <div className="p-3.5 space-y-3.5 flex-1 overflow-y-auto">
         
-        {/* Create Agent Blue Button */}
+        {/* Deep Forest Premium Button for Create AI Agent */}
         <button 
           onClick={() => setActiveTab(activeTab === "agent" ? null : "agent")}
-          className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white rounded-xl font-medium text-xs flex items-center justify-between transition-all shadow-sm group"
+          className="w-full py-3 px-4 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white rounded-xl font-medium text-xs flex items-center justify-between transition-all shadow-md hover:shadow-lg group border border-[#1a473d]"
         >
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
-              <Plus className="w-3.5 h-3.5 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded-lg bg-[#c59b43] text-[#13322b] flex items-center justify-center shadow-inner">
+              <Plus className="w-4 h-4 stroke-[2.5]" />
             </div>
-            <span className="font-semibold">Create AI Agent</span>
+            <span className="font-semibold tracking-wide text-xs">Create AI Agent</span>
           </div>
-          <ChevronRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+          <div className="flex items-center gap-1 text-[#c59b43] font-semibold text-[11px]">
+            <span>New</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </div>
         </button>
 
-        {/* Feature List Menu items */}
-        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100 shadow-sm overflow-hidden">
+        {/* Feature List Cards Container */}
+        <div className="bg-white rounded-xl border border-[#e5e2db] divide-y divide-[#f0ede6] shadow-sm overflow-hidden">
           
-          {/* Item 1: Import */}
-          <div className="transition-colors">
+          {/* Item 1: Import Data */}
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "import" ? null : "import")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
                   <Download className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-slate-800">Import Data</div>
-                  <div className="text-[10px] text-slate-400">Connect Shopify, Stripe, SQL & CRM</div>
+                  <div className="text-xs font-semibold text-[#13322b]">Import Data</div>
+                  <div className="text-[10px] text-[#8a8579]">Shopify, Stripe, Postgres, CRM</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "import" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "import" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
 
             {activeTab === "import" && (
-              <div className="p-3 bg-slate-50 border-t border-slate-100 space-y-2">
+              <div className="p-3 bg-[#fbfaf7] border-t border-[#e5e2db] space-y-2.5">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#8a8579]" />
                   <input 
                     type="text" 
-                    placeholder="Search integrations..."
+                    placeholder="Filter data sources..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 text-[11px] bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full pl-8 pr-3 py-1.5 text-[11px] bg-white border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] placeholder-[#a39e92]"
                   />
                 </div>
-                <div className="space-y-1 max-h-40 overflow-y-auto">
+                <div className="space-y-1.5 max-h-44 overflow-y-auto">
                   {integrations.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase())).map((item, idx) => (
-                    <div key={idx} className="p-2 bg-white rounded-lg border border-slate-200/60 flex items-center justify-between hover:border-blue-300 transition-colors cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                    <div key={idx} className="p-2.5 bg-white rounded-lg border border-[#e5e2db] flex items-center justify-between hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
                         <div>
-                          <div className="text-[11px] font-medium text-slate-700">{item.name}</div>
-                          <div className="text-[9px] text-slate-400">{item.category}</div>
+                          <div className="text-[11px] font-semibold text-[#13322b]">{item.name}</div>
+                          <div className="text-[9px] text-[#8a8579]">{item.category}</div>
                         </div>
                       </div>
-                      <Badge variant={item.status === "Connected" ? "secondary" : "outline"} className="text-[9px] px-1.5 py-0 h-4 font-normal">
+                      <Badge className={`text-[9px] px-2 py-0.5 font-medium border-0 ${item.status === "Connected" ? "bg-[#13322b]/10 text-[#13322b]" : "bg-gray-100 text-gray-600"}`}>
                         {item.status}
                       </Badge>
                     </div>
@@ -124,150 +130,157 @@ export default function AddonSidebarPage() {
             )}
           </div>
 
-          {/* Item 2: Export */}
-          <div className="transition-colors">
+          {/* Item 2: Export Data */}
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "export" ? null : "export")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
                   <Upload className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-slate-800">Export Data</div>
-                  <div className="text-[10px] text-slate-400">Push Sheet rows back to DB or CRM</div>
+                  <div className="text-xs font-semibold text-[#13322b]">Export Data</div>
+                  <div className="text-[10px] text-[#8a8579]">Push Sheet rows back to Database</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "export" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "export" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
           </div>
 
-          {/* Item 3: Monitor */}
-          <div className="transition-colors">
+          {/* Item 3: Monitor & Alerts */}
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "monitor" ? null : "monitor")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
                   <Bell className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-slate-800">Monitor & Alerts</span>
-                    <span className="text-[9px] font-bold bg-pink-100 text-pink-700 px-1.5 py-0.2 rounded uppercase">New</span>
+                    <span className="text-xs font-semibold text-[#13322b]">Monitor & Alerts</span>
+                    <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
                   </div>
-                  <div className="text-[10px] text-slate-400">Slack & Email notification triggers</div>
+                  <div className="text-[10px] text-[#8a8579]">Slack, Email & WhatsApp Triggers</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "monitor" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "monitor" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
           </div>
 
           {/* Item 4: Sheet Assistant */}
-          <div className="transition-colors">
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "assistant" ? null : "assistant")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-slate-800">Sheet Assistant</div>
-                  <div className="text-[10px] text-slate-400">Ask AI questions in plain English</div>
+                  <div className="text-xs font-semibold text-[#13322b]">Sheet Assistant</div>
+                  <div className="text-[10px] text-[#8a8579]">Ask AI questions in plain English</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "assistant" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "assistant" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
           </div>
 
-          {/* Item 5: Snapshot */}
-          <div className="transition-colors">
+          {/* Item 5: Snapshots */}
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "snapshot" ? null : "snapshot")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
                   <Camera className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-slate-800">Snapshots</div>
-                  <div className="text-[10px] text-slate-400">Save historical spreadsheet versions</div>
+                  <div className="text-xs font-semibold text-[#13322b]">Snapshots</div>
+                  <div className="text-[10px] text-[#8a8579]">Save historical spreadsheet versions</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "snapshot" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "snapshot" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
           </div>
 
           {/* Item 6: Web Dashboards */}
-          <div className="transition-colors">
+          <div>
             <button 
               onClick={() => setActiveTab(activeTab === "dashboards" ? null : "dashboards")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-slate-50 transition-colors group"
+              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
                   <BarChart3 className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-slate-800">Web Dashboards</span>
-                    <span className="text-[9px] font-bold bg-violet-100 text-violet-700 px-1.5 py-0.2 rounded uppercase">New</span>
+                    <span className="text-xs font-semibold text-[#13322b]">Web Dashboards</span>
+                    <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
                   </div>
-                  <div className="text-[10px] text-slate-400">Generate shareable visual reports</div>
+                  <div className="text-[10px] text-[#8a8579]">Generate shareable visual KPI reports</div>
                 </div>
               </div>
-              <ChevronRight className={`w-4 h-4 text-slate-400 transition-transform ${activeTab === "dashboards" ? "rotate-90 text-slate-700" : ""}`} />
+              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "dashboards" ? "rotate-90 text-[#13322b]" : ""}`} />
             </button>
           </div>
         </div>
 
-        {/* Integration Graphic Card */}
-        <div className="p-3 bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-xl border border-slate-700/50 shadow-sm relative overflow-hidden">
+        {/* Deep Forest Luxury Card */}
+        <div className="p-3.5 bg-gradient-to-br from-[#13322b] via-[#1a473d] to-[#0d221e] text-white rounded-xl border border-[#1a473d] shadow-md relative overflow-hidden">
           <div className="relative z-10 flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-slate-100">Connect 500+ Data Sources</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">Shopify, Stripe, Salesforce, Postgres & more</div>
+              <div className="text-xs font-bold tracking-tight text-white flex items-center gap-1.5">
+                <span>Connect 500+ Data Sources</span>
+                <Sparkles className="w-3 h-3 text-[#c59b43]" />
+              </div>
+              <div className="text-[10px] text-white/70 mt-0.5">Shopify, Stripe, Salesforce, Postgres</div>
             </div>
-            <Badge className="bg-blue-600 text-white text-[9px] border-none px-2">Live</Badge>
+            <span className="bg-[#c59b43] text-[#13322b] text-[9px] font-bold px-2 py-0.5 rounded-full shadow-xs uppercase">
+              Live Sync
+            </span>
           </div>
-          <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-700/60 text-[10px] text-slate-300">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-            <span>Automated hourly spreadsheet sync</span>
+          <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-white/10 text-[10px] text-white/80">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#c59b43] shrink-0" />
+            <span>Automated hourly spreadsheet refresh</span>
           </div>
         </div>
 
         {/* Welcome Collapsible Box */}
         {showWelcome && (
-          <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-900 transition-all">
+          <div className="bg-white border border-[#e5e2db] rounded-xl p-3.5 text-xs text-[#13322b] shadow-2xs">
             <div className="flex items-center justify-between cursor-pointer" onClick={() => setShowWelcome(!showWelcome)}>
-              <div className="flex items-center gap-1.5 font-semibold text-amber-900">
-                <span>👋 Welcome to DigitValues!</span>
+              <div className="flex items-center gap-2 font-semibold text-[#13322b]">
+                <span className="text-sm">👋</span>
+                <span>Welcome to DigitValues!</span>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-amber-700" />
+              <ChevronDown className="w-4 h-4 text-[#8a8579]" />
             </div>
-            <p className="text-[10px] text-amber-800/90 mt-1.5 leading-relaxed">
-              Connect your database or API to Google Sheets™ and build real-time visual dashboards in seconds.
+            <p className="text-[10px] text-[#635f54] mt-2 leading-relaxed font-sans">
+              Transform your Google Sheets™ data into beautiful AI-powered dashboards and get instant insights in seconds.
             </p>
-            <a href="/support" target="_blank" className="inline-block mt-2 text-[10px] font-semibold text-blue-600 hover:underline">
-              Learn how to get started →
+            <a href="/support" target="_blank" className="inline-flex items-center gap-1 mt-2.5 text-[10px] font-semibold text-[#13322b] hover:text-[#c59b43] transition-colors">
+              <span>Learn how to get started</span>
+              <ArrowUpRight className="w-3 h-3 text-[#c59b43]" />
             </a>
           </div>
         )}
 
       </div>
 
-      {/* Footer Status */}
-      <div className="px-4 py-2 bg-white border-t border-slate-200 text-[10px] text-slate-400 flex items-center justify-between">
-        <span className="flex items-center gap-1.5">
+      {/* Footer Status Bar */}
+      <div className="px-4 py-2.5 bg-white border-t border-[#e5e2db] text-[10px] text-[#8a8579] flex items-center justify-between">
+        <span className="flex items-center gap-1.5 font-medium">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           DigitValues v2.4 Active
         </span>
-        <a href="/support" target="_blank" className="hover:text-slate-600 transition-colors">Help</a>
+        <a href="/support" target="_blank" className="hover:text-[#13322b] transition-colors font-medium">Documentation</a>
       </div>
     </div>
   );
