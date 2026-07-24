@@ -21,22 +21,16 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+import { DV_LOGO_BASE64 } from "./logo-base64";
+
 function CustomDVLogo() {
   return (
-    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/30 shadow-md flex items-center justify-center bg-[#0d221e] shrink-0 relative group">
+    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/40 shadow-sm flex items-center justify-center bg-[#0d221e] shrink-0">
       <img 
-        src="/dv-logo.png" 
-        alt="DV Logo" 
+        src={DV_LOGO_BASE64} 
+        alt="DigitValues Logo" 
         className="w-full h-full object-cover"
-        onError={(e) => {
-          // Fallback to vector SVG if image is blocked/cached
-          e.currentTarget.style.display = 'none';
-        }}
       />
-      <svg className="w-6 h-6 absolute inset-0 m-auto pointer-events-none hidden group-has-[:invalid]:block" viewBox="0 0 100 100" fill="none">
-        <path d="M 25 25 L 50 25 C 65 25, 65 55, 50 55 L 25 55 Z" stroke="#eab308" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M 45 45 L 60 75 L 75 35" stroke="#10b981" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
     </div>
   );
 }
