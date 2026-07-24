@@ -687,19 +687,18 @@ export default function ImportPreviewPage() {
     }
   };
 
-  // Render Recursive Field Tree Node
+  // Render Recursive Field Tree Node (100% Dynamic Count Calculation)
   const renderTreeNode = (node: FieldNode, depth = 0) => {
     const isGroup = node.isGroup && node.children && node.children.length > 0;
     const isExpanded = expandedGroupIds.includes(node.id);
     
     let isChecked = false;
-    let selectedCount = node.selectedCount || 0;
+    let selectedCount = 0;
 
     if (isGroup) {
       const leafIds = getAllLeafIds(node.children!);
-      const selCount = leafIds.filter(id => selectedFieldIds.includes(id)).length;
-      isChecked = selCount === leafIds.length && leafIds.length > 0;
-      if (!selectedCount) selectedCount = selCount;
+      selectedCount = leafIds.filter(id => selectedFieldIds.includes(id)).length;
+      isChecked = selectedCount === leafIds.length && leafIds.length > 0;
     } else {
       isChecked = selectedFieldIds.includes(node.id);
     }
