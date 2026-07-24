@@ -24,8 +24,8 @@ import { DV_LOGO_BASE64 } from "./logo-base64";
 
 function CustomDVLogo() {
   return (
-    <div className="w-8.5 h-8.5 rounded-xl overflow-hidden border border-[#c59b43]/50 shadow-md flex items-center justify-center bg-[#0d221e] shrink-0 p-1">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/50 shadow-sm flex items-center justify-center bg-[#0d221e] shrink-0 p-1">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-5 h-5">
         {/* Dark Background */}
         <rect width="100" height="100" rx="18" fill="#0d221e" />
         {/* Outer Gold D */}
