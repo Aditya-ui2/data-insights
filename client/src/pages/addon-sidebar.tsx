@@ -239,8 +239,8 @@ export default function AddonSidebarPage() {
     const handleMessage = (event: MessageEvent) => {
       if (event.data === "dv_shopify_authorized") {
         setIsAuthorizing(false);
-        if (window.google?.script?.run?.showImportPreviewModal) {
-          window.google.script.run.showImportPreviewModal();
+        if ((window as any).google?.script?.run?.showImportPreviewModal) {
+          (window as any).google.script.run.showImportPreviewModal();
         } else {
           setShowPreviewModal(true);
         }
@@ -250,8 +250,8 @@ export default function AddonSidebarPage() {
     const handleStorage = (event: StorageEvent) => {
       if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
         setIsAuthorizing(false);
-        if (window.google?.script?.run?.showImportPreviewModal) {
-          window.google.script.run.showImportPreviewModal();
+        if ((window as any).google?.script?.run?.showImportPreviewModal) {
+          (window as any).google.script.run.showImportPreviewModal();
         } else {
           setShowPreviewModal(true);
         }
@@ -273,19 +273,12 @@ export default function AddonSidebarPage() {
   };
 
   const launchLargeImportPreviewModal = () => {
-    setIsAuthorizing(true);
-    
-    // Simulate loading progress
-    setTimeout(() => {
-      setIsAuthorizing(false);
-      
-      // Check if running inside Google Apps Script Addon
-      if ((window as any).google?.script?.run?.showImportPreviewModal) {
-        (window as any).google.script.run.showImportPreviewModal();
-      } else {
-        window.open("/import-preview", "_blank", "width=1200,height=750");
-      }
-    }, 1500);
+    // Synchronous call on direct click bypasses Chrome popup blockers 100%
+    if ((window as any).google?.script?.run?.showImportPreviewModal) {
+      (window as any).google.script.run.showImportPreviewModal();
+    } else {
+      window.open("/import-preview?loading=true", "_blank");
+    }
   };
 
   const handleAuthorizeClick = () => {
@@ -303,24 +296,12 @@ export default function AddonSidebarPage() {
       .replace(".myshopify.com", "")
       .split("/")[0];
 
-    // Trigger Fetching Animation Card
-    setIsAuthorizing(true);
-
-    // After 1.5s loading animation, launch the Large Import Preview Window
-    setTimeout(() => {
-      setIsAuthorizing(false);
-      
-      // Open Shopify Auth Screen / Large Preview Window
-      window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
-      
-      setTimeout(() => {
-        if ((window as any).google?.script?.run?.showImportPreviewModal) {
-          (window as any).google.script.run.showImportPreviewModal();
-        } else {
-          window.open("/import-preview", "_blank", "width=1200,height=750");
-        }
-      }, 1000);
-    }, 1500);
+    // Open directly on click -> Never blocked by Chrome popup blocker!
+    if ((window as any).google?.script?.run?.showImportPreviewModal) {
+      (window as any).google.script.run.showImportPreviewModal();
+    } else {
+      window.open(`/import-preview?shop=${cleanStore}&loading=true`, "_blank");
+    }
   };
 
   const handleConfirmImport = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   X, 
   Filter, 
@@ -152,6 +152,15 @@ export default function ImportPreviewPage() {
   const [selectedObject, setSelectedObject] = useState<string | null>(null);
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Initial 1.2s loading animation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const currentSchema = selectedObject ? getSchemaForObject(selectedObject) : [];
   const currentSampleData = selectedObject ? getSampleDataForObject(selectedObject) : [];
@@ -257,8 +266,23 @@ export default function ImportPreviewPage() {
           </div>
         </div>
 
-        {/* Modal Body: Left Pane (38 Shopify Objects) + Right Pane (Preview or Initial Illustration) */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Loading Overlay */}
+        {isLoading ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 bg-white space-y-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
+              <OfficialBrandLogo id="shopify" />
+            </div>
+            <div className="text-center space-y-1.5">
+              <h3 className="text-sm font-bold text-[#13322b] animate-pulse">Connecting to Shopify...</h3>
+              <p className="text-xs text-gray-500 font-medium">Fetching 38 Shopify Objects & Data Schemas</p>
+            </div>
+            <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+              <div className="w-full h-full bg-[#13322b] animate-pulse" />
+            </div>
+          </div>
+        ) : (
+          /* Modal Body: Left Pane (38 Shopify Objects) + Right Pane (Preview or Initial Illustration) */
+          <div className="flex-1 flex overflow-hidden">
           
           {/* COLUMN 1: All 38 Shopify Objects Selector Pane (Matching Image 1 Exact Design) */}
           <div className="w-80 border-r border-[#e5e2db] p-4 space-y-3.5 bg-[#faf9f6] flex flex-col shrink-0">
@@ -419,13 +443,11 @@ export default function ImportPreviewPage() {
 
               </div>
             )}
-
           </div>
-
         </div>
+        )}
 
       </div>
-
     </div>
   );
 }
