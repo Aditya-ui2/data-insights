@@ -273,11 +273,23 @@ export default function AddonSidebarPage() {
   };
 
   const launchLargeImportPreviewModal = () => {
-    // Synchronous call on direct click bypasses Chrome popup blockers 100%
+    setIsAuthorizing(true);
+
+    // Call Google Sheets Native showModalDialog to open in SAME TAB over spreadsheet cells (NO NEW BROWSER TAB)
     if ((window as any).google?.script?.run?.showImportPreviewModal) {
       (window as any).google.script.run.showImportPreviewModal();
+      setIsAuthorizing(false);
+    } else if (window.parent && window.parent !== window) {
+      try {
+        (window.parent as any).google?.script?.run?.showImportPreviewModal();
+      } catch (e) {
+        // Fallback for standalone web view testing only
+        setShowPreviewModal(true);
+      }
+      setIsAuthorizing(false);
     } else {
-      window.open("/import-preview?loading=true", "_blank");
+      setShowPreviewModal(true);
+      setIsAuthorizing(false);
     }
   };
 
@@ -296,12 +308,23 @@ export default function AddonSidebarPage() {
       .replace(".myshopify.com", "")
       .split("/")[0];
 
-    // Open directly on click -> Never blocked by Chrome popup blocker!
-    if ((window as any).google?.script?.run?.showImportPreviewModal) {
-      (window as any).google.script.run.showImportPreviewModal();
-    } else {
-      window.open(`/import-preview?shop=${cleanStore}&loading=true`, "_blank");
-    }
+    setIsAuthorizing(true);
+
+    // Always trigger Google Sheets Same-Tab Native Floating Modal
+    setTimeout(() => {
+      setIsAuthorizing(false);
+      if ((window as any).google?.script?.run?.showImportPreviewModal) {
+        (window as any).google.script.run.showImportPreviewModal();
+      } else if (window.parent && window.parent !== window) {
+        try {
+          (window.parent as any).google?.script?.run?.showImportPreviewModal();
+        } catch (e) {
+          setShowPreviewModal(true);
+        }
+      } else {
+        setShowPreviewModal(true);
+      }
+    }, 500);
   };
 
   const handleConfirmImport = () => {
