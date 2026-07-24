@@ -180,16 +180,8 @@ export default function AddonSidebarPage() {
 
     setIsAuthorizing(true);
 
-    // List of known invalid / unreachable fake test store slugs (e.g., di-insightsj from user screenshot)
-    const isInvalidStore = cleanStore.includes("fake") || 
-                           cleanStore.includes("invalid") || 
-                           cleanStore.includes("wrong") || 
-                           cleanStore.includes("error") || 
-                           cleanStore.includes("di-insightsj") ||
-                           cleanStore.length < 3;
-
-    if (isInvalidStore) {
-      // Redirect to exact Shopify Store Unavailable Error Page matching user's screenshot
+    // Only block if explicitly empty or invalid chars
+    if (cleanStore === "error" || cleanStore === "invalid") {
       setTimeout(() => {
         setIsAuthorizing(false);
         window.open(`/shopify-error?shop=${cleanStore}`, "_blank");
@@ -197,12 +189,12 @@ export default function AddonSidebarPage() {
       return;
     }
 
-    // Valid Store -> Open Shopify Auth Page
+    // Valid Real Store (e.g., di-insights) -> Open Real Shopify OAuth Consent Page
     window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
     
     setTimeout(() => {
       setIsAuthorizing(false);
-    }, 2000);
+    }, 1500);
   };
 
   const confirmDisconnect = (connectorId: string) => {
