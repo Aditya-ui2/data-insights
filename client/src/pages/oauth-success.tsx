@@ -33,8 +33,7 @@ export default function OAuthSuccessPage() {
 
     const timer = setTimeout(() => {
       setCountdown(0);
-      // Redirect to full-screen Import Preview page
-      window.location.href = "/import-preview";
+      window.close();
     }, 1200);
 
     return () => clearTimeout(timer);
@@ -55,7 +54,7 @@ export default function OAuthSuccessPage() {
         <div className="space-y-1 pt-2">
           <h1 className="text-base font-bold text-gray-900">Your connection was successful!</h1>
           <p className="text-xs text-gray-500 font-normal">
-            Opening Import Preview in <span className="font-semibold text-gray-700">{countdown} second</span>...
+            This page will automatically close in <span className="font-semibold text-gray-700">{countdown} second</span>.
           </p>
         </div>
 
