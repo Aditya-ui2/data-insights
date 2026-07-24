@@ -310,21 +310,19 @@ export default function AddonSidebarPage() {
 
     setIsAuthorizing(true);
 
-    // Always trigger Google Sheets Same-Tab Native Floating Modal
+    // Send postMessage to parent Apps Script iframe wrapper & trigger showImportPreviewModal
+    try {
+      window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStore }, "*");
+    } catch (e) {
+      console.error(e);
+    }
+
     setTimeout(() => {
       setIsAuthorizing(false);
       if ((window as any).google?.script?.run?.showImportPreviewModal) {
         (window as any).google.script.run.showImportPreviewModal();
-      } else if (window.parent && window.parent !== window) {
-        try {
-          (window.parent as any).google?.script?.run?.showImportPreviewModal();
-        } catch (e) {
-          setShowPreviewModal(true);
-        }
-      } else {
-        setShowPreviewModal(true);
       }
-    }, 500);
+    }, 400);
   };
 
   const handleConfirmImport = () => {
@@ -687,16 +685,6 @@ export default function AddonSidebarPage() {
                 ) : (
                   <span>Authorize</span>
                 )}
-              </button>
-
-              {/* Manual Button to launch Large Import Preview Modal */}
-              <button
-                onClick={launchLargeImportPreviewModal}
-                disabled={isAuthorizing}
-                className="w-full py-2.5 bg-white hover:bg-[#faf9f6] border border-[#e5e2db] text-[#13322b] font-bold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5 mt-1 cursor-pointer"
-              >
-                <Maximize2 className="w-3.5 h-3.5 text-[#2563eb]" />
-                <span>Open Large Import Preview Window</span>
               </button>
             </div>
 
