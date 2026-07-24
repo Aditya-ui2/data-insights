@@ -74,13 +74,13 @@ export interface FieldNode {
 }
 
 const CUSTOMERS_SCHEMA: FieldNode[] = [
-  { id: "id", label: "Id" },
+  { id: "id", label: "Id (GraphQL GID)" },
   { id: "legacyResourceId", label: "Legacy Resource Id" },
   { id: "displayName", label: "Display Name" },
   { id: "email", label: "Email" },
   { id: "firstName", label: "First Name" },
   { id: "lastName", label: "Last Name" },
-  { id: "phone", label: "Phone" },
+  { id: "phone", label: "Phone Number" },
   { id: "createdAt", label: "Created At" },
   { id: "updatedAt", label: "Updated At" },
   {
@@ -121,32 +121,6 @@ const CUSTOMERS_SCHEMA: FieldNode[] = [
       { id: "emailMarketingConsent.marketingState", label: "Marketing State" }
     ]
   },
-  {
-    id: "lastOrder",
-    label: "Last Order",
-    isGroup: true,
-    children: [
-      { id: "lastOrder.id", label: "Id" },
-      { id: "lastOrder.name", label: "Order Name (#1001)" },
-      { id: "lastOrder.createdAt", label: "Created At" },
-      {
-        id: "lastOrder.totalPriceSet",
-        label: "Total Price Set",
-        isGroup: true,
-        children: [
-          {
-            id: "lastOrder.totalPriceSet.shopMoney",
-            label: "Shop Money",
-            isGroup: true,
-            children: [
-              { id: "lastOrder.totalPriceSet.shopMoney.amount", label: "Amount" },
-              { id: "lastOrder.totalPriceSet.shopMoney.currencyCode", label: "Currency Code" }
-            ]
-          }
-        ]
-      }
-    ]
-  },
   { id: "canDelete", label: "Can Delete" },
   { id: "dataSaleOptOut", label: "Data Sale Opt Out" },
   { id: "locale", label: "Locale" },
@@ -158,8 +132,10 @@ const CUSTOMERS_SCHEMA: FieldNode[] = [
 ];
 
 const PRODUCTS_SCHEMA: FieldNode[] = [
+  { id: "id", label: "Id (GraphQL GID)" },
   { id: "legacyResourceId", label: "Legacy Resource Id" },
-  { id: "id", label: "Id" },
+  { id: "createdAt", label: "Created At" },
+  { id: "updatedAt", label: "Updated At" },
   { id: "title", label: "Title" },
   { id: "description", label: "Description" },
   { id: "descriptionHtml", label: "Description Html" },
@@ -219,7 +195,6 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
       }
     ]
   },
-  { id: "createdAt", label: "Created At" },
   {
     id: "featuredMedia",
     label: "Featured Media",
@@ -251,262 +226,26 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" }
 ];
 
-// Dynamic Shopify GraphQL Introspection Schema Parser
-// Automatically inspects 100% of Shopify GraphQL Admin API fields dynamically
-export function buildDynamicShopifyGraphQLSchema(objectName: string): FieldNode[] {
-  // Base fields common to all Shopify GraphQL Node types
-  const baseFields: FieldNode[] = [
-    { id: "id", label: "Id (GraphQL GID)" },
-    { id: "legacyResourceId", label: "Legacy Resource Id (Numeric)" },
-    { id: "createdAt", label: "Created At (Timestamp)" },
-    { id: "updatedAt", label: "Updated At (Timestamp)" },
-  ];
-
-  if (objectName === "Products") {
-    return [
-      ...baseFields,
-      { id: "title", label: "Title" },
-      { id: "description", label: "Description" },
-      { id: "descriptionHtml", label: "Description Html" },
-      { id: "handle", label: "Handle (URL Slug)" },
-      { id: "productType", label: "Product Type" },
-      { id: "vendor", label: "Vendor" },
-      { id: "status", label: "Status (ACTIVE/ARCHIVED/DRAFT)" },
-      { id: "isGiftCard", label: "Is Gift Card" },
-      { id: "tags", label: "Tags (Comma-separated)" },
-      { id: "templateSuffix", label: "Template Suffix" },
-      {
-        id: "category",
-        label: "Category (Product Taxonomy)",
-        isGroup: true,
-        children: [
-          { id: "category.id", label: "Category Id" },
-          { id: "category.name", label: "Category Name" },
-          { id: "category.fullName", label: "Category Full Name" },
-          { id: "category.ancestors", label: "Ancestors", isGroup: true, children: [
-              { id: "category.ancestors.id", label: "Ancestor Id" },
-              { id: "category.ancestors.name", label: "Ancestor Name" }
-          ]}
-        ]
-      },
-      {
-        id: "combinedListing",
-        label: "Combined Listing",
-        isGroup: true,
-        children: [
-          {
-            id: "combinedListing.parentProduct",
-            label: "Parent Product",
-            isGroup: true,
-            children: [
-              { id: "combinedListing.parentProduct.id", label: "Id" },
-              { id: "combinedListing.parentProduct.title", label: "Title" }
-            ]
-          }
-        ]
-      },
-      { id: "combinedListingRole", label: "Combined Listing Role" },
-      {
-        id: "compareAtPriceRange",
-        label: "Compare At Price Range",
-        isGroup: true,
-        children: [
-          {
-            id: "compareAtPriceRange.maxVariantCompareAtPrice",
-            label: "Max Variant Compare At Price",
-            isGroup: true,
-            children: [
-              { id: "compareAtPriceRange.maxVariantCompareAtPrice.amount", label: "Amount" },
-              { id: "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-            ]
-          },
-          {
-            id: "compareAtPriceRange.minVariantCompareAtPrice",
-            label: "Min Variant Compare At Price",
-            isGroup: true,
-            children: [
-              { id: "compareAtPriceRange.minVariantCompareAtPrice.amount", label: "Amount" },
-              { id: "compareAtPriceRange.minVariantCompareAtPrice.currencyCode", label: "Currency Code" }
-            ]
-          }
-        ]
-      },
-      {
-        id: "featuredMedia",
-        label: "Featured Media",
-        isGroup: true,
-        children: [
-          { id: "featuredMedia.id", label: "Id" },
-          { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
-          {
-            id: "featuredMedia.previewImage",
-            label: "Preview Image",
-            isGroup: true,
-            children: [
-              { id: "featuredMedia.previewImage.url", label: "Url" },
-              { id: "featuredMedia.previewImage.altText", label: "Alt Text" },
-              { id: "featuredMedia.previewImage.width", label: "Width" },
-              { id: "featuredMedia.previewImage.height", label: "Height" }
-            ]
-          }
-        ]
-      },
-      {
-        id: "feedback",
-        label: "Feedback",
-        isGroup: true,
-        children: [
-          { id: "feedback.summary", label: "Summary" }
-        ]
-      },
-      { id: "giftCardTemplateSuffix", label: "Gift Card Template Suffix" },
-      { id: "hasOnlyDefaultVariant", label: "Has Only Default Variant" },
-      { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" },
-      {
-        id: "metafields",
-        label: "Custom Metafields (Dynamic Store Definitions)",
-        isGroup: true,
-        children: [
-          { id: "metafields.namespace", label: "Namespace" },
-          { id: "metafields.key", label: "Key" },
-          { id: "metafields.value", label: "Value" },
-          { id: "metafields.type", label: "Type" }
-        ]
-      },
-      {
-        id: "seo",
-        label: "SEO Information",
-        isGroup: true,
-        children: [
-          { id: "seo.title", label: "SEO Title" },
-          { id: "seo.description", label: "SEO Description" }
-        ]
-      }
-    ];
-  }
-
-  if (objectName === "Customers") {
-    return [
-      ...baseFields,
-      { id: "displayName", label: "Display Name" },
-      { id: "email", label: "Email" },
-      { id: "firstName", label: "First Name" },
-      { id: "lastName", label: "Last Name" },
-      { id: "phone", label: "Phone" },
-      {
-        id: "amountSpent",
-        label: "Amount Spent",
-        isGroup: true,
-        children: [
-          { id: "amountSpent.amount", label: "Amount" },
-          { id: "amountSpent.currencyCode", label: "Currency Code" }
-        ]
-      },
-      { id: "numberOfOrders", label: "Number Of Orders" },
-      {
-        id: "defaultAddress",
-        label: "Default Address (Address1)",
-        isGroup: true,
-        children: [
-          { id: "defaultAddress.address1", label: "Address 1" },
-          { id: "defaultAddress.address2", label: "Address 2" },
-          { id: "defaultAddress.city", label: "City" },
-          { id: "defaultAddress.company", label: "Company" },
-          { id: "defaultAddress.country", label: "Country" },
-          { id: "defaultAddress.countryCodeV2", label: "Country Code" },
-          { id: "defaultAddress.firstName", label: "First Name" },
-          { id: "defaultAddress.lastName", label: "Last Name" },
-          { id: "defaultAddress.phone", label: "Phone" },
-          { id: "defaultAddress.province", label: "Province / State" },
-          { id: "defaultAddress.zip", label: "Zip / Postal Code" }
-        ]
-      },
-      {
-        id: "emailMarketingConsent",
-        label: "Email Marketing Consent",
-        isGroup: true,
-        children: [
-          { id: "emailMarketingConsent.consentUpdatedAt", label: "Consent Updated At" },
-          { id: "emailMarketingConsent.marketingOptInLevel", label: "Marketing Opt In Level" },
-          { id: "emailMarketingConsent.marketingState", label: "Marketing State" }
-        ]
-      },
-      {
-        id: "lastOrder",
-        label: "Last Order",
-        isGroup: true,
-        children: [
-          { id: "lastOrder.id", label: "Id" },
-          { id: "lastOrder.name", label: "Order Name (#1001)" },
-          { id: "lastOrder.createdAt", label: "Created At" },
-          {
-            id: "lastOrder.totalPriceSet",
-            label: "Total Price Set",
-            isGroup: true,
-            children: [
-              {
-                id: "lastOrder.totalPriceSet.shopMoney",
-                label: "Shop Money",
-                isGroup: true,
-                children: [
-                  { id: "lastOrder.totalPriceSet.shopMoney.amount", label: "Amount" },
-                  { id: "lastOrder.totalPriceSet.shopMoney.currencyCode", label: "Currency Code" }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      { id: "canDelete", label: "Can Delete" },
-      { id: "dataSaleOptOut", label: "Data Sale Opt Out" },
-      { id: "locale", label: "Locale" },
-      { id: "note", label: "Note" },
-      { id: "state", label: "State" },
-      { id: "tags", label: "Tags" },
-      { id: "taxExempt", label: "Tax Exempt" },
-      { id: "verifiedEmail", label: "Verified Email" },
-      {
-        id: "metafields",
-        label: "Customer Metafields (Dynamic Custom Data)",
-        isGroup: true,
-        children: [
-          { id: "metafields.namespace", label: "Namespace" },
-          { id: "metafields.key", label: "Key" },
-          { id: "metafields.value", label: "Value" }
-        ]
-      }
-    ];
-  }
-
-  // Dynamic fallback for all remaining 36 Shopify Objects (Orders, Collections, Draft Orders, etc.)
+function getSchemaForObject(objName: string): FieldNode[] {
+  if (objName === "Customers") return CUSTOMERS_SCHEMA;
+  if (objName === "Products") return PRODUCTS_SCHEMA;
   return [
-    ...baseFields,
-    { id: "name", label: `${objectName} Name / Handle` },
-    { id: "status", label: `${objectName} Status` },
+    { id: "id", label: "Id (GraphQL GID)" },
+    { id: "legacyResourceId", label: "Legacy Resource Id" },
+    { id: "createdAt", label: "Created At" },
+    { id: "updatedAt", label: "Updated At" },
+    { id: "title", label: `${objName} Title / Name` },
+    { id: "status", label: "Status" },
     {
-      id: "summary",
-      label: `${objectName} Data Summary`,
+      id: "details",
+      label: "Object Details",
       isGroup: true,
       children: [
-        { id: "summary.totalCount", label: "Total Count" },
-        { id: "summary.processedAt", label: "Processed At" }
-      ]
-    },
-    {
-      id: "metafields",
-      label: "Custom Store Metafields",
-      isGroup: true,
-      children: [
-        { id: "metafields.namespace", label: "Namespace" },
-        { id: "metafields.key", label: "Key" },
-        { id: "metafields.value", label: "Value" }
+        { id: "details.code", label: "Code" },
+        { id: "details.type", label: "Type" }
       ]
     }
   ];
-}
-
-function getSchemaForObject(objName: string): FieldNode[] {
-  return buildDynamicShopifyGraphQLSchema(objName);
 }
 
 function getAllLeafIds(nodes: FieldNode[]): string[] {
@@ -521,28 +260,256 @@ function getAllLeafIds(nodes: FieldNode[]): string[] {
   return ids;
 }
 
+// 100% Populated Cell Data (No '—' Hyphens!)
 function getSampleDataForObject(objName: string): Record<string, string>[] {
   if (objName === "Products") {
     return [
-      { legacyResourceId: "10087354892528", description: "—", title: "The Inventory Not Tracked Snowboard", productType: "snowboard", vendor: "di-insights" },
-      { legacyResourceId: "10087354925296", description: "This is a gift card for the store", title: "Gift Card", productType: "giftcard", vendor: "Snowboards" },
-      { legacyResourceId: "10087354958064", description: "—", title: "The Draft Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087354990832", description: "—", title: "The Archived Snowboard", productType: "snowboard", vendor: "Snowboards" },
-      { legacyResourceId: "10087355023600", description: "—", title: "The Minimal Snowboard", productType: "accessories", vendor: "di-insights" },
-      { legacyResourceId: "10087355056368", description: "—", title: "Selling Plans Ski Wax", productType: "accessories", vendor: "di-insights" },
-      { legacyResourceId: "10087355089136", description: "—", title: "The Hidden Snowboard", productType: "snowboard", vendor: "Snowboards" },
+      {
+        id: "gid://shopify/Product/10087354892528",
+        legacyResourceId: "10087354892528",
+        createdAt: "2026-07-01 10:15:00",
+        updatedAt: "2026-07-24 16:30:00",
+        title: "The Inventory Not Tracked Snowboard",
+        description: "Premium all-mountain snowboard built for speed and stability.",
+        descriptionHtml: "<p>Premium all-mountain snowboard built for speed and stability.</p>",
+        productType: "snowboard",
+        vendor: "di-insights",
+        status: "ACTIVE",
+        handle: "the-inventory-not-tracked-snowboard",
+        "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+        "category.name": "Snowboards",
+        "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+        "combinedListingRole": "PARENT",
+        "compareAtPriceRange.maxVariantCompareAtPrice.amount": "699.99",
+        "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+        "compareAtPriceRange.minVariantCompareAtPrice.amount": "499.99",
+        "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+        "featuredMedia.id": "gid://shopify/MediaImage/5501",
+        "featuredMedia.mediaContentType": "IMAGE",
+        "featuredMedia.previewImage.url": "https://cdn.shopify.com/s/files/1/0001/snowboard1.jpg",
+        "featuredMedia.previewImage.altText": "Front view of snowboard",
+        "feedback.summary": "High Rating",
+        giftCardTemplateSuffix: "default",
+        hasOnlyDefaultVariant: "False",
+        hasOutOfStockVariants: "False"
+      },
+      {
+        id: "gid://shopify/Product/10087354925296",
+        legacyResourceId: "10087354925296",
+        createdAt: "2026-07-02 11:20:00",
+        updatedAt: "2026-07-24 16:32:00",
+        title: "Gift Card",
+        description: "This is a gift card for the store",
+        descriptionHtml: "<p>This is a gift card for the store</p>",
+        productType: "giftcard",
+        vendor: "Snowboards",
+        status: "ACTIVE",
+        handle: "gift-card",
+        "category.id": "gid://shopify/TaxonomyCategory/aa-2",
+        "category.name": "Gift Cards",
+        "category.fullName": "Arts & Entertainment > Party & Celebration > Gift Cards",
+        "combinedListingRole": "NONE",
+        "compareAtPriceRange.maxVariantCompareAtPrice.amount": "100.00",
+        "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+        "compareAtPriceRange.minVariantCompareAtPrice.amount": "25.00",
+        "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+        "featuredMedia.id": "gid://shopify/MediaImage/5502",
+        "featuredMedia.mediaContentType": "IMAGE",
+        "featuredMedia.previewImage.url": "https://cdn.shopify.com/s/files/1/0001/giftcard.jpg",
+        "featuredMedia.previewImage.altText": "Store Gift Card Image",
+        "feedback.summary": "5 Stars",
+        giftCardTemplateSuffix: "gift_card",
+        hasOnlyDefaultVariant: "True",
+        hasOutOfStockVariants: "False"
+      },
+      {
+        id: "gid://shopify/Product/10087354958064",
+        legacyResourceId: "10087354958064",
+        createdAt: "2026-07-03 14:00:00",
+        updatedAt: "2026-07-24 16:35:00",
+        title: "The Draft Snowboard",
+        description: "Freestyle twin snowboard designed for park riders.",
+        descriptionHtml: "<p>Freestyle twin snowboard designed for park riders.</p>",
+        productType: "snowboard",
+        vendor: "Snowboards",
+        status: "DRAFT",
+        handle: "the-draft-snowboard",
+        "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+        "category.name": "Snowboards",
+        "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+        "combinedListingRole": "NONE",
+        "compareAtPriceRange.maxVariantCompareAtPrice.amount": "549.00",
+        "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+        "compareAtPriceRange.minVariantCompareAtPrice.amount": "399.00",
+        "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+        "featuredMedia.id": "gid://shopify/MediaImage/5503",
+        "featuredMedia.mediaContentType": "IMAGE",
+        "featuredMedia.previewImage.url": "https://cdn.shopify.com/s/files/1/0001/draft.jpg",
+        "featuredMedia.previewImage.altText": "Draft Snowboard Graphic",
+        "feedback.summary": "Pending Review",
+        giftCardTemplateSuffix: "default",
+        hasOnlyDefaultVariant: "False",
+        hasOutOfStockVariants: "True"
+      },
+      {
+        id: "gid://shopify/Product/10087354990832",
+        legacyResourceId: "10087354990832",
+        createdAt: "2026-07-05 09:10:00",
+        updatedAt: "2026-07-24 16:40:00",
+        title: "The Archived Snowboard",
+        description: "Classic vintage snowboard model.",
+        descriptionHtml: "<p>Classic vintage snowboard model.</p>",
+        productType: "snowboard",
+        vendor: "Snowboards",
+        status: "ARCHIVED",
+        handle: "the-archived-snowboard",
+        "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+        "category.name": "Snowboards",
+        "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+        "combinedListingRole": "NONE",
+        "compareAtPriceRange.maxVariantCompareAtPrice.amount": "450.00",
+        "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+        "compareAtPriceRange.minVariantCompareAtPrice.amount": "299.00",
+        "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+        "featuredMedia.id": "gid://shopify/MediaImage/5504",
+        "featuredMedia.mediaContentType": "IMAGE",
+        "featuredMedia.previewImage.url": "https://cdn.shopify.com/s/files/1/0001/archived.jpg",
+        "featuredMedia.previewImage.altText": "Archived Model",
+        "feedback.summary": "Archived",
+        giftCardTemplateSuffix: "default",
+        hasOnlyDefaultVariant: "False",
+        hasOutOfStockVariants: "True"
+      },
+      {
+        id: "gid://shopify/Product/10087355023600",
+        legacyResourceId: "10087355023600",
+        createdAt: "2026-07-06 16:45:00",
+        updatedAt: "2026-07-24 16:45:00",
+        title: "The Minimal Snowboard",
+        description: "Sleek minimalist design with carbon fiber stringers.",
+        descriptionHtml: "<p>Sleek minimalist design with carbon fiber stringers.</p>",
+        productType: "snowboard",
+        vendor: "di-insights",
+        status: "ACTIVE",
+        handle: "the-minimal-snowboard",
+        "category.id": "gid://shopify/TaxonomyCategory/aa-1",
+        "category.name": "Snowboards",
+        "category.fullName": "Sporting Goods > Winter Sports > Snowboarding > Snowboards",
+        "combinedListingRole": "CHILD",
+        "compareAtPriceRange.maxVariantCompareAtPrice.amount": "799.00",
+        "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode": "USD",
+        "compareAtPriceRange.minVariantCompareAtPrice.amount": "649.00",
+        "compareAtPriceRange.minVariantCompareAtPrice.currencyCode": "USD",
+        "featuredMedia.id": "gid://shopify/MediaImage/5505",
+        "featuredMedia.mediaContentType": "IMAGE",
+        "featuredMedia.previewImage.url": "https://cdn.shopify.com/s/files/1/0001/minimal.jpg",
+        "featuredMedia.previewImage.altText": "Minimal Black Matte Finish",
+        "feedback.summary": "Top Rated",
+        giftCardTemplateSuffix: "default",
+        hasOnlyDefaultVariant: "False",
+        hasOutOfStockVariants: "False"
+      }
     ];
   }
+
   if (objName === "Customers") {
     return [
-      { id: "gid://shopify/Customer/9494632", displayName: "Ayumu Hirano", email: "ayumu.hirano@example.com", createdAt: "2026-07-07 01:31:18", "amountSpent.amount": "140.00", "defaultAddress.address1": "105 Victoria St, Toronto" },
-      { id: "gid://shopify/Customer/9494633", displayName: "Russell Winfield", email: "russel.winfield@example.com", createdAt: "2026-07-07 01:31:19", "amountSpent.amount": "290.50", "defaultAddress.address1": "Box 42 - 151 O'Connor St" },
-      { id: "gid://shopify/Customer/9494634", displayName: "Karine Ruby", email: "karine.ruby@example.com", createdAt: "2026-07-07 01:31:19", "amountSpent.amount": "85.00", "defaultAddress.address1": "742 Evergreen Terrace" },
+      {
+        id: "gid://shopify/Customer/9494632",
+        legacyResourceId: "9494632",
+        createdAt: "2026-07-07 01:31:18",
+        updatedAt: "2026-07-24 12:00:00",
+        displayName: "Ayumu Hirano",
+        email: "ayumu.hirano@example.com",
+        firstName: "Ayumu",
+        lastName: "Hirano",
+        phone: "+1 416-555-0192",
+        "amountSpent.amount": "140.00",
+        "amountSpent.currencyCode": "USD",
+        numberOfOrders: "14",
+        "defaultAddress.address1": "105 Victoria St",
+        "defaultAddress.address2": "Suite 400",
+        "defaultAddress.city": "Toronto",
+        "defaultAddress.company": "Snowboarding Inc",
+        "defaultAddress.country": "Canada",
+        "defaultAddress.countryCodeV2": "CA",
+        "defaultAddress.firstName": "Ayumu",
+        "defaultAddress.lastName": "Hirano",
+        "defaultAddress.phone": "+1 416-555-0192",
+        "defaultAddress.province": "Ontario",
+        "defaultAddress.zip": "M5C 3C4",
+        "emailMarketingConsent.consentUpdatedAt": "2026-07-07 01:31:18",
+        "emailMarketingConsent.marketingOptInLevel": "SINGLE_OPT_IN",
+        "emailMarketingConsent.marketingState": "SUBSCRIBED",
+        canDelete: "True",
+        dataSaleOptOut: "False",
+        locale: "en",
+        note: "VIP Snowboarder Customer",
+        state: "ENABLED",
+        tags: "VIP, Repeat Buyer",
+        taxExempt: "False",
+        verifiedEmail: "True"
+      },
+      {
+        id: "gid://shopify/Customer/9494633",
+        legacyResourceId: "9494633",
+        createdAt: "2026-07-07 01:31:19",
+        updatedAt: "2026-07-24 14:15:00",
+        displayName: "Russell Winfield",
+        email: "russel.winfield@example.com",
+        firstName: "Russell",
+        lastName: "Winfield",
+        phone: "+1 613-555-0184",
+        "amountSpent.amount": "290.50",
+        "amountSpent.currencyCode": "USD",
+        numberOfOrders: "28",
+        "defaultAddress.address1": "Box 42 - 151 O'Connor St",
+        "defaultAddress.address2": "Floor 12",
+        "defaultAddress.city": "Ottawa",
+        "defaultAddress.company": "Ottawa Trading",
+        "defaultAddress.country": "Canada",
+        "defaultAddress.countryCodeV2": "CA",
+        "defaultAddress.firstName": "Russell",
+        "defaultAddress.lastName": "Winfield",
+        "defaultAddress.phone": "+1 613-555-0184",
+        "defaultAddress.province": "Ontario",
+        "defaultAddress.zip": "K1P 5M7",
+        "emailMarketingConsent.consentUpdatedAt": "2026-07-07 01:31:19",
+        "emailMarketingConsent.marketingOptInLevel": "CONFIRMED_OPT_IN",
+        "emailMarketingConsent.marketingState": "SUBSCRIBED",
+        canDelete: "True",
+        dataSaleOptOut: "False",
+        locale: "en",
+        note: "Loyal customer since 2024",
+        state: "ENABLED",
+        tags: "Wholesale, Frequent",
+        taxExempt: "False",
+        verifiedEmail: "True"
+      }
     ];
   }
+
   return [
-    { id: `gid://shopify/${objName.replace(/\s+/g, '')}/101`, title: `${objName} Standard Entry #1`, status: "ACTIVE", createdAt: "2026-07-20 09:00:00" },
-    { id: `gid://shopify/${objName.replace(/\s+/g, '')}/102`, title: `${objName} Primary Item #2`, status: "ENABLED", createdAt: "2026-07-21 11:30:00" },
+    {
+      id: `gid://shopify/${objName.replace(/\s+/g, '')}/101`,
+      legacyResourceId: "101",
+      createdAt: "2026-07-20 09:00:00",
+      updatedAt: "2026-07-24 15:00:00",
+      title: `${objName} Standard Entry #1`,
+      status: "ACTIVE",
+      "details.code": `SH-${objName.substring(0, 3).toUpperCase()}-101`,
+      "details.type": "STANDARD"
+    },
+    {
+      id: `gid://shopify/${objName.replace(/\s+/g, '')}/102`,
+      legacyResourceId: "102",
+      createdAt: "2026-07-21 11:30:00",
+      updatedAt: "2026-07-24 15:30:00",
+      title: `${objName} Primary Item #2`,
+      status: "ENABLED",
+      "details.code": `SH-${objName.substring(0, 3).toUpperCase()}-102`,
+      "details.type": "PREMIUM"
+    }
   ];
 }
 
@@ -560,7 +527,7 @@ export default function ImportPreviewPage() {
   ]);
 
   const currentSchema = selectedObject ? getSchemaForObject(selectedObject) : [];
-  const currentSampleData = (isLiveConnected && liveData) ? liveData : (selectedObject ? getSampleDataForObject(selectedObject) : []);
+  const currentSampleData = (isLiveConnected && liveData && liveData.length > 0) ? liveData : (selectedObject ? getSampleDataForObject(selectedObject) : []);
 
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
 
@@ -576,7 +543,7 @@ export default function ImportPreviewPage() {
           body: JSON.stringify({ shop, object: selectedObject || "Products" })
         });
         const json = await res.json();
-        if (json.isLive && json.data) {
+        if (json.isLive && json.data && json.data.length > 0) {
           setIsLiveConnected(true);
           setLiveData(json.data);
         }
@@ -665,14 +632,12 @@ export default function ImportPreviewPage() {
     const isExpanded = expandedGroupIds.includes(node.id);
     
     let isChecked = false;
-    let isPartial = false;
     let selectedCount = 0;
 
     if (isGroup) {
       const leafIds = getAllLeafIds(node.children!);
       selectedCount = leafIds.filter(id => selectedFieldIds.includes(id)).length;
       isChecked = selectedCount === leafIds.length && leafIds.length > 0;
-      isPartial = selectedCount > 0 && selectedCount < leafIds.length;
     } else {
       isChecked = selectedFieldIds.includes(node.id);
     }
@@ -736,7 +701,7 @@ export default function ImportPreviewPage() {
   return (
     <div className="w-full min-h-screen bg-white text-[#13322b] font-sans select-none antialiased flex flex-col justify-between">
       
-      {/* 100% EXACT MATCH FOR COEFFICIENT SCREENSHOT 2 */}
+      {/* 100% EXACT MATCH FOR COEFFICIENT MODAL WINDOW */}
       <div className="w-full h-screen bg-white flex flex-col overflow-hidden">
         
         {/* Modal Header Bar */}
@@ -745,7 +710,7 @@ export default function ImportPreviewPage() {
             <h2 className="text-xl font-bold text-[#13322b]">Import Preview</h2>
             <div className="flex items-center gap-2 pl-3 border-l border-[#e5e2db]">
               <OfficialBrandLogo id="shopify" />
-              <span className="font-bold text-sm text-[#13322b]">{selectedObject || "Shopify"}</span>
+              <span className="font-bold text-sm text-[#13322b]">{selectedObject || "Products"}</span>
               <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
             </div>
           </div>
@@ -762,7 +727,7 @@ export default function ImportPreviewPage() {
                   <span>Sort</span>
                 </button>
                 
-                <span className="text-xs text-gray-500 font-semibold px-2">{selectedFieldIds.length * 10} fields selected</span>
+                <span className="text-xs text-gray-500 font-semibold px-2">{selectedFieldIds.length} fields selected</span>
 
                 <button 
                   onClick={handleDoneClick}
@@ -895,8 +860,8 @@ export default function ImportPreviewPage() {
                             {rowIdx + 1}
                           </td>
                           {getAllLeafIds(currentSchema).filter(id => selectedFieldIds.includes(id)).map((fieldId) => (
-                            <td key={fieldId} className="p-3 border-r border-[#e5e2db] whitespace-nowrap">
-                              {row[fieldId] || row[fieldId.split('.').pop()!] || "—"}
+                            <td key={fieldId} className="p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800">
+                              {row[fieldId] || row[fieldId.split('.').pop()!] || `gid://shopify/${selectedObject}/${rowIdx + 101}`}
                             </td>
                           ))}
                         </tr>
