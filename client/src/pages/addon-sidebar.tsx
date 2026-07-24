@@ -26,7 +26,11 @@ import {
   RefreshCw,
   Zap,
   Layers,
-  Trash2
+  Trash2,
+  Key,
+  ShieldCheck,
+  Mail,
+  UserCheck
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DV_LOGO_BASE64 } from "./logo-base64";
@@ -180,7 +184,7 @@ const INITIAL_CONNECTORS: Connector[] = [
 
 export default function AddonSidebarPage() {
   const [connectorsList, setConnectorsList] = useState<Connector[]>(INITIAL_CONNECTORS);
-  const [currentView, setCurrentView] = useState<"home" | "import-connectors" | "connector-connect" | "importing-active">("home");
+  const [currentView, setCurrentView] = useState<"home" | "import-connectors" | "connector-connect" | "oauth-redirect" | "importing-active">("home");
   const [selectedConnector, setSelectedConnector] = useState<Connector>(INITIAL_CONNECTORS[0]);
   const [deleteTargetConnector, setDeleteTargetConnector] = useState<Connector | null>(null);
   const [storeNameInput, setStoreNameInput] = useState("");
@@ -230,12 +234,18 @@ export default function AddonSidebarPage() {
     setCurrentView("connector-connect");
   };
 
+  // STEP 1 Authorize Click -> Redirect to Shopify Security OAuth Screen (Image 2)
   const handleAuthorizeClick = () => {
     setIsAuthorizing(true);
     setTimeout(() => {
       setIsAuthorizing(false);
-      setShowPreviewModal(true);
-    }, 1200);
+      setCurrentView("oauth-redirect");
+    }, 800);
+  };
+
+  // STEP 2 Confirm on Shopify OAuth Screen -> Opens Import Preview Modal (Image 3 & 4)
+  const handleOAuthConfirm = () => {
+    setShowPreviewModal(true);
   };
 
   const handleConfirmImport = () => {
@@ -247,7 +257,6 @@ export default function AddonSidebarPage() {
     }, 3000);
   };
 
-  // Disconnect Handler for Trash Button
   const confirmDisconnect = (connectorId: string) => {
     setConnectorsList(prev => prev.map(c => c.id === connectorId ? { ...c, status: "Available" } : c));
     setDeleteTargetConnector(null);
@@ -457,7 +466,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (WITH DELETE TRASH BUTTON) */}
+      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE */}
       {currentView === "import-connectors" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
@@ -473,7 +482,7 @@ export default function AddonSidebarPage() {
             />
           </div>
 
-          {/* SECTION 1: CONNECTED SOURCES (WITH TRASH DELETE BUTTON) */}
+          {/* SECTION 1: CONNECTED SOURCES */}
           {searchTerm === "" && (
             <div className="space-y-2.5">
               <div className="flex items-center justify-between">
@@ -623,7 +632,83 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 4: STEP 4 - IMPORTING ACTIVE SYNC CARD */}
+      {/* VIEW 4: STEP 2 - SHOPIFY OAUTH SECURITY CONFIRMATION PAGE (EXACT MATCH FOR IMAGE 2) */}
+      {currentView === "oauth-redirect" && (
+        <div className="p-4 flex-1 overflow-y-auto bg-[#181818] text-white flex flex-col items-center justify-center relative">
+          
+          <div className="w-full max-w-sm space-y-6 animate-in fade-in zoom-in duration-200 py-4">
+            
+            {/* Shopify Brand Logo Icon */}
+            <div className="flex justify-center">
+              <div className="w-16 h-16 rounded-full bg-[#95bf47]/20 flex items-center justify-center p-3 border border-[#95bf47]/40 shadow-lg">
+                <img 
+                  src="https://cdn.simpleicons.org/shopify/95BF47" 
+                  alt="Shopify" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+
+            {/* White Security Card */}
+            <div className="bg-white text-[#13322b] rounded-3xl p-6 shadow-2xl space-y-5 border border-[#e5e2db]">
+              <div className="space-y-1">
+                <h2 className="text-base font-bold text-gray-900">Review your security settings</h2>
+                <p className="text-xs text-gray-500 leading-relaxed">
+                  Keep your account safe by making sure your security settings are up-to-date.
+                </p>
+              </div>
+
+              {/* Passkeys Block */}
+              <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400">Passkeys</span>
+                  <span className="text-[9px] bg-emerald-100 text-emerald-700 font-bold px-2 py-0.5 rounded-full">Recommended</span>
+                </div>
+                <p className="text-[11px] text-gray-600 leading-relaxed">
+                  Log in with your fingerprint, face recognition, or PIN instead of a password.
+                </p>
+                <button className="w-full py-2 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 flex items-center justify-center gap-1.5 shadow-2xs hover:bg-gray-50">
+                  <Key className="w-3.5 h-3.5 text-gray-500" />
+                  <span>Create a passkey</span>
+                </button>
+              </div>
+
+              {/* 2FA Block */}
+              <div className="p-3.5 bg-gray-50 rounded-2xl border border-gray-200 space-y-1.5">
+                <span className="text-[10px] font-bold tracking-wider uppercase text-gray-400">Two-Step Authentication</span>
+                <p className="text-[11px] text-gray-600 leading-relaxed">
+                  You don't have two-step turned on. Add an extra layer of security for your store data.
+                </p>
+              </div>
+
+              {/* Recovery Options */}
+              <div className="p-3 bg-gray-50 rounded-2xl border border-gray-200 flex items-center justify-between text-xs">
+                <span className="font-medium text-gray-600">Secondary Email</span>
+                <span className="text-xs font-bold text-gray-400">Off</span>
+              </div>
+
+              {/* CONFIRM BUTTON -> AUTHORIZES & OPENS IMPORT PREVIEW MODAL */}
+              <button 
+                onClick={handleOAuthConfirm}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <ShieldCheck className="w-4 h-4 text-[#c59b43]" />
+                <span>Confirm & Authorize</span>
+              </button>
+
+              <div className="text-center">
+                <button onClick={handleOAuthConfirm} className="text-[11px] font-medium text-gray-500 hover:text-gray-900 underline">
+                  Remind me next time
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* VIEW 5: STEP 4 - IMPORTING ACTIVE SYNC CARD */}
       {currentView === "importing-active" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
