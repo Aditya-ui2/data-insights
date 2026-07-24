@@ -551,6 +551,8 @@ export default function ImportPreviewPage() {
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [liveData, setLiveData] = useState<Record<string, string>[] | null>(null);
+  const [isLiveConnected, setIsLiveConnected] = useState(false);
 
   // Expanded Groups Set (stores group field ids that are open)
   const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([
@@ -558,16 +560,35 @@ export default function ImportPreviewPage() {
   ]);
 
   const currentSchema = selectedObject ? getSchemaForObject(selectedObject) : [];
-  const currentSampleData = selectedObject ? getSampleDataForObject(selectedObject) : [];
+  const currentSampleData = (isLiveConnected && liveData) ? liveData : (selectedObject ? getSampleDataForObject(selectedObject) : []);
 
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
+    // Attempt fetching live data from server API
+    const fetchLiveShopifyData = async () => {
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const shop = urlParams.get("shop") || "di-insights";
+        const res = await fetch("/api/shopify/fetch-live-data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ shop, object: selectedObject || "Products" })
+        });
+        const json = await res.json();
+        if (json.isLive && json.data) {
+          setIsLiveConnected(true);
+          setLiveData(json.data);
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLiveShopifyData();
+  }, [selectedObject]);
 
   useEffect(() => {
     if (selectedObject) {
