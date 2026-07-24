@@ -34,6 +34,7 @@ import fs from "fs";
 import path from "path";
 
 import { parseDocument, indexKnowledgeBaseDocument, retrieveRelevantKbChunks } from "./services/knowledgeBase";
+import { saveIntegrationSource } from "./services/integrationsHub";
 import { queryBusinessData } from "./services/dataCopilot";
 import { orchestrateAgentAnalysis } from "./services/agentWorkspace";
 import { createCopilotAction, executeCopilotAction } from "./services/actionsCenter";
@@ -295,11 +296,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/shopify/fetch-live-data", async (req, res) => {
+  app.post("/api/shopify/fetch-live-data", optionalAuth, async (req: any, res) => {
     try {
       const { shop, accessToken, object } = req.body;
       const cleanShop = (shop || "di-insights").trim().toLowerCase().replace(".myshopify.com", "");
-      const token = accessToken || process.env.SHOPIFY_ACCESS_TOKEN || "";
+      
+      let token = accessToken || "";
+      if (!token) {
+        const userId = req.user?.claims?.sub || 'admin-demo-id';
+        const dbIntegrations = await db
+          .select()
+          .from(integrationsTable)
+          .where(eq(integrationsTable.sourceType, "shopify"));
+
+        const matched = dbIntegrations.find((item: any) => {
+          const userMatches = item.userId === userId;
+          const config = item.config || {};
+          const configShop = (config.shopUrl || config.apiUrl || config.host || "").trim().toLowerCase().replace(".myshopify.com", "");
+          const shopMatches = configShop === cleanShop || configShop.includes(cleanShop) || cleanShop.includes(configShop);
+          return userMatches && shopMatches;
+        }) || dbIntegrations.find((item: any) => {
+          const config = item.config || {};
+          const configShop = (config.shopUrl || config.apiUrl || config.host || "").trim().toLowerCase().replace(".myshopify.com", "");
+          return configShop === cleanShop || configShop.includes(cleanShop) || cleanShop.includes(configShop);
+        });
+
+        if (matched?.config) {
+          token = matched.config.accessToken || matched.config.apiKey || "";
+        }
+      }
+
+      if (!token) {
+        token = process.env.SHOPIFY_ACCESS_TOKEN || "";
+      }
 
       let liveRecords: any[] = [];
       if (token) {
@@ -316,11 +345,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/shopify/introspect-schema", async (req, res) => {
+  app.post("/api/shopify/introspect-schema", optionalAuth, async (req: any, res) => {
     try {
       const { shop, accessToken, object } = req.body;
       const cleanShop = (shop || "di-insights").trim().toLowerCase().replace(".myshopify.com", "");
-      const token = accessToken || process.env.SHOPIFY_ACCESS_TOKEN || "";
+
+      let token = accessToken || "";
+      if (!token) {
+        const userId = req.user?.claims?.sub || 'admin-demo-id';
+        const dbIntegrations = await db
+          .select()
+          .from(integrationsTable)
+          .where(eq(integrationsTable.sourceType, "shopify"));
+
+        const matched = dbIntegrations.find((item: any) => {
+          const userMatches = item.userId === userId;
+          const config = item.config || {};
+          const configShop = (config.shopUrl || config.apiUrl || config.host || "").trim().toLowerCase().replace(".myshopify.com", "");
+          const shopMatches = configShop === cleanShop || configShop.includes(cleanShop) || cleanShop.includes(configShop);
+          return userMatches && shopMatches;
+        }) || dbIntegrations.find((item: any) => {
+          const config = item.config || {};
+          const configShop = (config.shopUrl || config.apiUrl || config.host || "").trim().toLowerCase().replace(".myshopify.com", "");
+          return configShop === cleanShop || configShop.includes(cleanShop) || cleanShop.includes(configShop);
+        });
+
+        if (matched?.config) {
+          token = matched.config.accessToken || matched.config.apiKey || "";
+        }
+      }
+
+      if (!token) {
+        token = process.env.SHOPIFY_ACCESS_TOKEN || "";
+      }
+
       const typeName = getShopifyGraphQLTypeName(object || "Products");
 
       if (token) {
