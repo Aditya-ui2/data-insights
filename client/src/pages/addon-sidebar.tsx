@@ -239,14 +239,23 @@ export default function AddonSidebarPage() {
     const handleMessage = (event: MessageEvent) => {
       if (event.data === "dv_shopify_authorized") {
         setIsAuthorizing(false);
-        setShowPreviewModal(true);
+        // Trigger Google Sheets Native showModalDialog if running in Google Sheets Addon
+        if (window.google?.script?.run?.showImportPreviewModal) {
+          window.google.script.run.showImportPreviewModal();
+        } else {
+          setShowPreviewModal(true);
+        }
       }
     };
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
         setIsAuthorizing(false);
-        setShowPreviewModal(true);
+        if (window.google?.script?.run?.showImportPreviewModal) {
+          window.google.script.run.showImportPreviewModal();
+        } else {
+          setShowPreviewModal(true);
+        }
       }
     };
 
