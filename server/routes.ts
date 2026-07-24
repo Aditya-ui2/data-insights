@@ -48,6 +48,7 @@ import {
   buildUnionSchemaFromRecords, 
   normalizeRecordsWithUnionSchema 
 } from "./services/shopifyUnionFlattener";
+import { inspectRuntimeDynamicJson } from "./services/shopifyDynamicEngine";
 
 import { 
   knowledgeBaseDocuments as kbDocsTable, 
@@ -246,6 +247,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           window.location.href = '/data-import-suite?google_error=true';
         }
       </script><p>Error connecting. You can close this window.</p></body></html>`);
+    }
+  });
+
+  app.post("/api/shopify/inspect-dynamic-json", async (req, res) => {
+    try {
+      const { rawRecords } = req.body;
+      if (!rawRecords || !Array.isArray(rawRecords)) {
+        return res.status(400).json({ error: "rawRecords must be an array" });
+      }
+
+      const dynamicResult = inspectRuntimeDynamicJson(rawRecords);
+      return res.json({
+        success: true,
+        totalRecords: rawRecords.length,
+        totalDiscoveredFields: dynamicResult.allKeys.length,
+        schemaTree: dynamicResult.schemaTree,
+        allKeys: dynamicResult.allKeys,
+        flatRows: dynamicResult.flatRows
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message });
     }
   });
 
