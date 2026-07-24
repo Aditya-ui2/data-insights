@@ -25,7 +25,40 @@ function OfficialBrandLogo({ id }: { id: string }) {
   );
 }
 
-// All 38 Official Shopify Objects (Query Target Selector)
+// Coefficient Empty State Graphic Component (Exact Vector Illustration Match)
+function EmptyObjectSelectionGraphic() {
+  return (
+    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center select-none">
+      <div className="w-48 h-48 rounded-full bg-[#f4f7f6] flex items-center justify-center relative shadow-2xs">
+        <svg 
+          className="w-24 h-24 text-gray-300" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          stroke="currentColor" 
+          strokeWidth="1.2"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <div className="absolute top-8 right-8 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center text-blue-500">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+          </svg>
+        </div>
+      </div>
+      
+      <div className="space-y-1">
+        <p className="text-base font-semibold text-[#13322b]">
+          Select object to preview or{" "}
+          <button className="text-blue-600 underline font-semibold hover:text-blue-800 cursor-pointer">
+            start with a template
+          </button>
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// All 38 Official Shopify Objects (Coefficient 100% Match)
 const ALL_SHOPIFY_OBJECTS = [
   "Automatic Discount Nodes",
   "Automatic Discount Saved Searches",
@@ -75,7 +108,6 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Extract all leaf node IDs from any dynamic JSON schema tree
 function getLeafNodes(nodes: FieldNode[]): { id: string; label: string }[] {
   let list: { id: string; label: string }[] = [];
   for (const node of nodes) {
@@ -93,26 +125,59 @@ function getAllLeafIds(nodes: FieldNode[]): string[] {
 }
 
 export default function ImportPreviewPage() {
-  const [selectedObject, setSelectedObject] = useState<string>("Products");
+  // Initial state: selectedObject is null until user selects an object
+  const [selectedObject, setSelectedObject] = useState<string | null>(null);
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [shopName, setShopName] = useState<string>("di-insights");
 
-  // 100% Dynamic State (Zero Hardcoded Arrays)
+  // 100% Dynamic Schema & Records State
   const [dynamicSchemaTree, setDynamicSchemaTree] = useState<FieldNode[]>([]);
   const [dynamicStoreRows, setDynamicStoreRows] = useState<Record<string, string>[]>([]);
   const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
   const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([]);
 
-  // 100% Runtime Dynamic Schema & Data Sync Engine per Selected Category Object
+  // Coefficient postMessage Payload Protocol (`get:import-preview-payload:request` & `response`)
   useEffect(() => {
+    const messageId = Math.random().toString(36).substring(2, 9);
+    
+    const handleParentMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === "get:import-preview-payload:response") {
+        console.log("RECEIVED MESSAGE", event.data);
+        const payload = event.data.result || event.data.payload;
+        if (payload && payload.shop) {
+          setShopName(payload.shop);
+        }
+      }
+    };
+
+    window.addEventListener("message", handleParentMessage);
+
+    // Send payload request to parent Google Apps Script container
+    console.log("SENDING MESSAGE", { id: messageId, type: "get:import-preview-payload:request" });
+    try {
+      window.parent.postMessage({ id: messageId, type: "get:import-preview-payload:request" }, "*");
+    } catch (e) {
+      console.error(e);
+    }
+
+    return () => {
+      window.removeEventListener("message", handleParentMessage);
+    };
+  }, []);
+
+  // Fetch live schema and records when user selects an object
+  useEffect(() => {
+    if (!selectedObject) return;
+
     let isMounted = true;
     setIsLoading(true);
 
     const fetchDynamicShopifyData = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
-        const shop = urlParams.get("shop") || "di-insights";
+        const shop = urlParams.get("shop") || shopName || "di-insights";
 
         // 1. Fetch Live Store Records for selected category
         const dataRes = await fetch("/api/shopify/fetch-live-data", {
@@ -156,7 +221,7 @@ export default function ImportPreviewPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedObject]);
+  }, [selectedObject, shopName]);
 
   const masterLeafNodes = useMemo(() => getLeafNodes(dynamicSchemaTree), [dynamicSchemaTree]);
 
@@ -206,7 +271,6 @@ export default function ImportPreviewPage() {
 
   const isAllSelected = selectedFieldIds.length === masterLeafNodes.length && masterLeafNodes.length > 0;
 
-  // DYNAMICALLY RENDER COLUMNS FOR ALL CHECKED FIELDS
   const activeTableColumns = useMemo(() => {
     return masterLeafNodes.filter(node => selectedFieldIds.includes(node.id));
   }, [masterLeafNodes, selectedFieldIds]);
@@ -231,7 +295,6 @@ export default function ImportPreviewPage() {
     }
   };
 
-  // Render Recursive Field Tree Node
   const renderTreeNode = (node: FieldNode, depth = 0) => {
     const isGroup = node.isGroup && node.children && node.children.length > 0;
     const isExpanded = expandedGroupIds.includes(node.id);
@@ -402,115 +465,121 @@ export default function ImportPreviewPage() {
             </div>
           </div>
 
-          {/* COLUMN 2 & 3 CONTAINER WITH COEFFICIENT LOADER OVERLAY */}
-          <div className="flex-1 flex overflow-hidden relative bg-[#faf9f6]">
-            
-            {/* Coefficient Loader Overlay when clicking any category section */}
-            {isLoading ? (
-              <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-white/95 backdrop-blur-xs space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
-                  <OfficialBrandLogo id="shopify" />
-                </div>
-                <div className="text-center space-y-1.5">
-                  <h3 className="text-sm font-bold text-[#13322b] animate-pulse">
-                    Loading {selectedObject}...
-                  </h3>
-                  <p className="text-xs text-gray-500 font-medium">
-                    Fetching 100% Dynamic Schema & Store Records Live
-                  </p>
-                </div>
-                <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="w-full h-full bg-[#13322b] animate-pulse" />
-                </div>
-              </div>
-            ) : null}
-
-            {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
-            <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
-              <div className="flex items-center justify-between px-1">
-                <span className="font-bold text-xs text-[#13322b]">{selectedObject}</span>
-                <span className="text-xs text-blue-600 font-semibold cursor-pointer">edit</span>
-              </div>
-
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
-                <input 
-                  type="text" 
-                  placeholder="Search fields"
-                  value={fieldSearchTerm}
-                  onChange={(e) => setFieldSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b] font-medium"
-                />
-              </div>
-
-              <div className="flex-1 overflow-y-auto space-y-1 pr-1 border-t border-[#f0ede6] pt-2">
-                {/* Fully Interactive Select All Button */}
-                <div 
-                  onClick={(e) => toggleSelectAll(e)}
-                  className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-bold text-[#1d4ed8] cursor-pointer hover:bg-blue-50 transition-colors"
-                >
-                  <input 
-                    type="checkbox" 
-                    checked={isAllSelected}
-                    onChange={(e) => toggleSelectAll(e as any)}
-                    className="w-4 h-4 rounded text-[#2563eb] accent-[#2563eb] cursor-pointer" 
-                  />
-                  <span>Select All</span>
-                </div>
-                {dynamicSchemaTree.map(node => renderTreeNode(node, 0))}
-              </div>
+          {/* RIGHT CONTAINER: Initial Empty State OR Dynamic 2-Pane Tree & Preview Table */}
+          {selectedObject === null ? (
+            <div className="flex-1 flex items-center justify-center bg-white">
+              <EmptyObjectSelectionGraphic />
             </div>
-
-            {/* COLUMN 3: Right Dynamic Table Preview Pane */}
-            <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
-              {activeTableColumns.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
-                  <FileText className="w-12 h-12 text-gray-300 mb-3" />
-                  <h3 className="text-sm font-medium text-gray-600">No fields selected for preview</h3>
-                  <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
+          ) : (
+            <div className="flex-1 flex overflow-hidden relative bg-[#faf9f6]">
+              
+              {/* Coefficient Loader Overlay when switching category section */}
+              {isLoading ? (
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-white/95 backdrop-blur-xs space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
+                    <OfficialBrandLogo id="shopify" />
+                  </div>
+                  <div className="text-center space-y-1.5">
+                    <h3 className="text-sm font-bold text-[#13322b] animate-pulse">
+                      Loading {selectedObject}...
+                    </h3>
+                    <p className="text-xs text-gray-500 font-medium">
+                      Fetching 100% Dynamic Schema & Store Records Live
+                    </p>
+                  </div>
+                  <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-full h-full bg-[#13322b] animate-pulse" />
+                  </div>
                 </div>
-              ) : (
-                <div className="flex-1 overflow-x-auto overflow-y-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white scrollbar-thin scrollbar-thumb-gray-400">
-                  <table className="min-w-full text-left border-collapse text-xs border-spacing-0">
-                    <thead>
-                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8] sticky top-0 z-10">
-                        {activeTableColumns.map((col, idx) => (
-                          <th 
-                            key={col.id} 
-                            className={`p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8] ${
-                              idx === 0 ? "sticky left-0 z-20 bg-[#e2e8f0]" : ""
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <span>{col.label}</span>
-                              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                            </div>
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#e5e2db]">
-                      {dynamicStoreRows.map((row, rowIdx) => (
-                        <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
+              ) : null}
+
+              {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
+              <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
+                <div className="flex items-center justify-between px-1">
+                  <span className="font-bold text-xs text-[#13322b]">{selectedObject}</span>
+                  <span className="text-xs text-blue-600 font-semibold cursor-pointer">edit</span>
+                </div>
+
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
+                  <input 
+                    type="text" 
+                    placeholder="Search fields"
+                    value={fieldSearchTerm}
+                    onChange={(e) => setFieldSearchTerm(e.target.value)}
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b] font-medium"
+                  />
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-1 pr-1 border-t border-[#f0ede6] pt-2">
+                  {/* Fully Interactive Select All Button */}
+                  <div 
+                    onClick={(e) => toggleSelectAll(e)}
+                    className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-bold text-[#1d4ed8] cursor-pointer hover:bg-blue-50 transition-colors"
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={isAllSelected}
+                      onChange={(e) => toggleSelectAll(e as any)}
+                      className="w-4 h-4 rounded text-[#2563eb] accent-[#2563eb] cursor-pointer" 
+                    />
+                    <span>Select All</span>
+                  </div>
+                  {dynamicSchemaTree.map(node => renderTreeNode(node, 0))}
+                </div>
+              </div>
+
+              {/* COLUMN 3: Right Dynamic Table Preview Pane */}
+              <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
+                {activeTableColumns.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
+                    <FileText className="w-12 h-12 text-gray-300 mb-3" />
+                    <h3 className="text-sm font-medium text-gray-600">No fields selected for preview</h3>
+                    <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
+                  </div>
+                ) : (
+                  <div className="flex-1 overflow-x-auto overflow-y-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white scrollbar-thin scrollbar-thumb-gray-400">
+                    <table className="min-w-full text-left border-collapse text-xs border-spacing-0">
+                      <thead>
+                        <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8] sticky top-0 z-10">
                           {activeTableColumns.map((col, idx) => (
-                            <td 
+                            <th 
                               key={col.id} 
-                              className={`p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800 ${
-                                idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
+                              className={`p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8] ${
+                                idx === 0 ? "sticky left-0 z-20 bg-[#e2e8f0]" : ""
                               }`}
                             >
-                              {row[col.id] || "—"}
-                            </td>
+                              <div className="flex items-center justify-between gap-3">
+                                <span>{col.label}</span>
+                                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                              </div>
+                            </th>
                           ))}
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
+                      </thead>
+                      <tbody className="divide-y divide-[#e5e2db]">
+                        {dynamicStoreRows.map((row, rowIdx) => (
+                          <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
+                            {activeTableColumns.map((col, idx) => (
+                              <td 
+                                key={col.id} 
+                                className={`p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800 ${
+                                  idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
+                                }`}
+                              >
+                                {row[col.id] || "—"}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
 
-          </div>
+            </div>
+          )}
 
         </div>
 
