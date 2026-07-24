@@ -228,24 +228,45 @@ export default function AddonSidebarPage() {
     { id: "gid://shopify/Customer/9494636", name: "Chloe Kim", email: "chloe.kim@example.com", created: "2026-07-07 01:31:22", amount: "$310.00" },
   ];
 
+  // Listen for OAuth completion signal from the new tab
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data === "dv_shopify_authorized") {
+        setIsAuthorizing(false);
+        setShowPreviewModal(true);
+      }
+    };
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
+        setIsAuthorizing(false);
+        setShowPreviewModal(true);
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    window.addEventListener("storage", handleStorage);
+    return () => {
+      window.removeEventListener("message", handleMessage);
+      window.removeEventListener("storage", handleStorage);
+    };
+  }, []);
+
   const handleOpenConnector = (connector: Connector) => {
     setSelectedConnector(connector);
     setStoreNameInput("");
     setCurrentView("connector-connect");
   };
 
-  // STEP 1 Authorize Click -> Redirect to Shopify Security OAuth Screen (Image 2)
+  // STEP 1 Authorize Click -> Opens Shopify Security OAuth in NEW BROWSER TAB
   const handleAuthorizeClick = () => {
     setIsAuthorizing(true);
+    // Open Shopify OAuth page in a NEW TAB
+    window.open("/shopify-auth", "_blank");
+
+    // Fallback simulation timer in case popups are blocked or user manually clicks confirm
     setTimeout(() => {
       setIsAuthorizing(false);
-      setCurrentView("oauth-redirect");
-    }, 800);
-  };
-
-  // STEP 2 Confirm on Shopify OAuth Screen -> Opens Import Preview Modal (Image 3 & 4)
-  const handleOAuthConfirm = () => {
-    setShowPreviewModal(true);
+      setShowPreviewModal(true);
+    }, 4000);
   };
 
   const handleConfirmImport = () => {

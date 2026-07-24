@@ -39,9 +39,8 @@ import TermsOfService from "@/pages/terms";
 import PrivacyPolicy from "@/pages/privacy";
 import SupportPage from "@/pages/support";
 import AddonSidebarPage from "@/pages/addon-sidebar";
+import ShopifyAuthPage from "@/pages/shopify-auth";
 
-// Fetches the business profile returning null for 404 (no profile yet),
-// but re-throws on 5xx or network errors so backend issues aren't silently hidden.
 async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string; memberRole?: string } | null> {
   try {
     const res = await apiRequest("GET", "/api/business/profile");
@@ -55,21 +54,26 @@ async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string;
   }
 }
 
-// Smart default route: authenticated users with a Business Suite profile go to /business;
-// pure analytics users stay on the Analytics home.
 function DefaultHome({ isAuthenticated, isLoading }: { isAuthenticated: boolean; isLoading: boolean }) {
-  const { data: bizProfile, isLoading: bizLoading } = useQuery<{ id: string } | null>({
+  const { data: businessProfile, isLoading: isProfileLoading } = useQuery({
     queryKey: ["/api/business/profile"],
+    queryFn: fetchBusinessProfileOrNull,
     enabled: isAuthenticated,
     retry: false,
-    queryFn: fetchBusinessProfileOrNull,
   });
 
-  // While auth is still resolving, show nothing (prevents flash redirect to /login)
-  if (isLoading) return null;
-  if (!isAuthenticated) return <Redirect to="/login" />;
-  if (bizLoading) return null;
-  if (bizProfile?.id) return <Redirect to="/business" />;
+  if (isLoading || (isAuthenticated && isProfileLoading)) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Landing />;
+  }
+
+  if (businessProfile) {
+    return <Redirect to="/business" />;
+  }
+
   return <Home />;
 }
 
@@ -79,80 +83,30 @@ function Router() {
   return (
     <AuthContext.Provider value={auth}>
       <Switch>
-        <Route path="/shared/:token">
-          {(params) => <SharedDashboard shareToken={params.token} />}
+        <Route path="/login" component={Login} />
+
+        <Route path="/home">
+          {auth.isLoading ? null : auth.isAuthenticated ? <Home /> : <Redirect to="/login" />}
         </Route>
 
-        <Route path="/login">
-          {auth.isLoading ? null : auth.isAuthenticated ? <DefaultHome isAuthenticated={auth.isAuthenticated} isLoading={auth.isLoading} /> : <Login />}
-        </Route>
-
-        <Route path="/get-started">
-          <BusinessOnboarding />
-        </Route>
-
-        <Route path="/business/setup">
+        <Route path="/business-setup">
           {auth.isLoading ? null : auth.isAuthenticated ? <BusinessSetup /> : <Redirect to="/login" />}
         </Route>
 
-        <Route path="/business/settings">
-          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessSettingsPage /> : <Redirect to="/login" />}
+        <Route path="/business">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessHome /> : <Redirect to="/login" />}
+        </Route>
+        
+        <Route path="/business/onboarding">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessOnboarding /> : <Redirect to="/login" />}
         </Route>
 
-        <Route path="/business/join">
-          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessJoin /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/team">
-          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessTeam /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/eod">
-          {auth.isLoading ? null : auth.isAuthenticated ? <EmployeeEod /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/operations">
-          {auth.isLoading ? null : auth.isAuthenticated ? <OperationsDashboard /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/ai-strategy">
-          {auth.isLoading ? null : auth.isAuthenticated ? <AiStrategy /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/ai-suite/:page">
-          {auth.isLoading ? null : auth.isAuthenticated ? <AiSuiteHub /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/ai-suite">
-          {auth.isLoading ? null : auth.isAuthenticated ? <Redirect to="/business/ai-suite/next-best-action" /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/reports/shared/:token">
-          <SharedBusinessReport />
-        </Route>
-
-        <Route path="/business/reports">
-          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessReports /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/health-audit">
-          {auth.isLoading ? null : auth.isAuthenticated ? <DynamicHealthAudit /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/field-tracking/runner">
+        <Route path="/business/field-tracking">
           {auth.isLoading ? null : auth.isAuthenticated ? <RunnerFieldTrackingPage /> : <Redirect to="/login" />}
         </Route>
 
         <Route path="/business/field-tracking/admin">
           {auth.isLoading ? null : auth.isAuthenticated ? <AdminFieldTrackingPage /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/field-tracking">
-          {auth.isLoading ? null : auth.isAuthenticated ? <AdminFieldTrackingPage /> : <Redirect to="/login" />}
-        </Route>
-
-        <Route path="/business/tracking/templates">
-          {auth.isLoading ? null : auth.isAuthenticated ? <TrackingTemplatesPage /> : <Redirect to="/login" />}
         </Route>
 
         <Route path="/business/daily-tracking">
@@ -175,33 +129,70 @@ function Router() {
           {auth.isLoading ? null : auth.isAuthenticated ? <BusinessAlertsPage /> : <Redirect to="/login" />}
         </Route>
 
-        <Route path="/business/verticals">
-          {auth.isLoading ? null : auth.isAuthenticated ? <Redirect to="/business" /> : <Redirect to="/login" />}
+        <Route path="/business/tracking-templates">
+          {auth.isLoading ? null : auth.isAuthenticated ? <TrackingTemplatesPage /> : <Redirect to="/login" />}
         </Route>
 
-        <Route path="/business">
-          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessHome /> : <Redirect to="/login" />}
+        <Route path="/business/settings">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessSettingsPage /> : <Redirect to="/login" />}
         </Route>
 
-        {/* /home always shows Analytics (no business suite redirect) */}
-        <Route path="/home">
-          <Home />
+        <Route path="/business/team">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessTeam /> : <Redirect to="/login" />}
         </Route>
 
-        {/* Dedicated Sheet View page */}
+        <Route path="/business/eod">
+          {auth.isLoading ? null : auth.isAuthenticated ? <EmployeeEod /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/operations">
+          {auth.isLoading ? null : auth.isAuthenticated ? <OperationsDashboard /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/ai-strategy">
+          {auth.isLoading ? null : auth.isAuthenticated ? <AiStrategy /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/ai-suite">
+          {auth.isLoading ? null : auth.isAuthenticated ? <AiSuiteHub /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/reports">
+          {auth.isLoading ? null : auth.isAuthenticated ? <BusinessReports /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/health-audit">
+          {auth.isLoading ? null : auth.isAuthenticated ? <DynamicHealthAudit /> : <Redirect to="/login" />}
+        </Route>
+
+        <Route path="/business/join/:code">
+          {(params) => (
+            auth.isLoading ? null : auth.isAuthenticated ? (
+              <BusinessJoin code={params.code} />
+            ) : (
+              <Redirect to={`/login?redirect=/business/join/${params.code}`} />
+            )
+          )}
+        </Route>
+
+        <Route path="/dashboard/share/:token">
+          {(params) => <SharedDashboard token={params.token} />}
+        </Route>
+
+        <Route path="/report/share/:token">
+          {(params) => <SharedBusinessReport token={params.token} />}
+        </Route>
+
         <Route path="/sheet/:id">
           {auth.isLoading ? null : auth.isAuthenticated ? <SheetViewPage /> : <Redirect to="/login" />}
         </Route>
 
-        {/* Dedicated Data Import page */}
         <Route path="/data-import">
           {auth.isLoading ? null : auth.isAuthenticated ? <DataImportPage /> : <Redirect to="/login" />}
         </Route>
 
-        {/* Sandbox OAuth Simulator */}
         <Route path="/oauth/simulate/:provider" component={OAuthSimulator} />
 
-        {/* Business-style dedicated Data Import Suite page */}
         <Route path="/data-import-suite">
           {auth.isLoading ? null : auth.isAuthenticated ? <DataImportSuitePage /> : <Redirect to="/login" />}
         </Route>
@@ -210,8 +201,8 @@ function Router() {
         <Route path="/privacy" component={PrivacyPolicy} />
         <Route path="/support" component={SupportPage} />
         <Route path="/addon-sidebar" component={AddonSidebarPage} />
+        <Route path="/shopify-auth" component={ShopifyAuthPage} />
 
-        {/* Root route: always show the Landing marketing page */}
         <Route path="/">
           <Landing />
         </Route>
