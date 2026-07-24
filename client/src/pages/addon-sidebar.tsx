@@ -272,6 +272,22 @@ export default function AddonSidebarPage() {
     setCurrentView("connector-connect");
   };
 
+  const launchLargeImportPreviewModal = () => {
+    setIsAuthorizing(true);
+    
+    // Simulate loading progress
+    setTimeout(() => {
+      setIsAuthorizing(false);
+      
+      // Check if running inside Google Apps Script Addon
+      if ((window as any).google?.script?.run?.showImportPreviewModal) {
+        (window as any).google.script.run.showImportPreviewModal();
+      } else {
+        window.open("/import-preview", "_blank", "width=1200,height=750");
+      }
+    }, 1500);
+  };
+
   const handleAuthorizeClick = () => {
     if (!storeNameInput.trim()) {
       alert("Please enter your Shopify store name (e.g. di-insights).");
@@ -287,13 +303,23 @@ export default function AddonSidebarPage() {
       .replace(".myshopify.com", "")
       .split("/")[0];
 
+    // Trigger Fetching Animation Card
     setIsAuthorizing(true);
 
-    // Open Shopify Security Auth page passing the shop query param
-    window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
-
+    // After 1.5s loading animation, launch the Large Import Preview Window
     setTimeout(() => {
       setIsAuthorizing(false);
+      
+      // Open Shopify Auth Screen / Large Preview Window
+      window.open(`/shopify-auth?shop=${cleanStore}`, "_blank");
+      
+      setTimeout(() => {
+        if ((window as any).google?.script?.run?.showImportPreviewModal) {
+          (window as any).google.script.run.showImportPreviewModal();
+        } else {
+          window.open("/import-preview", "_blank", "width=1200,height=750");
+        }
+      }, 1000);
     }, 1500);
   };
 
@@ -661,7 +687,8 @@ export default function AddonSidebarPage() {
 
               {/* Manual Button to launch Large Import Preview Modal */}
               <button
-                onClick={() => setShowPreviewModal(true)}
+                onClick={launchLargeImportPreviewModal}
+                disabled={isAuthorizing}
                 className="w-full py-2.5 bg-white hover:bg-[#faf9f6] border border-[#e5e2db] text-[#13322b] font-bold text-[11px] rounded-xl transition-all flex items-center justify-center gap-1.5 mt-1 cursor-pointer"
               >
                 <Maximize2 className="w-3.5 h-3.5 text-[#2563eb]" />
