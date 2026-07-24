@@ -136,6 +136,7 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   { id: "legacyResourceId", label: "Legacy Resource Id" },
   { id: "createdAt", label: "Created At" },
   { id: "updatedAt", label: "Updated At" },
+  { id: "publishedAt", label: "Published At" },
   { id: "title", label: "Title" },
   { id: "description", label: "Description" },
   { id: "descriptionHtml", label: "Description Html" },
@@ -143,6 +144,9 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   { id: "vendor", label: "Vendor" },
   { id: "status", label: "Status" },
   { id: "handle", label: "Handle" },
+  { id: "isGiftCard", label: "Is Gift Card" },
+  { id: "tags", label: "Tags" },
+  { id: "templateSuffix", label: "Template Suffix" },
   {
     id: "category",
     label: "Category",
@@ -150,7 +154,16 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
     children: [
       { id: "category.id", label: "Category Id" },
       { id: "category.name", label: "Category Name" },
-      { id: "category.fullName", label: "Category Full Name" }
+      { id: "category.fullName", label: "Category Full Name" },
+      {
+        id: "category.ancestors",
+        label: "Category Ancestors",
+        isGroup: true,
+        children: [
+          { id: "category.ancestors.id", label: "Ancestor Id" },
+          { id: "category.ancestors.name", label: "Ancestor Name" }
+        ]
+      }
     ]
   },
   {
@@ -163,8 +176,9 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
         label: "Parent Product",
         isGroup: true,
         children: [
-          { id: "combinedListing.parentProduct.id", label: "Id" },
-          { id: "combinedListing.parentProduct.title", label: "Title" }
+          { id: "combinedListing.parentProduct.id", label: "Parent Product Id" },
+          { id: "combinedListing.parentProduct.title", label: "Parent Product Title" },
+          { id: "combinedListing.parentProduct.handle", label: "Parent Product Handle" }
         ]
       }
     ]
@@ -200,15 +214,18 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
     label: "Featured Media",
     isGroup: true,
     children: [
-      { id: "featuredMedia.id", label: "Id" },
+      { id: "featuredMedia.id", label: "Media Id" },
       { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
+      { id: "featuredMedia.alt", label: "Media Alt Text" },
       {
         id: "featuredMedia.previewImage",
         label: "Preview Image",
         isGroup: true,
         children: [
           { id: "featuredMedia.previewImage.url", label: "Url" },
-          { id: "featuredMedia.previewImage.altText", label: "Alt Text" }
+          { id: "featuredMedia.previewImage.altText", label: "Alt Text" },
+          { id: "featuredMedia.previewImage.width", label: "Width" },
+          { id: "featuredMedia.previewImage.height", label: "Height" }
         ]
       }
     ]
@@ -223,7 +240,99 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   },
   { id: "giftCardTemplateSuffix", label: "Gift Card Template Suffix" },
   { id: "hasOnlyDefaultVariant", label: "Has Only Default Variant" },
-  { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" }
+  { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" },
+  { id: "hasVariantsThatRequiresComponents", label: "Has Variants That Requires Components" },
+  { id: "inCollection", label: "In Collection" },
+  { id: "mediaCount", label: "Media Count" },
+  { id: "onlineStorePreviewUrl", label: "Online Store Preview Url" },
+  { id: "onlineStoreUrl", label: "Online Store Url" },
+  {
+    id: "options",
+    label: "Product Options",
+    isGroup: true,
+    children: [
+      { id: "options.id", label: "Option Id" },
+      { id: "options.name", label: "Option Name (e.g. Size/Color)" },
+      { id: "options.position", label: "Option Position" },
+      { id: "options.values", label: "Option Values (List)" }
+    ]
+  },
+  {
+    id: "priceRangeV2",
+    label: "Price Range V2",
+    isGroup: true,
+    children: [
+      {
+        id: "priceRangeV2.maxVariantPrice",
+        label: "Max Variant Price",
+        isGroup: true,
+        children: [
+          { id: "priceRangeV2.maxVariantPrice.amount", label: "Amount" },
+          { id: "priceRangeV2.maxVariantPrice.currencyCode", label: "Currency Code" }
+        ]
+      },
+      {
+        id: "priceRangeV2.minVariantPrice",
+        label: "Min Variant Price",
+        isGroup: true,
+        children: [
+          { id: "priceRangeV2.minVariantPrice.amount", label: "Amount" },
+          { id: "priceRangeV2.minVariantPrice.currencyCode", label: "Currency Code" }
+        ]
+      }
+    ]
+  },
+  { id: "requiresSellingPlan", label: "Requires Selling Plan" },
+  { id: "sellingPlanGroupCount", label: "Selling Plan Group Count" },
+  {
+    id: "seo",
+    label: "SEO Details",
+    isGroup: true,
+    children: [
+      { id: "seo.title", label: "SEO Title" },
+      { id: "seo.description", label: "SEO Description" }
+    ]
+  },
+  { id: "totalInventory", label: "Total Inventory Quantity" },
+  { id: "totalVariants", label: "Total Variants Count" },
+  { id: "tracksInventory", label: "Tracks Inventory" },
+  {
+    id: "variants",
+    label: "Product Variants List",
+    isGroup: true,
+    children: [
+      { id: "variants.id", label: "Variant Id" },
+      { id: "variants.title", label: "Variant Title" },
+      { id: "variants.sku", label: "Variant SKU" },
+      { id: "variants.barcode", label: "Variant Barcode" },
+      { id: "variants.price", label: "Variant Price" },
+      { id: "variants.compareAtPrice", label: "Variant Compare At Price" },
+      { id: "variants.inventoryQuantity", label: "Variant Inventory Quantity" },
+      { id: "variants.weight", label: "Variant Weight" },
+      { id: "variants.weightUnit", label: "Variant Weight Unit" }
+    ]
+  },
+  {
+    id: "collections",
+    label: "Associated Collections",
+    isGroup: true,
+    children: [
+      { id: "collections.id", label: "Collection Id" },
+      { id: "collections.title", label: "Collection Title" },
+      { id: "collections.handle", label: "Collection Handle" }
+    ]
+  },
+  {
+    id: "metafields",
+    label: "Custom Store Metafields",
+    isGroup: true,
+    children: [
+      { id: "metafields.namespace", label: "Namespace" },
+      { id: "metafields.key", label: "Key" },
+      { id: "metafields.value", label: "Value" },
+      { id: "metafields.type", label: "Type" }
+    ]
+  }
 ];
 
 function getSchemaForObject(objName: string): FieldNode[] {
