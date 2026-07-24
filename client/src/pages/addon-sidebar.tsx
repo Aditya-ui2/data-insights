@@ -234,130 +234,112 @@ export default function AddonSidebarPage() {
               </div>
             </button>
 
-            {/* 6 Features List inside Create Agent Dropdown */}
-            {isAgentExpanded && (
-              <div className="divide-y divide-[#f0ede6] bg-white transition-all">
-                
-                {/* Item 1: Import Data */}
-                <div>
-                  <button 
-                    onClick={() => setCurrentView("import-connectors")}
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
-                        <Download className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#13322b] flex items-center gap-1.5">
+              {/* 6 Features List inside Create Agent Dropdown */}
+              {isAgentExpanded && (
+                <div className="divide-y divide-[#f0ede6] bg-white transition-all">
+                  
+                  {/* Item 1: Import Data */}
+                  <div>
+                    <button 
+                      onClick={() => setCurrentView("import-connectors")}
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
+                          <Download className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-bold text-[#13322b] flex items-center gap-1.5">
                           <span>Import Data</span>
                           <span className="text-[9px] bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded font-bold uppercase">10+ Sources</span>
                         </div>
-                        <div className="text-[10px] text-[#8a8579]">Shopify, Stripe, Postgres, CRM & GA4</div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
 
-                {/* Item 2: Export Data */}
-                <div>
-                  <button 
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
-                        <Upload className="w-4 h-4" />
+                  {/* Item 2: Export Data */}
+                  <div>
+                    <button 
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
+                          <Upload className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-bold text-[#13322b]">Export Data</div>
                       </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#13322b]">Export Data</div>
-                        <div className="text-[10px] text-[#8a8579]">Push Sheet rows back to Database</div>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                    </button>
+                  </div>
 
-                {/* Item 3: Monitor & Alerts */}
-                <div>
-                  <button 
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
-                        <Bell className="w-4 h-4" />
-                      </div>
-                      <div>
+                  {/* Item 3: Monitor & Alerts */}
+                  <div>
+                    <button 
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
+                          <Bell className="w-4 h-4" />
+                        </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-[#13322b]">Monitor & Alerts</span>
+                          <span className="text-xs font-bold text-[#13322b]">Monitor & Alerts</span>
                           <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
                         </div>
-                        <div className="text-[10px] text-[#8a8579]">Slack, Email & WhatsApp Triggers</div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                    </button>
+                  </div>
 
-                {/* Item 4: Sheet Assistant */}
-                <div>
-                  <button 
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
-                        <Bot className="w-4 h-4" />
+                  {/* Item 4: Sheet Assistant */}
+                  <div>
+                    <button 
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
+                          <Bot className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-bold text-[#13322b]">Sheet Assistant</div>
                       </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#13322b]">Sheet Assistant</div>
-                        <div className="text-[10px] text-[#8a8579]">Ask AI questions in plain English</div>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                    </button>
+                  </div>
 
-                {/* Item 5: Snapshots */}
-                <div>
-                  <button 
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
-                        <Camera className="w-4 h-4" />
+                  {/* Item 5: Snapshots */}
+                  <div>
+                    <button 
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
+                          <Camera className="w-4 h-4" />
+                        </div>
+                        <div className="text-xs font-bold text-[#13322b]">Snapshots</div>
                       </div>
-                      <div>
-                        <div className="text-xs font-semibold text-[#13322b]">Snapshots</div>
-                        <div className="text-[10px] text-[#8a8579]">Save historical spreadsheet versions</div>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                    </button>
+                  </div>
 
-                {/* Item 6: Web Dashboards */}
-                <div>
-                  <button 
-                    className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
-                        <BarChart3 className="w-4 h-4" />
-                      </div>
-                      <div>
+                  {/* Item 6: Web Dashboards */}
+                  <div>
+                    <button 
+                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
+                          <BarChart3 className="w-4 h-4" />
+                        </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-[#13322b]">Web Dashboards</span>
+                          <span className="text-xs font-bold text-[#13322b]">Web Dashboards</span>
                           <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
                         </div>
-                        <div className="text-[10px] text-[#8a8579]">Generate shareable visual KPI reports</div>
                       </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                  </button>
-                </div>
+                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                    </button>
+                  </div>
 
-              </div>
-            )}
+                </div>
+              )}
           </div>
 
           {/* Deep Forest Luxury Card */}
