@@ -43,6 +43,11 @@ import {
   fetchShopifyMetafieldDefinitions, 
   parseIntrospectionToFieldNodes 
 } from "./services/shopifySchemaFetcher";
+import { 
+  flattenJsonObject, 
+  buildUnionSchemaFromRecords, 
+  normalizeRecordsWithUnionSchema 
+} from "./services/shopifyUnionFlattener";
 
 import { 
   knowledgeBaseDocuments as kbDocsTable, 
@@ -241,6 +246,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           window.location.href = '/data-import-suite?google_error=true';
         }
       </script><p>Error connecting. You can close this window.</p></body></html>`);
+    }
+  });
+
+  app.post("/api/shopify/fetch-union-schema", async (req, res) => {
+    try {
+      const { records } = req.body;
+      if (!records || !Array.isArray(records)) {
+        return res.status(400).json({ error: "records must be an array" });
+      }
+
+      const unionSchema = buildUnionSchemaFromRecords(records);
+      const leafKeys = Array.from(new Set(records.flatMap(r => Object.keys(flattenJsonObject(r)))));
+      const normalizedRows = normalizeRecordsWithUnionSchema(records, leafKeys);
+
+      return res.json({
+        success: true,
+        totalRecords: records.length,
+        totalUnionColumns: leafKeys.length,
+        unionSchema,
+        normalizedRows
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message });
     }
   });
 
