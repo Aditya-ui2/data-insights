@@ -5,20 +5,8 @@ export default function ShopifyAuthPage() {
   const [isDone, setIsDone] = useState(false);
 
   const handleConfirm = () => {
-    setIsDone(true);
-    // Broadcast authorization signal to parent sidebar window
-    try {
-      localStorage.setItem("dv_shopify_auth_status", "approved_" + Date.now());
-      if (window.opener) {
-        window.opener.postMessage("dv_shopify_authorized", "*");
-      }
-    } catch (e) {
-      console.error(e);
-    }
-
-    setTimeout(() => {
-      window.close();
-    }, 1200);
+    // Redirect to Coefficient style OAuth attempt success callback page
+    window.location.href = "/oauth_attempt?status=success&error_message=None&from=addon";
   };
 
   return (

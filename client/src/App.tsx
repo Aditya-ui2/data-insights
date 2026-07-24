@@ -40,6 +40,7 @@ import PrivacyPolicy from "@/pages/privacy";
 import SupportPage from "@/pages/support";
 import AddonSidebarPage from "@/pages/addon-sidebar";
 import ShopifyAuthPage from "@/pages/shopify-auth";
+import OAuthSuccessPage from "@/pages/oauth-success";
 
 async function fetchBusinessProfileOrNull(): Promise<{ id: string; name: string; memberRole?: string } | null> {
   try {
@@ -202,6 +203,7 @@ function Router() {
         <Route path="/support" component={SupportPage} />
         <Route path="/addon-sidebar" component={AddonSidebarPage} />
         <Route path="/shopify-auth" component={ShopifyAuthPage} />
+        <Route path="/oauth_attempt" component={OAuthSuccessPage} />
 
         <Route path="/">
           <Landing />
