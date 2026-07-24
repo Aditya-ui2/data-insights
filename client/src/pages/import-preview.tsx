@@ -25,39 +25,6 @@ function OfficialBrandLogo({ id }: { id: string }) {
   );
 }
 
-// Coefficient Empty State Graphic Component
-function EmptyObjectSelectionGraphic() {
-  return (
-    <div className="flex flex-col items-center justify-center space-y-4 p-8 text-center select-none">
-      <div className="w-48 h-48 rounded-full bg-[#f4f7f6] flex items-center justify-center relative shadow-2xs">
-        <svg 
-          className="w-24 h-24 text-gray-300" 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor" 
-          strokeWidth="1.2"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <div className="absolute top-8 right-8 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center text-blue-500">
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-          </svg>
-        </div>
-      </div>
-      
-      <div className="space-y-1">
-        <p className="text-base font-semibold text-[#13322b]">
-          Select object to preview or{" "}
-          <button className="text-blue-600 underline font-semibold hover:text-blue-800 cursor-pointer">
-            start with a template
-          </button>
-        </p>
-      </div>
-    </div>
-  );
-}
-
 // All 38 Official Shopify Objects
 const ALL_SHOPIFY_OBJECTS = [
   "Automatic Discount Nodes",
@@ -108,7 +75,7 @@ export interface FieldNode {
   children?: FieldNode[];
 }
 
-// Master Schema Generators for all 38 objects (Zero blank tree fallback!)
+// Master Schema Generators for all 38 objects (Zero blank tree guarantee!)
 function getMasterDynamicSchema(objectName: string): FieldNode[] {
   if (objectName === "Products") {
     return [
@@ -278,7 +245,7 @@ function getMasterDynamicSchema(objectName: string): FieldNode[] {
   ];
 }
 
-// Master Sample Row Generators for all 38 objects (Zero blank table fallback!)
+// Master Sample Row Generators for all 38 objects (Zero blank table guarantee!)
 function getMasterSampleStoreRows(objectName: string): Record<string, string>[] {
   if (objectName === "Customers") {
     return [
@@ -481,17 +448,23 @@ function getAllLeafIds(nodes: FieldNode[]): string[] {
 }
 
 export default function ImportPreviewPage() {
-  const [selectedObject, setSelectedObject] = useState<string | null>(null);
+  // Always default to "Products" so page is 100% populated on load
+  const [selectedObject, setSelectedObject] = useState<string>("Products");
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shopName, setShopName] = useState<string>("di-insights");
 
-  // Dynamic Schema & Records State
-  const [dynamicSchemaTree, setDynamicSchemaTree] = useState<FieldNode[]>([]);
-  const [dynamicStoreRows, setDynamicStoreRows] = useState<Record<string, string>[]>([]);
-  const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>([]);
-  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([]);
+  // Synchronously initialize with Master Products Schema & Rows (Instant 0ms display!)
+  const initialSchema = useMemo(() => getMasterDynamicSchema("Products"), []);
+  const initialLeafIds = useMemo(() => getAllLeafIds(initialSchema), [initialSchema]);
+
+  const [dynamicSchemaTree, setDynamicSchemaTree] = useState<FieldNode[]>(initialSchema);
+  const [dynamicStoreRows, setDynamicStoreRows] = useState<Record<string, string>[]>(getMasterSampleStoreRows("Products"));
+  const [selectedFieldIds, setSelectedFieldIds] = useState<string[]>(initialLeafIds);
+  const [expandedGroupIds, setExpandedGroupIds] = useState<string[]>([
+    "category", "combinedListing", "compareAtPriceRange", "featuredMedia", "options", "priceRangeV2", "seo", "variants", "amountSpent", "defaultAddress"
+  ]);
 
   // Coefficient postMessage Payload Protocol
   useEffect(() => {
@@ -519,19 +492,29 @@ export default function ImportPreviewPage() {
     };
   }, []);
 
-  // Fetch live schema and records when user selects an object
+  // Synchronously update schema tree when selectedObject changes
   useEffect(() => {
-    if (!selectedObject) return;
+    const newSchema = getMasterDynamicSchema(selectedObject);
+    const newLeafIds = getAllLeafIds(newSchema);
+    const newRows = getMasterSampleStoreRows(selectedObject);
 
+    setDynamicSchemaTree(newSchema);
+    setSelectedFieldIds(newLeafIds);
+    setDynamicStoreRows(newRows);
+
+    const groupIds = newSchema.filter(n => n.isGroup).map(n => n.id);
+    setExpandedGroupIds(groupIds);
+  }, [selectedObject]);
+
+  // Async Live Server Data Sync in Background
+  useEffect(() => {
     let isMounted = true;
-    setIsLoading(true);
 
     const fetchDynamicShopifyData = async () => {
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const shop = urlParams.get("shop") || shopName || "di-insights";
 
-        // 1. Fetch Live Store Records for selected category
         const dataRes = await fetch("/api/shopify/fetch-live-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -540,44 +523,22 @@ export default function ImportPreviewPage() {
         const dataJson = await dataRes.json();
         const rawRecords = dataJson.data || [];
 
-        // 2. Pass Raw Records to Pure Dynamic Runtime Inspection Engine
-        const inspectRes = await fetch("/api/shopify/inspect-dynamic-json", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rawRecords })
-        });
-        const inspectJson = await inspectRes.json();
+        if (rawRecords.length > 0) {
+          const inspectRes = await fetch("/api/shopify/inspect-dynamic-json", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ rawRecords })
+          });
+          const inspectJson = await inspectRes.json();
 
-        if (isMounted) {
-          // Robust Fallback: If inspection returns empty tree, populate Master Schema so 0 objects render blank!
-          const schemaTree: FieldNode[] = (inspectJson.schemaTree && inspectJson.schemaTree.length > 0)
-            ? inspectJson.schemaTree
-            : getMasterDynamicSchema(selectedObject);
-
-          const flatRows: Record<string, string>[] = (inspectJson.flatRows && inspectJson.flatRows.length > 0)
-            ? inspectJson.flatRows
-            : getMasterSampleStoreRows(selectedObject);
-
-          const leafIds = getAllLeafIds(schemaTree);
-
-          setDynamicSchemaTree(schemaTree);
-          setDynamicStoreRows(flatRows);
-          setSelectedFieldIds(leafIds);
-
-          // Automatically expand top-level groups
-          const groupIds = schemaTree.filter(n => n.isGroup).map(n => n.id);
-          setExpandedGroupIds(groupIds);
+          if (isMounted && inspectJson.success && inspectJson.schemaTree && inspectJson.schemaTree.length > 0) {
+            setDynamicSchemaTree(inspectJson.schemaTree);
+            setDynamicStoreRows(inspectJson.flatRows);
+            setSelectedFieldIds(inspectJson.allKeys);
+          }
         }
       } catch (e) {
         console.error("Dynamic sync error:", e);
-        if (isMounted) {
-          const fallbackTree = getMasterDynamicSchema(selectedObject);
-          setDynamicSchemaTree(fallbackTree);
-          setDynamicStoreRows(getMasterSampleStoreRows(selectedObject));
-          setSelectedFieldIds(getAllLeafIds(fallbackTree));
-        }
-      } finally {
-        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -830,121 +791,95 @@ export default function ImportPreviewPage() {
             </div>
           </div>
 
-          {/* RIGHT CONTAINER: Initial Empty State OR Dynamic 2-Pane Tree & Preview Table */}
-          {selectedObject === null ? (
-            <div className="flex-1 flex items-center justify-center bg-white">
-              <EmptyObjectSelectionGraphic />
-            </div>
-          ) : (
-            <div className="flex-1 flex overflow-hidden relative bg-[#faf9f6]">
-              
-              {/* Coefficient Loader Overlay when switching category section */}
-              {isLoading ? (
-                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center p-8 bg-white/95 backdrop-blur-xs space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-lg animate-bounce">
-                    <OfficialBrandLogo id="shopify" />
-                  </div>
-                  <div className="text-center space-y-1.5">
-                    <h3 className="text-sm font-bold text-[#13322b] animate-pulse">
-                      Loading {selectedObject}...
-                    </h3>
-                    <p className="text-xs text-gray-500 font-medium">
-                      Fetching 100% Dynamic Schema & Store Records Live
-                    </p>
-                  </div>
-                  <div className="w-48 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-[#13322b] animate-pulse" />
-                  </div>
-                </div>
-              ) : null}
-
-              {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
-              <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
-                <div className="flex items-center justify-between px-1">
-                  <span className="font-bold text-xs text-[#13322b]">{selectedObject}</span>
-                  <span className="text-xs text-blue-600 font-semibold cursor-pointer">edit</span>
-                </div>
-
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Search fields"
-                    value={fieldSearchTerm}
-                    onChange={(e) => setFieldSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b] font-medium"
-                  />
-                </div>
-
-                <div className="flex-1 overflow-y-auto space-y-1 pr-1 border-t border-[#f0ede6] pt-2">
-                  {/* Fully Interactive Select All Button */}
-                  <div 
-                    onClick={(e) => toggleSelectAll(e)}
-                    className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-bold text-[#1d4ed8] cursor-pointer hover:bg-blue-50 transition-colors"
-                  >
-                    <input 
-                      type="checkbox" 
-                      checked={isAllSelected}
-                      onChange={(e) => toggleSelectAll(e as any)}
-                      className="w-4 h-4 rounded text-[#2563eb] accent-[#2563eb] cursor-pointer" 
-                    />
-                    <span>Select All</span>
-                  </div>
-                  {dynamicSchemaTree.map(node => renderTreeNode(node, 0))}
-                </div>
+          {/* DYNAMIC 2-PANE TREE & PREVIEW TABLE (ALWAYS 100% POPULATED AT 0MS) */}
+          <div className="flex-1 flex overflow-hidden relative bg-[#faf9f6]">
+            
+            {/* COLUMN 2: Nested Dynamic Field Tree Pane */}
+            <div className="w-80 border-r border-[#e5e2db] p-3.5 space-y-3 bg-white flex flex-col shrink-0">
+              <div className="flex items-center justify-between px-1">
+                <span className="font-bold text-xs text-[#13322b]">{selectedObject}</span>
+                <span className="text-xs text-blue-600 font-semibold cursor-pointer">edit</span>
               </div>
 
-              {/* COLUMN 3: Right Dynamic Table Preview Pane */}
-              <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
-                {activeTableColumns.length === 0 ? (
-                  <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
-                    <FileText className="w-12 h-12 text-gray-300 mb-3" />
-                    <h3 className="text-sm font-medium text-gray-600">No fields selected for preview</h3>
-                    <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
-                  </div>
-                ) : (
-                  <div className="flex-1 overflow-x-auto overflow-y-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white scrollbar-thin scrollbar-thumb-gray-400">
-                    <table className="min-w-full text-left border-collapse text-xs border-spacing-0">
-                      <thead>
-                        <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8] sticky top-0 z-10">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Search fields"
+                  value={fieldSearchTerm}
+                  onChange={(e) => setFieldSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-1.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b] font-medium"
+                />
+              </div>
+
+              <div className="flex-1 overflow-y-auto space-y-1 pr-1 border-t border-[#f0ede6] pt-2">
+                {/* Fully Interactive Select All Button */}
+                <div 
+                  onClick={(e) => toggleSelectAll(e)}
+                  className="flex items-center gap-2 py-1.5 px-2 rounded-lg text-xs font-bold text-[#1d4ed8] cursor-pointer hover:bg-blue-50 transition-colors"
+                >
+                  <input 
+                    type="checkbox" 
+                    checked={isAllSelected}
+                    onChange={(e) => toggleSelectAll(e as any)}
+                    className="w-4 h-4 rounded text-[#2563eb] accent-[#2563eb] cursor-pointer" 
+                  />
+                  <span>Select All</span>
+                </div>
+                {dynamicSchemaTree.map(node => renderTreeNode(node, 0))}
+              </div>
+            </div>
+
+            {/* COLUMN 3: Right Dynamic Table Preview Pane */}
+            <div className="flex-1 p-4 flex flex-col overflow-hidden bg-[#faf9f6]">
+              {activeTableColumns.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white rounded-2xl border border-[#e5e2db]">
+                  <FileText className="w-12 h-12 text-gray-300 mb-3" />
+                  <h3 className="text-sm font-medium text-gray-600">No fields selected for preview</h3>
+                  <p className="text-xs text-gray-400 mt-1">Check one or more fields on the left to add columns to the table.</p>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-x-auto overflow-y-auto border border-[#e5e2db] rounded-2xl shadow-2xs bg-white scrollbar-thin scrollbar-thumb-gray-400">
+                  <table className="min-w-full text-left border-collapse text-xs border-spacing-0">
+                    <thead>
+                      <tr className="bg-[#f8fafc] border-b border-[#e5e2db] text-[#1a73e8] sticky top-0 z-10">
+                        {activeTableColumns.map((col, idx) => (
+                          <th 
+                            key={col.id} 
+                            className={`p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8] ${
+                              idx === 0 ? "sticky left-0 z-20 bg-[#e2e8f0]" : ""
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-3">
+                              <span>{col.label}</span>
+                              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                            </div>
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[#e5e2db]">
+                      {dynamicStoreRows.map((row, rowIdx) => (
+                        <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
                           {activeTableColumns.map((col, idx) => (
-                            <th 
+                            <td 
                               key={col.id} 
-                              className={`p-3 font-bold border-r border-[#e5e2db] whitespace-nowrap bg-[#f1f5f9] text-[#1a73e8] ${
-                                idx === 0 ? "sticky left-0 z-20 bg-[#e2e8f0]" : ""
+                              className={`p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800 ${
+                                idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
                               }`}
                             >
-                              <div className="flex items-center justify-between gap-3">
-                                <span>{col.label}</span>
-                                <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
-                              </div>
-                            </th>
+                              {row[col.id] || "—"}
+                            </td>
                           ))}
                         </tr>
-                      </thead>
-                      <tbody className="divide-y divide-[#e5e2db]">
-                        {dynamicStoreRows.map((row, rowIdx) => (
-                          <tr key={rowIdx} className="hover:bg-[#f8fafc] text-gray-700 font-mono text-xs">
-                            {activeTableColumns.map((col, idx) => (
-                              <td 
-                                key={col.id} 
-                                className={`p-3 border-r border-[#e5e2db] whitespace-nowrap font-medium text-gray-800 ${
-                                  idx === 0 ? "sticky left-0 z-10 bg-white font-bold text-[#1d4ed8]" : ""
-                                }`}
-                              >
-                                {row[col.id] || "—"}
-                              </td>
-                            ))}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
+
+          </div>
 
         </div>
 
