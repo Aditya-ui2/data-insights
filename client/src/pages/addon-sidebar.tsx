@@ -21,16 +21,19 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-import { DV_LOGO_BASE64 } from "./logo-base64";
-
 function CustomDVLogo() {
   return (
-    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/40 shadow-sm flex items-center justify-center bg-[#0d221e] shrink-0">
-      <img 
-        src={DV_LOGO_BASE64} 
-        alt="DigitValues Logo" 
-        className="w-full h-full object-cover"
-      />
+    <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#c59b43]/50 shadow-md flex items-center justify-center bg-[#0b1d19] shrink-0 p-1">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+        {/* Dark Background */}
+        <rect width="100" height="100" rx="16" fill="#0b1d19" />
+        {/* Yellow Double-Line D */}
+        <path d="M 22 22 H 48 C 66 22, 66 56, 48 56 H 22 V 22 Z" stroke="#eab308" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M 31 31 H 46 C 56 31, 56 47, 46 47 H 31 V 31 Z" stroke="#eab308" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        {/* Green Double-Line V */}
+        <path d="M 44 48 L 60 78 L 78 34" stroke="#10b981" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path d="M 50 48 L 60 69 L 72 38" stroke="#10b981" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </svg>
     </div>
   );
 }
