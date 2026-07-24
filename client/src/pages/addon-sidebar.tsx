@@ -239,7 +239,6 @@ export default function AddonSidebarPage() {
     const handleMessage = (event: MessageEvent) => {
       if (event.data === "dv_shopify_authorized") {
         setIsAuthorizing(false);
-        // Trigger Google Sheets Native showModalDialog if running in Google Sheets Addon
         if (window.google?.script?.run?.showImportPreviewModal) {
           window.google.script.run.showImportPreviewModal();
         } else {
