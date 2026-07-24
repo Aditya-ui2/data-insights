@@ -293,61 +293,42 @@ export default function AddonSidebarPage() {
     }
   };
 
-  const handleAuthorizeClick = () => {
+  const cleanStoreName = storeNameInput
+    .trim()
+    .toLowerCase()
+    .replace("https://", "")
+    .replace("http://", "")
+    .replace(".myshopify.com", "")
+    .split("/")[0];
+
+  const getBackendBaseUrl = (): string => {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+    }
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return "http://localhost:3000";
+    }
+    return "https://data-insights-backend-1node.onrender.com";
+  };
+
+  const backendBase = getBackendBaseUrl();
+  const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName || "sandbox")}`;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!storeNameInput.trim()) {
+      e.preventDefault();
       alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    // Clean store name
-    const cleanStore = storeNameInput
-      .trim()
-      .toLowerCase()
-      .replace("https://", "")
-      .replace("http://", "")
-      .replace(".myshopify.com", "")
-      .split("/")[0];
-
     setIsAuthorizing(true);
 
-    // Send postMessage to parent Apps Script iframe wrapper & trigger showImportPreviewModal
+    // Send postMessage to parent Apps Script iframe wrapper
     try {
-      window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStore }, "*");
-    } catch (e) {
-      console.error(e);
+      window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStoreName }, "*");
+    } catch (err) {
+      console.error(err);
     }
-
-    // Open the secure OAuth popup window to authorize the shop connection
-    const getBackendBaseUrl = (): string => {
-      if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
-      }
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return "http://localhost:3000";
-      }
-      return "https://data-insights-backend-1node.onrender.com";
-    };
-
-    const backendBase = getBackendBaseUrl();
-    const width = 600;
-    const height = 700;
-    const left = window.screen.width / 2 - width / 2;
-    const top = window.screen.height / 2 - height / 2;
-    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStore)}`;
-
-    const popup = window.open(
-      oauthUrl,
-      `oauth_shopify`,
-      `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes`
-    );
-
-    // Monitor popup window closure to reset loading state
-    const checkPopupTimer = setInterval(() => {
-      if (!popup || popup.closed) {
-        clearInterval(checkPopupTimer);
-        setIsAuthorizing(false);
-      }
-    }, 1000);
   };
 
   const handleConfirmImport = () => {
@@ -696,11 +677,13 @@ export default function AddonSidebarPage() {
                 <span>{selectedConnector.domainSuffix || ".com"}</span>
               </div>
 
-              {/* Authorize Action Button */}
-              <button 
-                onClick={handleAuthorizeClick}
-                disabled={isAuthorizing}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+              {/* Authorize Action Link (treated as user navigation, never blocked by sandbox) */}
+              <a 
+                href={oauthUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleLinkClick}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center"
               >
                 {isAuthorizing ? (
                   <>
@@ -710,7 +693,7 @@ export default function AddonSidebarPage() {
                 ) : (
                   <span>Authorize</span>
                 )}
-              </button>
+              </a>
             </div>
 
           </div>
@@ -728,7 +711,16 @@ export default function AddonSidebarPage() {
                 <RefreshCw className="w-8 h-8 text-[#13322b] animate-spin" />
                 <div>
                   <h3 className="font-bold text-xs text-[#13322b]">Connecting to {selectedConnector.name}</h3>
-                  <p className="text-[10px] text-[#8a8579] mt-1">Please complete the authorization in the popup window.</p>
+                  <p className="text-[10px] text-[#8a8579] mt-1 mb-3">Please complete the authorization in the newly opened tab.</p>
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAuthorizing(false);
+                    }}
+                    className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-[10px] font-bold cursor-pointer transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             </div>
