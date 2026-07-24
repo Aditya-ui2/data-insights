@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Sparkles, 
   Download, 
@@ -17,7 +17,16 @@ import {
   ArrowUpRight,
   ArrowLeft,
   Check,
-  FileSpreadsheet
+  FileSpreadsheet,
+  HelpCircle,
+  Lock,
+  X,
+  Filter,
+  ArrowUpDown,
+  RefreshCw,
+  Zap,
+  Layers,
+  Database
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DV_LOGO_BASE64 } from "./logo-base64";
@@ -40,103 +49,109 @@ function CustomDVLogo() {
   );
 }
 
-// Pure Inline HD Vector SVG Brand Logos (0 External Network Calls - 100% Reliable)
-function OfficialBrandLogo({ id }: { id: string }) {
+// Circular Brand Logos SVG Component
+function OfficialBrandLogo({ id, size = "w-10 h-10" }: { id: string; size?: string }) {
   switch (id) {
     case "shopify":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#95bf47]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M78 28H66C66 18 58 10 48 10C38 10 30 18 30 28H18C15 28 13 30 13 33L22 85C22 88 25 90 28 90H68C71 90 74 88 74 85L83 33C83 30 81 28 78 28Z" fill="#95BF47" />
-            <path d="M48 16C53 16 58 21 59 28H37C38 21 43 16 48 16Z" fill="#5E8E3E" />
-            <path d="M44 42L35 60H43L41 78L58 52H48L53 42H44Z" fill="white" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/shopify/95BF47" 
+            alt="Shopify" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "stripe":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#635bff]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M85 41C85 24 72 15 52 15H15V85H52C75 85 85 71 85 55C85 46 80 43 85 41ZM52 35C60 35 64 38 64 43C64 48 58 50 49 53L35 57V35H52ZM52 65H35V45L49 41C61 38 67 43 67 52C67 60 61 65 52 65Z" fill="#635BFF" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#f0efff] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/stripe/635BFF" 
+            alt="Stripe" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "salesforce":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#00a1e0]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M38 32C41 23 49 16 60 16C72 16 82 25 84 37C90 38 95 44 95 52C95 61 88 68 79 68H24C14 68 6 60 6 50C6 41 12 34 21 33C25 24 33 19 43 19" fill="#00A1E0" />
-            <path d="M43 40C43 38 45 36 48 36H52C54 36 56 38 56 40V60C56 62 54 64 52 64H48C45 64 43 62 43 60V40Z" fill="white" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#e6f4fb] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/salesforce/00A1E0" 
+            alt="Salesforce" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "postgres":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#336791]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M50 10C27 10 10 27 10 50C10 72 27 90 50 90C72 90 90 72 90 50C90 27 72 10 50 10Z" fill="#336791" />
-            <path d="M35 35C35 30 42 25 52 25C65 25 72 32 72 45C72 58 62 65 52 65H42V75H32V35H35ZM42 35V55H50C58 55 62 50 62 45C62 39 57 35 50 35H42Z" fill="white" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#e8f1f7] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/postgresql/4169E1" 
+            alt="PostgreSQL" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "ga4":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#f9ab00]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <rect x="15" y="55" width="20" height="30" rx="5" fill="#F9AB00" />
-            <rect x="40" y="35" width="20" height="50" rx="5" fill="#E37400" />
-            <rect x="65" y="15" width="20" height="70" rx="5" fill="#E37400" />
-            <circle cx="75" cy="25" r="10" fill="#EA4335" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#fff4e5] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/googleanalytics/E37400" 
+            alt="GA4" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "hubspot":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#ff7a59]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M50 10L85 30V70L50 90L15 70V30L50 10Z" fill="#FF7A59" />
-            <circle cx="50" cy="50" r="16" fill="white" />
-            <circle cx="50" cy="50" r="8" fill="#FF7A59" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#fff0eb] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/hubspot/FF7A59" 
+            alt="HubSpot" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "meta_ads":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#0668e1]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M30 30C18 30 10 40 10 50C10 60 18 70 30 70C40 70 47 62 50 55C53 62 60 70 70 70C82 70 90 60 90 50C90 40 82 30 70 30C60 30 53 38 50 45C47 38 40 30 30 30Z" fill="#0668E1" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#e7f0ff] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/meta/0668E1" 
+            alt="Meta Ads" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "google_ads":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#4285f4]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <polygon points="30,85 10,50 45,15 65,50" fill="#FBBC04" />
-            <polygon points="70,85 90,50 55,15 35,50" fill="#4285F4" />
-            <circle cx="75" cy="75" r="12" fill="#34A853" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#e8f0fe] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/googleads/4285F4" 
+            alt="Google Ads" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "mysql":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#00758f]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs">
-          <svg viewBox="0 0 100 100" fill="none" className="w-6 h-6">
-            <path d="M20 70C30 40 50 20 85 20C75 40 60 65 30 80C25 82 20 75 20 70Z" fill="#00758F" />
-            <path d="M40 75C55 60 70 45 80 30C75 45 60 65 45 78" fill="#F29111" />
-          </svg>
+        <div className={`${size} rounded-full bg-[#f0f4f7] flex items-center justify-center shrink-0 p-2 shadow-2xs`}>
+          <img 
+            src="https://cdn.simpleicons.org/mysql/4479A1" 
+            alt="MySQL" 
+            className="w-full h-full object-contain"
+          />
         </div>
       );
     case "csv_upload":
       return (
-        <div className="w-10 h-10 rounded-full bg-[#107c41]/15 flex items-center justify-center shrink-0 p-2 shadow-2xs text-[#107c41]">
-          <FileSpreadsheet className="w-6 h-6 stroke-[2]" />
+        <div className={`${size} rounded-full bg-[#eaf4e0] flex items-center justify-center shrink-0 p-2 shadow-2xs text-[#107c41]`}>
+          <FileSpreadsheet className="w-full h-full stroke-[2]" />
         </div>
       );
     default:
       return (
-        <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-gray-600">
-          <FileSpreadsheet className="w-6 h-6" />
+        <div className={`${size} rounded-full bg-gray-100 flex items-center justify-center shrink-0 text-gray-600`}>
+          <FileSpreadsheet className="w-full h-full" />
         </div>
       );
   }
@@ -147,10 +162,11 @@ interface Connector {
   name: string;
   category: "E-Commerce" | "Payments" | "CRM" | "Databases" | "Marketing" | "Files";
   status: "Connected" | "Available";
+  domainSuffix?: string;
 }
 
 const CONNECTORS: Connector[] = [
-  { id: "shopify", name: "Shopify", category: "E-Commerce", status: "Connected" },
+  { id: "shopify", name: "Shopify", category: "E-Commerce", status: "Connected", domainSuffix: ".myshopify.com" },
   { id: "stripe", name: "Stripe", category: "Payments", status: "Connected" },
   { id: "ga4", name: "Google Analytics 4", category: "Marketing", status: "Connected" },
   { id: "csv_upload", name: "Files (CSV & Excel)", category: "Files", status: "Connected" },
@@ -163,34 +179,89 @@ const CONNECTORS: Connector[] = [
 ];
 
 export default function AddonSidebarPage() {
-  const [currentView, setCurrentView] = useState<"home" | "import-connectors" | "connector-setup">("home");
-  const [selectedConnector, setSelectedConnector] = useState<Connector | null>(null);
+  const [currentView, setCurrentView] = useState<"home" | "import-connectors" | "connector-connect" | "importing-active">("home");
+  const [selectedConnector, setSelectedConnector] = useState<Connector>(CONNECTORS[0]);
+  const [storeNameInput, setStoreNameInput] = useState("");
+  const [isAuthorizing, setIsAuthorizing] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [selectedObject, setSelectedObject] = useState("Customers");
   const [isAgentExpanded, setIsAgentExpanded] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [showWelcome, setShowWelcome] = useState(true);
+  const [isImportingProgress, setIsImportingProgress] = useState(false);
 
   const connectedSources = CONNECTORS.filter((c) => c.status === "Connected");
   const availableSources = CONNECTORS.filter((c) => c.status === "Available" && (searchTerm === "" || c.name.toLowerCase().includes(searchTerm.toLowerCase())));
 
+  const objectsList = [
+    "Automatic Discount Nodes",
+    "Automatic Discount Saved Searches",
+    "Code Discount Nodes",
+    "Code Discount Saved Searches",
+    "Collection Saved Searches",
+    "Collections",
+    "Customers",
+    "Deletion Events",
+    "Delivery Profiles",
+    "Draft Order Saved Searches",
+    "Draft Orders",
+    "Files",
+    "Gift Cards",
+    "Inventory Items",
+    "Line Items",
+    "Locations",
+    "Market Catalogs",
+    "Order Saved Searches"
+  ];
+
+  const customerSampleData = [
+    { id: "gid://shopify/Customer/9494632", name: "Ayumu Hirano", email: "ayumu.hirano@example.com", created: "2026-07-07 01:31:18", amount: "$140.00" },
+    { id: "gid://shopify/Customer/9494633", name: "Russell Winfield", email: "russel.winfield@example.com", created: "2026-07-07 01:31:19", amount: "$290.50" },
+    { id: "gid://shopify/Customer/9494634", name: "Karine Ruby", email: "karine.ruby@example.com", created: "2026-07-07 01:31:19", amount: "$85.00" },
+    { id: "gid://shopify/Customer/9494635", name: "Shaun White", email: "shaun.white@example.com", created: "2026-07-07 01:31:20", amount: "$420.00" },
+    { id: "gid://shopify/Customer/9494636", name: "Chloe Kim", email: "chloe.kim@example.com", created: "2026-07-07 01:31:22", amount: "$310.00" },
+  ];
+
+  // STEP 1: Click Connector -> Open Connect Screen (Image 1)
   const handleOpenConnector = (connector: Connector) => {
     setSelectedConnector(connector);
-    setCurrentView("connector-setup");
+    setStoreNameInput("");
+    setCurrentView("connector-connect");
+  };
+
+  // STEP 2: Click Authorize -> Simulate Redirect & Open Preview Modal (Image 2 -> 3)
+  const handleAuthorizeClick = () => {
+    setIsAuthorizing(true);
+    setTimeout(() => {
+      setIsAuthorizing(false);
+      setShowPreviewModal(true); // Open Step 3 Import Preview Modal
+    }, 1200);
+  };
+
+  // STEP 4: Click Import in Modal -> Close Modal & Show Live Syncing Card (Image 4 -> 5)
+  const handleConfirmImport = () => {
+    setShowPreviewModal(false);
+    setCurrentView("importing-active");
+    setIsImportingProgress(true);
+    setTimeout(() => {
+      setIsImportingProgress(false);
+    }, 3000);
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#faf9f6] text-[#13322b] font-sans flex flex-col justify-between select-none antialiased">
+    <div className="w-full min-h-screen bg-[#faf9f6] text-[#13322b] font-sans flex flex-col justify-between select-none antialiased relative">
       
       {/* Top Header Bar */}
       <div className="bg-white/95 backdrop-blur-md border-b border-[#e5e2db] px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
         <div className="flex items-center gap-2.5">
           {currentView !== "home" ? (
             <button 
-              onClick={() => setCurrentView(currentView === "connector-setup" ? "import-connectors" : "home")}
+              onClick={() => setCurrentView(currentView === "connector-connect" ? "import-connectors" : "home")}
               className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b] transition-all flex items-center gap-2 font-bold text-sm"
               title="Back"
             >
               <ArrowLeft className="w-4 h-4 text-[#13322b]" />
-              <span>Import Data</span>
+              <span>{currentView === "connector-connect" ? `Connect ${selectedConnector.name}` : "Import Data"}</span>
             </button>
           ) : (
             <>
@@ -203,11 +274,8 @@ export default function AddonSidebarPage() {
           )}
         </div>
         <div className="flex items-center gap-1.5">
-          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Assistant Chat">
-            <MessageSquare className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Settings">
-            <SlidersHorizontal className="w-4 h-4" />
+          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Help">
+            <HelpCircle className="w-4 h-4 text-[#8a8579]" />
           </button>
         </div>
       </div>
@@ -234,111 +302,111 @@ export default function AddonSidebarPage() {
               </div>
             </button>
 
-              {/* 6 Features List inside Create Agent Dropdown */}
-              {isAgentExpanded && (
-                <div className="divide-y divide-[#f0ede6] bg-white transition-all">
-                  
-                  {/* Item 1: Import Data */}
-                  <div>
-                    <button 
-                      onClick={() => setCurrentView("import-connectors")}
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
-                          <Download className="w-4 h-4" />
-                        </div>
-                        <div className="text-xs font-bold text-[#13322b]">
-                          <span>Import Data</span>
-                        </div>
+            {/* 6 Features List inside Create Agent Dropdown */}
+            {isAgentExpanded && (
+              <div className="divide-y divide-[#f0ede6] bg-white transition-all">
+                
+                {/* Item 1: Import Data */}
+                <div>
+                  <button 
+                    onClick={() => setCurrentView("import-connectors")}
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
+                        <Download className="w-4 h-4" />
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
-                    </button>
-                  </div>
-
-                  {/* Item 2: Export Data */}
-                  <div>
-                    <button 
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
-                          <Upload className="w-4 h-4" />
-                        </div>
-                        <div className="text-xs font-bold text-[#13322b]">Export Data</div>
+                      <div className="text-xs font-bold text-[#13322b]">
+                        <span>Import Data</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                    </button>
-                  </div>
-
-                  {/* Item 3: Monitor & Alerts */}
-                  <div>
-                    <button 
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
-                          <Bell className="w-4 h-4" />
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-[#13322b]">Monitor & Alerts</span>
-                          <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                    </button>
-                  </div>
-
-                  {/* Item 4: Sheet Assistant */}
-                  <div>
-                    <button 
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
-                          <Bot className="w-4 h-4" />
-                        </div>
-                        <div className="text-xs font-bold text-[#13322b]">Sheet Assistant</div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                    </button>
-                  </div>
-
-                  {/* Item 5: Snapshots */}
-                  <div>
-                    <button 
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
-                          <Camera className="w-4 h-4" />
-                        </div>
-                        <div className="text-xs font-bold text-[#13322b]">Snapshots</div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                    </button>
-                  </div>
-
-                  {/* Item 6: Web Dashboards */}
-                  <div>
-                    <button 
-                      className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
-                          <BarChart3 className="w-4 h-4" />
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-bold text-[#13322b]">Web Dashboards</span>
-                          <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-[#a39e92]" />
-                    </button>
-                  </div>
-
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92] group-hover:translate-x-0.5 transition-transform" />
+                  </button>
                 </div>
-              )}
+
+                {/* Item 2: Export Data */}
+                <div>
+                  <button 
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
+                        <Upload className="w-4 h-4" />
+                      </div>
+                      <div className="text-xs font-bold text-[#13322b]">Export Data</div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                  </button>
+                </div>
+
+                {/* Item 3: Monitor & Alerts */}
+                <div>
+                  <button 
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
+                        <Bell className="w-4 h-4" />
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-[#13322b]">Monitor & Alerts</span>
+                        <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                  </button>
+                </div>
+
+                {/* Item 4: Sheet Assistant */}
+                <div>
+                  <button 
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
+                        <Bot className="w-4 h-4" />
+                      </div>
+                      <div className="text-xs font-bold text-[#13322b]">Sheet Assistant</div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                  </button>
+                </div>
+
+                {/* Item 5: Snapshots */}
+                <div>
+                  <button 
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
+                        <Camera className="w-4 h-4" />
+                      </div>
+                      <div className="text-xs font-bold text-[#13322b]">Snapshots</div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                  </button>
+                </div>
+
+                {/* Item 6: Web Dashboards */}
+                <div>
+                  <button 
+                    className="w-full px-3.5 py-3.5 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
+                        <BarChart3 className="w-4 h-4" />
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-bold text-[#13322b]">Web Dashboards</span>
+                        <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#a39e92]" />
+                  </button>
+                </div>
+
+              </div>
+            )}
           </div>
 
           {/* Deep Forest Luxury Card */}
@@ -384,7 +452,7 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE (PURE INLINE HD VECTOR BRAND LOGOS) */}
+      {/* VIEW 2: DEDICATED IMPORT CONNECTORS SUB-PAGE */}
       {currentView === "import-connectors" && (
         <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
           
@@ -433,7 +501,7 @@ export default function AddonSidebarPage() {
             </div>
           )}
 
-          {/* SECTION 2: SUGGESTED / AVAILABLE CONNECTORS */}
+          {/* SECTION 2: SUGGESTED SOURCES */}
           <div className="space-y-2.5 pt-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-[#13322b] tracking-wider uppercase">Suggested Sources</span>
@@ -461,58 +529,251 @@ export default function AddonSidebarPage() {
         </div>
       )}
 
-      {/* VIEW 3: CONNECTOR SETUP SCREEN */}
-      {currentView === "connector-setup" && selectedConnector && (
-        <div className="p-3.5 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
+      {/* VIEW 3: STEP 1 - CONNECT SCREEN (EXACT MATCH FOR IMAGE 1) */}
+      {currentView === "connector-connect" && (
+        <div className="p-4 space-y-5 flex-1 overflow-y-auto bg-[#faf9f6] flex flex-col justify-between">
           
-          {/* Connector Banner */}
-          <div className="p-4 bg-white rounded-xl border border-[#e5e2db] shadow-sm flex items-center gap-3.5">
-            <OfficialBrandLogo id={selectedConnector.id} />
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-[#13322b]">{selectedConnector.name}</h3>
-                <Badge className="bg-emerald-100 text-emerald-800 text-[9px] border-0">{selectedConnector.status}</Badge>
+          <div className="space-y-6 pt-2">
+            
+            {/* Plug Connector Illustration */}
+            <div className="flex items-center justify-center gap-4 py-3">
+              <div className="w-14 h-14 rounded-full bg-[#13322b] text-[#c59b43] flex items-center justify-center shadow-md">
+                <Zap className="w-7 h-7 fill-[#c59b43]" />
+              </div>
+              <div className="w-6 border-b-2 border-dashed border-[#8a8579]" />
+              <OfficialBrandLogo id={selectedConnector.id} size="w-14 h-14" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h2 className="text-base font-bold text-[#13322b]">Let's connect to {selectedConnector.name}</h2>
+              <p className="text-xs text-[#8a8579]">Sign in to authorize your store data sync</p>
+            </div>
+
+            {/* Input Form */}
+            <div className="bg-white rounded-2xl border border-[#e5e2db] p-4 space-y-3 shadow-2xs">
+              <label className="text-xs font-bold text-[#13322b] block">
+                {selectedConnector.name} Store Name
+              </label>
+              
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="shop-name"
+                  value={storeNameInput}
+                  onChange={(e) => setStoreNameInput(e.target.value)}
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-xl focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] font-medium"
+                />
+              </div>
+
+              <p className="text-[11px] text-[#8a8579] leading-relaxed">
+                You can find your {selectedConnector.name} store name in your browser's address bar when you are logged in to {selectedConnector.name}.
+              </p>
+
+              {/* Domain Preview Box */}
+              <div className="p-2.5 bg-[#f5f3ee] rounded-xl border border-[#e5e2db] text-[11px] text-[#8a8579] flex items-center gap-1.5 font-mono">
+                <span>https://</span>
+                <span className="bg-[#c59b43]/30 text-[#13322b] px-1 py-0.5 rounded font-bold">{storeNameInput || "store-name"}</span>
+                <span>{selectedConnector.domainSuffix || ".com"}</span>
+              </div>
+
+              {/* Authorize Action Button */}
+              <button 
+                onClick={handleAuthorizeClick}
+                disabled={isAuthorizing}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2"
+              >
+                {isAuthorizing ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin text-[#c59b43]" />
+                    <span>Redirecting to {selectedConnector.name}...</span>
+                  </>
+                ) : (
+                  <span>Authorize</span>
+                )}
+              </button>
+            </div>
+
+          </div>
+
+          {/* Footnote Security Notice */}
+          <div className="p-3 bg-white/80 rounded-xl border border-[#e5e2db] flex items-start gap-2.5 text-[10px] text-[#8a8579]">
+            <Lock className="w-3.5 h-3.5 text-[#13322b] shrink-0 mt-0.5" />
+            <span>DigitValues encrypts your credentials and never stores raw data when importing.</span>
+          </div>
+
+        </div>
+      )}
+
+      {/* VIEW 4: STEP 4 - IMPORTING ACTIVE SYNC CARD (EXACT MATCH FOR IMAGE 5) */}
+      {currentView === "importing-active" && (
+        <div className="p-4 space-y-4 flex-1 overflow-y-auto bg-[#faf9f6]">
+          
+          <div className="bg-white rounded-2xl border border-[#e5e2db] p-4 space-y-4 shadow-sm">
+            <div className="flex items-center justify-between border-b border-[#f0ede6] pb-3">
+              <div className="flex items-center gap-2.5">
+                <OfficialBrandLogo id={selectedConnector.id} size="w-8 h-8" />
+                <span className="font-bold text-sm text-[#13322b]">Import {selectedConnector.name}</span>
+              </div>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                Connected
+              </span>
+            </div>
+
+            {/* Selected Config Summary */}
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center justify-between text-[#8a8579]">
+                <span>Objects:</span>
+                <span className="font-bold text-[#13322b]">{selectedObject}</span>
+              </div>
+              <div className="flex items-center justify-between text-[#8a8579]">
+                <span>Fields:</span>
+                <span className="font-medium text-[#13322b]">Id, Display Name, Email, Created At...</span>
               </div>
             </div>
+
+            {/* Live Sync Graphic Animation */}
+            <div className="p-4 bg-[#fcfbf9] rounded-xl border border-[#e5e2db] text-center space-y-3">
+              <div className="flex items-center justify-center gap-3">
+                <OfficialBrandLogo id={selectedConnector.id} size="w-9 h-9" />
+                <div className="flex items-center gap-1 text-[#c59b43]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping delay-100" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#c59b43] animate-ping delay-200" />
+                </div>
+                <CustomDVLogo />
+                <div className="flex items-center gap-1 text-emerald-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping delay-100" />
+                </div>
+                <div className="w-9 h-9 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shadow-2xs">
+                  <FileSpreadsheet className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="text-xs font-bold text-[#13322b]">
+                {isImportingProgress ? `Importing data from ${selectedConnector.name}...` : `Live Data Synced to Sheet1!`}
+              </div>
+              <p className="text-[10px] text-[#8a8579]">Auto-refresh set to hourly</p>
+            </div>
           </div>
 
-          {/* Configuration Form */}
-          <div className="bg-white rounded-xl border border-[#e5e2db] p-4 space-y-3.5 shadow-2xs">
-            <h4 className="text-xs font-bold text-[#13322b] uppercase tracking-wider">Connector Settings</h4>
+        </div>
+      )}
+
+      {/* STEP 3 & 4 OVERLAY MODAL: IMPORT PREVIEW MODAL DIALOG (EXACT MATCH FOR IMAGES 3 & 4) */}
+      {showPreviewModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-4xl max-h-[85vh] shadow-2xl flex flex-col overflow-hidden border border-[#e5e2db] animate-in fade-in zoom-in duration-200">
             
-            <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-[#13322b]">API Key / Store URL</label>
-              <input 
-                type="text" 
-                placeholder={`Enter your ${selectedConnector.name} API Key or URL...`}
-                className="w-full px-3 py-2 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b]"
-              />
+            {/* Modal Header Bar */}
+            <div className="px-6 py-4 border-b border-[#e5e2db] flex items-center justify-between bg-[#faf9f6]">
+              <div className="flex items-center gap-3">
+                <h2 className="text-base font-bold text-[#13322b]">Import Preview</h2>
+                <div className="flex items-center gap-2 pl-3 border-l border-[#e5e2db]">
+                  <OfficialBrandLogo id={selectedConnector.id} size="w-7 h-7" />
+                  <span className="font-bold text-sm text-[#13322b]">{selectedConnector.name}</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowPreviewModal(false)}
+                className="p-2 hover:bg-[#e5e2db]/50 rounded-full text-[#8a8579] hover:text-[#13322b] transition-all"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-[#13322b]">Target Sheet Range</label>
-              <input 
-                type="text" 
-                defaultValue="Sheet1!A1"
-                className="w-full px-3 py-2 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b]"
-              />
+            {/* Modal Body: Left Sidebar + Right Preview Table */}
+            <div className="flex-1 flex overflow-hidden">
+              
+              {/* Left Object Tree Selector Pane */}
+              <div className="w-64 border-r border-[#e5e2db] p-3 space-y-3 bg-[#faf9f6] flex flex-col">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#8a8579]" />
+                  <input 
+                    type="text" 
+                    placeholder="Search objects..."
+                    className="w-full pl-9 pr-3 py-1.5 text-xs bg-white border border-[#e5e2db] rounded-lg focus:outline-none text-[#13322b]"
+                  />
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-1">
+                  {objectsList.map((obj) => (
+                    <button
+                      key={obj}
+                      onClick={() => setSelectedObject(obj)}
+                      className={`w-full px-3 py-2 text-left rounded-lg text-xs font-medium flex items-center gap-2 transition-all ${
+                        selectedObject === obj 
+                          ? "bg-[#13322b] text-white font-bold shadow-xs" 
+                          : "text-[#635f54] hover:bg-white hover:text-[#13322b]"
+                      }`}
+                    >
+                      <Layers className="w-3.5 h-3.5 shrink-0 opacity-70" />
+                      <span className="truncate">{obj}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Live Table Preview Pane */}
+              <div className="flex-1 p-5 flex flex-col justify-between overflow-hidden bg-white">
+                
+                <div className="space-y-4 flex-1 overflow-y-auto">
+                  {/* Actions Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <button className="px-3 py-1.5 bg-[#faf9f6] border border-[#e5e2db] rounded-lg text-xs font-semibold text-[#13322b] flex items-center gap-1.5 hover:bg-[#f3f0e8]">
+                        <Filter className="w-3.5 h-3.5" />
+                        <span>Filter</span>
+                      </button>
+                      <button className="px-3 py-1.5 bg-[#faf9f6] border border-[#e5e2db] rounded-lg text-xs font-semibold text-[#13322b] flex items-center gap-1.5 hover:bg-[#f3f0e8]">
+                        <ArrowUpDown className="w-3.5 h-3.5" />
+                        <span>Sort</span>
+                      </button>
+                    </div>
+
+                    <button 
+                      onClick={handleConfirmImport}
+                      className="px-5 py-2 bg-[#13322b] hover:bg-[#1a473d] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2"
+                    >
+                      <Check className="w-4 h-4 text-[#c59b43]" />
+                      <span>Import Data</span>
+                    </button>
+                  </div>
+
+                  {/* Live Sample Data Table */}
+                  <div className="border border-[#e5e2db] rounded-2xl overflow-hidden shadow-2xs">
+                    <table className="w-full text-left border-collapse text-xs">
+                      <thead>
+                        <tr className="bg-[#faf9f6] border-b border-[#e5e2db] text-[#13322b]">
+                          <th className="p-3 font-bold">Id</th>
+                          <th className="p-3 font-bold">Display Name</th>
+                          <th className="p-3 font-bold">Email</th>
+                          <th className="p-3 font-bold">Created At</th>
+                          <th className="p-3 font-bold">Amount Spent</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#f0ede6]">
+                        {customerSampleData.map((row, idx) => (
+                          <tr key={idx} className="hover:bg-[#fcfbf9] transition-colors text-[#635f54] font-mono text-[11px]">
+                            <td className="p-3 font-semibold text-[#13322b]">{row.id}</td>
+                            <td className="p-3 font-sans font-medium text-[#13322b]">{row.name}</td>
+                            <td className="p-3">{row.email}</td>
+                            <td className="p-3">{row.created}</td>
+                            <td className="p-3 font-semibold text-emerald-700">{row.amount}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-[#13322b]">Auto-Sync Schedule</label>
-              <select className="w-full px-3 py-2 text-xs bg-[#faf9f6] border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b]">
-                <option>Hourly Auto Refresh</option>
-                <option>Daily Auto Refresh (Midnight)</option>
-                <option>On-Demand Manual Sync</option>
-              </select>
-            </div>
-
-            <button className="w-full py-2.5 bg-[#13322b] hover:bg-[#1a473d] text-white rounded-lg font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2">
-              <Check className="w-4 h-4 text-[#c59b43]" />
-              <span>Import Data to Sheet</span>
-            </button>
           </div>
-
         </div>
       )}
 
