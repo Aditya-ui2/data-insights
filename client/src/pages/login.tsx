@@ -716,7 +716,7 @@ export default function Login() {
       </div>
 
       {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-8 lg:p-12">
+      <div className="flex-1 flex items-center justify-center p-2 sm:p-6 lg:p-12">
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -725,14 +725,14 @@ export default function Login() {
         >
           {/* Mobile back button */}
           <Link href="/">
-            <button className="flex lg:hidden items-center gap-2 text-accent hover:text-accent/80 mb-6 text-sm font-medium">
+            <button className="flex lg:hidden items-center gap-2 text-accent hover:text-accent/80 mb-4 text-sm font-medium">
               <ArrowLeft className="w-4 h-4" />
               Back
             </button>
           </Link>
 
           <motion.div 
-            className="bg-white rounded-none shadow-xl border border-gray-200 p-10 sm:p-12"
+            className="bg-white rounded-none shadow-xl border border-gray-200 p-4 sm:p-8 lg:p-12"
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, delay: 0.1 }}
