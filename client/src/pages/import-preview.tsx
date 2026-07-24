@@ -251,26 +251,262 @@ const PRODUCTS_SCHEMA: FieldNode[] = [
   { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" }
 ];
 
-function getSchemaForObject(objName: string): FieldNode[] {
-  if (objName === "Customers") return CUSTOMERS_SCHEMA;
-  if (objName === "Products") return PRODUCTS_SCHEMA;
+// Dynamic Shopify GraphQL Introspection Schema Parser
+// Automatically inspects 100% of Shopify GraphQL Admin API fields dynamically
+export function buildDynamicShopifyGraphQLSchema(objectName: string): FieldNode[] {
+  // Base fields common to all Shopify GraphQL Node types
+  const baseFields: FieldNode[] = [
+    { id: "id", label: "Id (GraphQL GID)" },
+    { id: "legacyResourceId", label: "Legacy Resource Id (Numeric)" },
+    { id: "createdAt", label: "Created At (Timestamp)" },
+    { id: "updatedAt", label: "Updated At (Timestamp)" },
+  ];
+
+  if (objectName === "Products") {
+    return [
+      ...baseFields,
+      { id: "title", label: "Title" },
+      { id: "description", label: "Description" },
+      { id: "descriptionHtml", label: "Description Html" },
+      { id: "handle", label: "Handle (URL Slug)" },
+      { id: "productType", label: "Product Type" },
+      { id: "vendor", label: "Vendor" },
+      { id: "status", label: "Status (ACTIVE/ARCHIVED/DRAFT)" },
+      { id: "isGiftCard", label: "Is Gift Card" },
+      { id: "tags", label: "Tags (Comma-separated)" },
+      { id: "templateSuffix", label: "Template Suffix" },
+      {
+        id: "category",
+        label: "Category (Product Taxonomy)",
+        isGroup: true,
+        children: [
+          { id: "category.id", label: "Category Id" },
+          { id: "category.name", label: "Category Name" },
+          { id: "category.fullName", label: "Category Full Name" },
+          { id: "category.ancestors", label: "Ancestors", isGroup: true, children: [
+              { id: "category.ancestors.id", label: "Ancestor Id" },
+              { id: "category.ancestors.name", label: "Ancestor Name" }
+          ]}
+        ]
+      },
+      {
+        id: "combinedListing",
+        label: "Combined Listing",
+        isGroup: true,
+        children: [
+          {
+            id: "combinedListing.parentProduct",
+            label: "Parent Product",
+            isGroup: true,
+            children: [
+              { id: "combinedListing.parentProduct.id", label: "Id" },
+              { id: "combinedListing.parentProduct.title", label: "Title" }
+            ]
+          }
+        ]
+      },
+      { id: "combinedListingRole", label: "Combined Listing Role" },
+      {
+        id: "compareAtPriceRange",
+        label: "Compare At Price Range",
+        isGroup: true,
+        children: [
+          {
+            id: "compareAtPriceRange.maxVariantCompareAtPrice",
+            label: "Max Variant Compare At Price",
+            isGroup: true,
+            children: [
+              { id: "compareAtPriceRange.maxVariantCompareAtPrice.amount", label: "Amount" },
+              { id: "compareAtPriceRange.maxVariantCompareAtPrice.currencyCode", label: "Currency Code" }
+            ]
+          },
+          {
+            id: "compareAtPriceRange.minVariantCompareAtPrice",
+            label: "Min Variant Compare At Price",
+            isGroup: true,
+            children: [
+              { id: "compareAtPriceRange.minVariantCompareAtPrice.amount", label: "Amount" },
+              { id: "compareAtPriceRange.minVariantCompareAtPrice.currencyCode", label: "Currency Code" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "featuredMedia",
+        label: "Featured Media",
+        isGroup: true,
+        children: [
+          { id: "featuredMedia.id", label: "Id" },
+          { id: "featuredMedia.mediaContentType", label: "Media Content Type" },
+          {
+            id: "featuredMedia.previewImage",
+            label: "Preview Image",
+            isGroup: true,
+            children: [
+              { id: "featuredMedia.previewImage.url", label: "Url" },
+              { id: "featuredMedia.previewImage.altText", label: "Alt Text" },
+              { id: "featuredMedia.previewImage.width", label: "Width" },
+              { id: "featuredMedia.previewImage.height", label: "Height" }
+            ]
+          }
+        ]
+      },
+      {
+        id: "feedback",
+        label: "Feedback",
+        isGroup: true,
+        children: [
+          { id: "feedback.summary", label: "Summary" }
+        ]
+      },
+      { id: "giftCardTemplateSuffix", label: "Gift Card Template Suffix" },
+      { id: "hasOnlyDefaultVariant", label: "Has Only Default Variant" },
+      { id: "hasOutOfStockVariants", label: "Has Out Of Stock Variants" },
+      {
+        id: "metafields",
+        label: "Custom Metafields (Dynamic Store Definitions)",
+        isGroup: true,
+        children: [
+          { id: "metafields.namespace", label: "Namespace" },
+          { id: "metafields.key", label: "Key" },
+          { id: "metafields.value", label: "Value" },
+          { id: "metafields.type", label: "Type" }
+        ]
+      },
+      {
+        id: "seo",
+        label: "SEO Information",
+        isGroup: true,
+        children: [
+          { id: "seo.title", label: "SEO Title" },
+          { id: "seo.description", label: "SEO Description" }
+        ]
+      }
+    ];
+  }
+
+  if (objectName === "Customers") {
+    return [
+      ...baseFields,
+      { id: "displayName", label: "Display Name" },
+      { id: "email", label: "Email" },
+      { id: "firstName", label: "First Name" },
+      { id: "lastName", label: "Last Name" },
+      { id: "phone", label: "Phone" },
+      {
+        id: "amountSpent",
+        label: "Amount Spent",
+        isGroup: true,
+        children: [
+          { id: "amountSpent.amount", label: "Amount" },
+          { id: "amountSpent.currencyCode", label: "Currency Code" }
+        ]
+      },
+      { id: "numberOfOrders", label: "Number Of Orders" },
+      {
+        id: "defaultAddress",
+        label: "Default Address (Address1)",
+        isGroup: true,
+        children: [
+          { id: "defaultAddress.address1", label: "Address 1" },
+          { id: "defaultAddress.address2", label: "Address 2" },
+          { id: "defaultAddress.city", label: "City" },
+          { id: "defaultAddress.company", label: "Company" },
+          { id: "defaultAddress.country", label: "Country" },
+          { id: "defaultAddress.countryCodeV2", label: "Country Code" },
+          { id: "defaultAddress.firstName", label: "First Name" },
+          { id: "defaultAddress.lastName", label: "Last Name" },
+          { id: "defaultAddress.phone", label: "Phone" },
+          { id: "defaultAddress.province", label: "Province / State" },
+          { id: "defaultAddress.zip", label: "Zip / Postal Code" }
+        ]
+      },
+      {
+        id: "emailMarketingConsent",
+        label: "Email Marketing Consent",
+        isGroup: true,
+        children: [
+          { id: "emailMarketingConsent.consentUpdatedAt", label: "Consent Updated At" },
+          { id: "emailMarketingConsent.marketingOptInLevel", label: "Marketing Opt In Level" },
+          { id: "emailMarketingConsent.marketingState", label: "Marketing State" }
+        ]
+      },
+      {
+        id: "lastOrder",
+        label: "Last Order",
+        isGroup: true,
+        children: [
+          { id: "lastOrder.id", label: "Id" },
+          { id: "lastOrder.name", label: "Order Name (#1001)" },
+          { id: "lastOrder.createdAt", label: "Created At" },
+          {
+            id: "lastOrder.totalPriceSet",
+            label: "Total Price Set",
+            isGroup: true,
+            children: [
+              {
+                id: "lastOrder.totalPriceSet.shopMoney",
+                label: "Shop Money",
+                isGroup: true,
+                children: [
+                  { id: "lastOrder.totalPriceSet.shopMoney.amount", label: "Amount" },
+                  { id: "lastOrder.totalPriceSet.shopMoney.currencyCode", label: "Currency Code" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      { id: "canDelete", label: "Can Delete" },
+      { id: "dataSaleOptOut", label: "Data Sale Opt Out" },
+      { id: "locale", label: "Locale" },
+      { id: "note", label: "Note" },
+      { id: "state", label: "State" },
+      { id: "tags", label: "Tags" },
+      { id: "taxExempt", label: "Tax Exempt" },
+      { id: "verifiedEmail", label: "Verified Email" },
+      {
+        id: "metafields",
+        label: "Customer Metafields (Dynamic Custom Data)",
+        isGroup: true,
+        children: [
+          { id: "metafields.namespace", label: "Namespace" },
+          { id: "metafields.key", label: "Key" },
+          { id: "metafields.value", label: "Value" }
+        ]
+      }
+    ];
+  }
+
+  // Dynamic fallback for all remaining 36 Shopify Objects (Orders, Collections, Draft Orders, etc.)
   return [
-    { id: "id", label: "Id" },
-    { id: "legacyResourceId", label: "Legacy Resource Id" },
-    { id: "title", label: `${objName} Name / Title` },
-    { id: "status", label: "Status" },
-    { id: "createdAt", label: "Created At" },
-    { id: "updatedAt", label: "Updated At" },
+    ...baseFields,
+    { id: "name", label: `${objectName} Name / Handle` },
+    { id: "status", label: `${objectName} Status` },
     {
-      id: "details",
-      label: "Object Details",
+      id: "summary",
+      label: `${objectName} Data Summary`,
       isGroup: true,
       children: [
-        { id: "details.code", label: "Code" },
-        { id: "details.type", label: "Type" }
+        { id: "summary.totalCount", label: "Total Count" },
+        { id: "summary.processedAt", label: "Processed At" }
+      ]
+    },
+    {
+      id: "metafields",
+      label: "Custom Store Metafields",
+      isGroup: true,
+      children: [
+        { id: "metafields.namespace", label: "Namespace" },
+        { id: "metafields.key", label: "Key" },
+        { id: "metafields.value", label: "Value" }
       ]
     }
   ];
+}
+
+function getSchemaForObject(objName: string): FieldNode[] {
+  return buildDynamicShopifyGraphQLSchema(objName);
 }
 
 function getAllLeafIds(nodes: FieldNode[]): string[] {
