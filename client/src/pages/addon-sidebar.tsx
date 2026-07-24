@@ -14,13 +14,9 @@ import {
   Search,
   CheckCircle2,
   Plus,
-  Zap,
-  ShieldCheck,
-  ExternalLink,
   ArrowUpRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-
 import { DV_LOGO_BASE64 } from "./logo-base64";
 
 function CustomDVLogo() {
@@ -36,6 +32,7 @@ function CustomDVLogo() {
 }
 
 export default function AddonSidebarPage() {
+  const [isAgentExpanded, setIsAgentExpanded] = useState(true);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,7 +57,7 @@ export default function AddonSidebarPage() {
           </div>
         </div>
         <div className="flex items-center gap-1.5">
-          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="AI Assistant">
+          <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Assistant Chat">
             <MessageSquare className="w-4 h-4" />
           </button>
           <button className="p-1.5 hover:bg-[#f3f0e8] rounded-lg text-[#13322b]/70 hover:text-[#13322b] transition-all" title="Settings">
@@ -72,176 +69,181 @@ export default function AddonSidebarPage() {
       {/* Main Content Area */}
       <div className="p-3.5 space-y-3.5 flex-1 overflow-y-auto">
         
-        {/* Deep Forest Premium Button for Create AI Agent */}
-        <button 
-          onClick={() => setActiveTab(activeTab === "agent" ? null : "agent")}
-          className="w-full py-3 px-4 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white rounded-xl font-medium text-xs flex items-center justify-between transition-all shadow-md hover:shadow-lg group border border-[#1a473d]"
-        >
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded-lg bg-[#c59b43] text-[#13322b] flex items-center justify-center shadow-inner">
-              <Plus className="w-4 h-4 stroke-[2.5]" />
+        {/* Create Agent Master Dropdown Header Button */}
+        <div className="bg-white rounded-xl border border-[#e5e2db] shadow-sm overflow-hidden transition-all">
+          <button 
+            onClick={() => setIsAgentExpanded(!isAgentExpanded)}
+            className="w-full py-3.5 px-4 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-medium text-xs flex items-center justify-between transition-all shadow-sm border-b border-[#1a473d] group"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-6 h-6 rounded-lg bg-[#c59b43] text-[#13322b] flex items-center justify-center shadow-inner">
+                <Plus className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <span className="font-semibold tracking-wide text-xs">Create Agent</span>
             </div>
-            <span className="font-semibold tracking-wide text-xs">Create AI Agent</span>
-          </div>
-          <div className="flex items-center gap-1 text-[#c59b43] font-semibold text-[11px]">
-            <span>New</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-          </div>
-        </button>
+            <div className="flex items-center gap-1.5 text-[#c59b43] font-semibold text-[11px]">
+              <span className="bg-[#c59b43]/20 text-[#c59b43] px-2 py-0.5 rounded-full text-[10px]">6 Tools</span>
+              <ChevronDown className={`w-4 h-4 text-[#c59b43] transition-transform duration-200 ${isAgentExpanded ? "rotate-180" : ""}`} />
+            </div>
+          </button>
 
-        {/* Feature List Cards Container */}
-        <div className="bg-white rounded-xl border border-[#e5e2db] divide-y divide-[#f0ede6] shadow-sm overflow-hidden">
-          
-          {/* Item 1: Import Data */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "import" ? null : "import")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
-                  <Download className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-[#13322b]">Import Data</div>
-                  <div className="text-[10px] text-[#8a8579]">Shopify, Stripe, Postgres, CRM</div>
-                </div>
-              </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "import" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-
-            {activeTab === "import" && (
-              <div className="p-3 bg-[#fbfaf7] border-t border-[#e5e2db] space-y-2.5">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#8a8579]" />
-                  <input 
-                    type="text" 
-                    placeholder="Filter data sources..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 text-[11px] bg-white border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] placeholder-[#a39e92]"
-                  />
-                </div>
-                <div className="space-y-1.5 max-h-44 overflow-y-auto">
-                  {integrations.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase())).map((item, idx) => (
-                    <div key={idx} className="p-2.5 bg-white rounded-lg border border-[#e5e2db] flex items-center justify-between hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs">
-                      <div className="flex items-center gap-2.5">
-                        <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
-                        <div>
-                          <div className="text-[11px] font-semibold text-[#13322b]">{item.name}</div>
-                          <div className="text-[9px] text-[#8a8579]">{item.category}</div>
-                        </div>
-                      </div>
-                      <Badge className={`text-[9px] px-2 py-0.5 font-medium border-0 ${item.status === "Connected" ? "bg-[#13322b]/10 text-[#13322b]" : "bg-gray-100 text-gray-600"}`}>
-                        {item.status}
-                      </Badge>
+          {/* 6 Features List nested inside Create Agent Dropdown */}
+          {isAgentExpanded && (
+            <div className="divide-y divide-[#f0ede6] bg-white transition-all">
+              
+              {/* Item 1: Import Data */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "import" ? null : "import")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#13322b]/5 text-[#13322b] border border-[#13322b]/10 flex items-center justify-center">
+                      <Download className="w-4 h-4" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Item 2: Export Data */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "export" ? null : "export")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
-                  <Upload className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-[#13322b]">Export Data</div>
-                  <div className="text-[10px] text-[#8a8579]">Push Sheet rows back to Database</div>
-                </div>
-              </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "export" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-          </div>
-
-          {/* Item 3: Monitor & Alerts */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "monitor" ? null : "monitor")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
-                  <Bell className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-[#13322b]">Monitor & Alerts</span>
-                    <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                    <div>
+                      <div className="text-xs font-semibold text-[#13322b]">Import Data</div>
+                      <div className="text-[10px] text-[#8a8579]">Shopify, Stripe, Postgres, CRM</div>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[#8a8579]">Slack, Email & WhatsApp Triggers</div>
-                </div>
-              </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "monitor" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-          </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "import" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
 
-          {/* Item 4: Sheet Assistant */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "assistant" ? null : "assistant")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-[#13322b]">Sheet Assistant</div>
-                  <div className="text-[10px] text-[#8a8579]">Ask AI questions in plain English</div>
-                </div>
-              </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "assistant" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-          </div>
-
-          {/* Item 5: Snapshots */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "snapshot" ? null : "snapshot")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
-                  <Camera className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="text-xs font-semibold text-[#13322b]">Snapshots</div>
-                  <div className="text-[10px] text-[#8a8579]">Save historical spreadsheet versions</div>
-                </div>
-              </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "snapshot" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-          </div>
-
-          {/* Item 6: Web Dashboards */}
-          <div>
-            <button 
-              onClick={() => setActiveTab(activeTab === "dashboards" ? null : "dashboards")}
-              className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
-                  <BarChart3 className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold text-[#13322b]">Web Dashboards</span>
-                    <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                {activeTab === "import" && (
+                  <div className="p-3 bg-[#fbfaf7] border-t border-[#e5e2db] space-y-2.5">
+                    <div className="relative">
+                      <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-[#8a8579]" />
+                      <input 
+                        type="text" 
+                        placeholder="Filter data sources..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-8 pr-3 py-1.5 text-[11px] bg-white border border-[#e5e2db] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#13322b] text-[#13322b] placeholder-[#a39e92]"
+                      />
+                    </div>
+                    <div className="space-y-1.5 max-h-44 overflow-y-auto">
+                      {integrations.filter(i => i.name.toLowerCase().includes(searchTerm.toLowerCase())).map((item, idx) => (
+                        <div key={idx} className="p-2.5 bg-white rounded-lg border border-[#e5e2db] flex items-center justify-between hover:border-[#c59b43] transition-all cursor-pointer shadow-2xs">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-2.5 h-2.5 rounded-full ${item.color}`} />
+                            <div>
+                              <div className="text-[11px] font-semibold text-[#13322b]">{item.name}</div>
+                              <div className="text-[9px] text-[#8a8579]">{item.category}</div>
+                            </div>
+                          </div>
+                          <Badge className={`text-[9px] px-2 py-0.5 font-medium border-0 ${item.status === "Connected" ? "bg-[#13322b]/10 text-[#13322b]" : "bg-gray-100 text-gray-600"}`}>
+                            {item.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-[10px] text-[#8a8579]">Generate shareable visual KPI reports</div>
-                </div>
+                )}
               </div>
-              <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "dashboards" ? "rotate-90 text-[#13322b]" : ""}`} />
-            </button>
-          </div>
+
+              {/* Item 2: Export Data */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "export" ? null : "export")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#c59b43]/10 text-[#a37b2c] border border-[#c59b43]/20 flex items-center justify-center">
+                      <Upload className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[#13322b]">Export Data</div>
+                      <div className="text-[10px] text-[#8a8579]">Push Sheet rows back to Database</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "export" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
+              </div>
+
+              {/* Item 3: Monitor & Alerts */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "monitor" ? null : "monitor")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-700 border border-pink-100 flex items-center justify-center">
+                      <Bell className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-[#13322b]">Monitor & Alerts</span>
+                        <span className="text-[9px] font-bold bg-[#c59b43]/15 text-[#a37b2c] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                      </div>
+                      <div className="text-[10px] text-[#8a8579]">Slack, Email & WhatsApp Triggers</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "monitor" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
+              </div>
+
+              {/* Item 4: Sheet Assistant */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "assistant" ? null : "assistant")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center justify-center">
+                      <Bot className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[#13322b]">Sheet Assistant</div>
+                      <div className="text-[10px] text-[#8a8579]">Ask AI questions in plain English</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "assistant" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
+              </div>
+
+              {/* Item 5: Snapshots */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "snapshot" ? null : "snapshot")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-700 border border-amber-100 flex items-center justify-center">
+                      <Camera className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-[#13322b]">Snapshots</div>
+                      <div className="text-[10px] text-[#8a8579]">Save historical spreadsheet versions</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "snapshot" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
+              </div>
+
+              {/* Item 6: Web Dashboards */}
+              <div>
+                <button 
+                  onClick={() => setActiveTab(activeTab === "dashboards" ? null : "dashboards")}
+                  className="w-full px-3.5 py-3 flex items-center justify-between text-left hover:bg-[#faf9f6] transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-700 border border-violet-100 flex items-center justify-center">
+                      <BarChart3 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-xs font-semibold text-[#13322b]">Web Dashboards</span>
+                        <span className="text-[9px] font-bold bg-[#13322b]/10 text-[#13322b] px-1.5 py-0.2 rounded uppercase tracking-wider">New</span>
+                      </div>
+                      <div className="text-[10px] text-[#8a8579]">Generate shareable visual KPI reports</div>
+                    </div>
+                  </div>
+                  <ChevronRight className={`w-4 h-4 text-[#a39e92] transition-transform ${activeTab === "dashboards" ? "rotate-90 text-[#13322b]" : ""}`} />
+                </button>
+              </div>
+
+            </div>
+          )}
         </div>
 
         {/* Deep Forest Luxury Card */}
