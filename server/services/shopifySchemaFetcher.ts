@@ -119,52 +119,159 @@ export async function fetchShopifyMetafieldDefinitions(shop: string, accessToken
     const json = await response.json();
     return json?.data?.metafieldDefinitions?.edges?.map((e: any) => e.node) || [];
   } catch (err) {
-    console.error("Metafield Introspection Error:", err);
+    console.error("Shopify Metafields Fetch Error:", err);
     return [];
   }
 }
 
-// 3. Build 100% Complete Dynamic Field Tree Node Hierarchy
-export function parseIntrospectionToFieldNodes(fields: any[], metafields: any[] = []): DynamicFieldNode[] {
+// 3. Query Live Paginated Records from Shopify Admin API
+export async function fetchLiveShopifyDataFromAdmin(shop: string, accessToken: string, objectName: string): Promise<any[]> {
+  const cleanShop = shop.trim().toLowerCase().replace(".myshopify.com", "");
+  const graphqlEndpoint = `https://${cleanShop}.myshopify.com/admin/api/2026-04/graphql.json`;
+
+  let query = "";
+  if (objectName === "Products") {
+    query = `
+      query GetProducts {
+        products(first: 250) {
+          edges {
+            node {
+              id
+              legacyResourceId
+              title
+              description
+              handle
+              status
+              vendor
+              productType
+              createdAt
+              updatedAt
+              totalInventory
+              totalVariants
+              category {
+                id
+                name
+                fullName
+                description
+                handle
+                level
+                updatedAt
+              }
+              combinedListingRole
+              compareAtPriceRange {
+                maxVariantCompareAtPrice { amount currencyCode }
+                minVariantCompareAtPrice { amount currencyCode }
+              }
+            }
+          }
+        }
+      }
+    `;
+  } else if (objectName === "Customers") {
+    query = `
+      query GetCustomers {
+        customers(first: 250) {
+          edges {
+            node {
+              id
+              legacyResourceId
+              displayName
+              email
+              firstName
+              lastName
+              phone
+              createdAt
+              updatedAt
+              numberOfOrders
+              amountSpent { amount currencyCode }
+              defaultAddress {
+                address1
+                address2
+                city
+                company
+                country
+                countryCodeV2
+                firstName
+                lastName
+                phone
+                province
+                zip
+              }
+              canDelete
+              locale
+              note
+              state
+              tags
+              taxExempt
+              verifiedEmail
+            }
+          }
+        }
+      }
+    `;
+  }
+
+  if (!query) return [];
+
+  try {
+    const response = await fetch(graphqlEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Access-Token": accessToken
+      },
+      body: JSON.stringify({ query })
+    });
+
+    const json = await response.json();
+    const key = objectName.toLowerCase();
+    const edges = json?.data?.[key]?.edges || [];
+    return edges.map((e: any) => e.node);
+  } catch (err) {
+    console.error("Live Shopify Data Fetch Error:", err);
+    return [];
+  }
+}
+
+// Convert raw GraphQL Introspection & Metafield Definitions into dynamic tree nodes
+export function parseIntrospectionToFieldNodes(fields: any[], metafields: any[]): DynamicFieldNode[] {
   const nodes: DynamicFieldNode[] = [];
 
   for (const field of fields) {
-    const fieldId = field.name;
-    const fieldLabel = field.name.replace(/([A-Z])/g, " $1").replace(/^./, (str: string) => str.toUpperCase());
+    const label = field.name.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase());
+    const isObject = field.type?.kind === "OBJECT" || field.type?.ofType?.kind === "OBJECT";
 
-    const isComplexObject = field.type?.kind === "OBJECT" || field.type?.ofType?.kind === "OBJECT";
-    const subFields = field.type?.fields || field.type?.ofType?.fields || [];
+    if (isObject && field.type?.ofType?.fields) {
+      const childNodes: DynamicFieldNode[] = field.type.ofType.fields.map((sub: any) => ({
+        id: `${field.name}.${sub.name}`,
+        label: sub.name.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())
+      }));
 
-    if (isComplexObject && subFields.length > 0) {
       nodes.push({
-        id: fieldId,
-        label: fieldLabel,
+        id: field.name,
+        label,
         isGroup: true,
-        selectedCount: subFields.length,
-        children: subFields.map((sub: any) => ({
-          id: `${fieldId}.${sub.name}`,
-          label: sub.name.replace(/([A-Z])/g, " $1").replace(/^./, (str: string) => str.toUpperCase())
-        }))
+        children: childNodes
       });
     } else {
       nodes.push({
-        id: fieldId,
-        label: fieldLabel
+        id: field.name,
+        label
       });
     }
   }
 
-  // Inject Custom Metafield Definitions if present
-  if (metafields.length > 0) {
+  if (metafields && metafields.length > 0) {
+    const metafieldNodes: DynamicFieldNode[] = metafields.map(m => ({
+      id: `metafields.${m.namespace}.${m.key}`,
+      label: `${m.name || m.key} (${m.namespace})`
+    }));
+
     nodes.push({
       id: "metafields",
-      label: "Custom Store Metafields (Dynamic Definitions)",
+      label: "Custom Store Metafields",
       isGroup: true,
-      selectedCount: metafields.length,
-      children: metafields.map((m: any) => ({
-        id: `metafields.${m.namespace}.${m.key}`,
-        label: `${m.name} (${m.namespace}.${m.key})`
-      }))
+      children: metafieldNodes
     });
   }
 

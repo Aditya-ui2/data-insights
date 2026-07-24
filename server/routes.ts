@@ -41,7 +41,8 @@ import {
   getShopifyGraphQLTypeName, 
   introspectShopifyType, 
   fetchShopifyMetafieldDefinitions, 
-  parseIntrospectionToFieldNodes 
+  parseIntrospectionToFieldNodes,
+  fetchLiveShopifyDataFromAdmin
 } from "./services/shopifySchemaFetcher";
 import { 
   flattenJsonObject, 
@@ -288,6 +289,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         totalUnionColumns: leafKeys.length,
         unionSchema,
         normalizedRows
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: err.message });
+    }
+  });
+
+  app.post("/api/shopify/fetch-live-data", async (req, res) => {
+    try {
+      const { shop, accessToken, object } = req.body;
+      const cleanShop = (shop || "di-insights").trim().toLowerCase().replace(".myshopify.com", "");
+      const token = accessToken || process.env.SHOPIFY_ACCESS_TOKEN || "";
+
+      let liveRecords: any[] = [];
+      if (token) {
+        liveRecords = await fetchLiveShopifyDataFromAdmin(cleanShop, token, object || "Products");
+      }
+
+      return res.json({
+        success: true,
+        isLive: liveRecords.length > 0,
+        data: liveRecords
       });
     } catch (err: any) {
       return res.status(500).json({ error: err.message });
