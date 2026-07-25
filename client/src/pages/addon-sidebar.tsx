@@ -349,6 +349,9 @@ export default function AddonSidebarPage() {
       return;
     }
 
+    // Persist shop name to localStorage so siblings (e.g. import-preview modal) can access it
+    localStorage.setItem("dv_shopify_shop", cleanStoreName);
+
     // Defer state change to ensure the browser successfully opens the target="_blank" tab first
     setTimeout(() => {
       setIsAuthorizing(true);

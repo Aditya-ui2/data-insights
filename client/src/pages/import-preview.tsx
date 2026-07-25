@@ -453,7 +453,17 @@ export default function ImportPreviewPage() {
   const [objectSearchTerm, setObjectSearchTerm] = useState("");
   const [fieldSearchTerm, setFieldSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [shopName, setShopName] = useState<string>("di-insights");
+  const [shopName, setShopName] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlShop = urlParams.get("shop");
+      if (urlShop) return urlShop;
+      
+      const stored = localStorage.getItem("dv_shopify_shop");
+      if (stored) return stored;
+    }
+    return "di-insights";
+  });
 
   // Synchronously initialize with Master Products Schema & Rows (Instant 0ms display!)
   const initialSchema = useMemo(() => getMasterDynamicSchema("Products"), []);
