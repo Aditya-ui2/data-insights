@@ -4216,10 +4216,11 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
     const shopUrl = req.query.shopUrl || '';
     const userId = req.user?.claims?.sub || 'admin-demo-id';
     const frontendUrl = (req.query.frontendUrl as string) || 'https://digitvalues.vercel.app';
+    const popup = req.query.popup || 'true';
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.get('host');
-    const redirectUri = `${protocol}://${host}/api/oauth/${provider}/callback`;
+    const redirectUri = `${protocol}://${host}/api/oauth/${provider}/callback?popup=${popup}&frontendUrl=${encodeURIComponent(frontendUrl)}`;
 
     const simulateUrl = `${frontendUrl.replace(/\/$/, "")}/oauth/simulate/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(userId)}&shopUrl=${encodeURIComponent(shopUrl)}`;
     res.redirect(simulateUrl);
@@ -4227,6 +4228,9 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
 
   app.get('/api/oauth/:provider/callback', async (req: any, res) => {
     const provider = req.params.provider;
+    let popupParam = req.query.popup || 'true';
+    let frontendUrlParam = (req.query.frontendUrl as string) || 'https://digitvalues.vercel.app';
+
     try {
       const { code, state, shopUrl } = req.query;
       let userId = (state as string) || 'admin-demo-id';
@@ -4277,6 +4281,10 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
 
       const integration = await saveIntegrationSource(userId, sourceName, provider, config);
 
+      if (popupParam === 'false') {
+        return res.redirect(`${frontendUrlParam.replace(/\/$/, "")}/addon-sidebar?status=success&shop=${encodeURIComponent((shopUrl as string) || 'sandbox')}`);
+      }
+
       res.send(`<html><body><script>
         try {
           localStorage.setItem('oauth_success_${provider}', JSON.stringify({
@@ -4300,6 +4308,11 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       </script><p>Connected successfully! You can close this window now.</p></body></html>`);
     } catch (error: any) {
       console.error("OAuth callback error:", error);
+
+      if (popupParam === 'false') {
+        return res.redirect(`${frontendUrlParam.replace(/\/$/, "")}/addon-sidebar?status=error&error=${encodeURIComponent(error.message || 'Authorization failed')}`);
+      }
+
       res.send(`<html><body><script>
         try {
           localStorage.setItem('oauth_error_${provider}', '${error.message || 'Authorization failed'}');

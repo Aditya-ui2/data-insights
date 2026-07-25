@@ -234,6 +234,52 @@ export default function AddonSidebarPage() {
     }
   };
 
+  // Check for successful callback redirect parameter from popup-free authorization
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get("status");
+    const shop = urlParams.get("shop");
+    const errorMsg = urlParams.get("error");
+
+    if (status === "success") {
+      // Clean url parameters to keep address bar tidy
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
+
+      if (shop) {
+        localStorage.setItem("dv_shopify_shop", shop);
+      }
+
+      setIsAuthorizing(false);
+
+      // Notify parent to open preview modal now that authorization succeeded
+      try {
+        window.parent.postMessage({ type: "dv_open_import_preview", shop: shop || "" }, "*");
+      } catch (err) {
+        console.error(err);
+      }
+
+      if ((window as any).google?.script?.run?.showImportPreviewModal) {
+        (window as any).google.script.run.showImportPreviewModal();
+      } else if (window.parent && window.parent !== window) {
+        try {
+          (window.parent as any).google?.script?.run?.showImportPreviewModal();
+        } catch (e) {
+          setShowPreviewModal(true);
+        }
+      } else {
+        setShowPreviewModal(true);
+      }
+    } else if (status === "error") {
+      try {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (e) {}
+      setIsAuthorizing(false);
+      alert(errorMsg || "Shopify authorization failed. Please try again.");
+    }
+  }, []);
+
   // Listen for OAuth completion signal from new tab -> LAUNCHES LARGE IMPORT PREVIEW MODAL
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -337,35 +383,32 @@ export default function AddonSidebarPage() {
     .replace(".myshopify.com", "")
     .split("/")[0];
 
-  const getBackendBaseUrl = (): string => {
-    if (import.meta.env.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL.replace(/\/$/, "");
-    }
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-      return "http://localhost:3000";
-    }
-    return "https://data-insights-backend-1node.onrender.com";
-  };
-
-  const backendBase = getBackendBaseUrl();
-  const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName || "sandbox")}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
-
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleAuthorizeClick = () => {
     if (!storeNameInput.trim()) {
-      e.preventDefault();
       alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    console.log("[DigitValues Dev] Native anchor link clicked. target URL:", oauthUrl);
+    setIsAuthorizing(true);
+
+    const getBackendBaseUrl = (): string => {
+      if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+      }
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        return "http://localhost:3000";
+      }
+      return "https://data-insights-backend-1node.onrender.com";
+    };
+
+    const backendBase = getBackendBaseUrl();
+    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}&popup=false`;
 
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    // Defer state change to ensure browser successfully opens target="_blank" tab first
-    setTimeout(() => {
-      setIsAuthorizing(true);
-    }, 300);
+    // Redirect the sidebar iframe itself to bypass popup blockers
+    window.location.href = oauthUrl;
   };
 
   const handleConfirmImport = () => {
@@ -714,16 +757,14 @@ export default function AddonSidebarPage() {
                 <span>{selectedConnector.domainSuffix || ".com"}</span>
               </div>
 
-              {/* Authorize Action Link (immune to browser popup blockers) */}
-              <a 
-                href={oauthUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleLinkClick}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center"
+              {/* Authorize Action Button (redirects the sidebar itself to bypass popup blockers) */}
+              <button 
+                onClick={handleAuthorizeClick}
+                disabled={isAuthorizing}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 <span>Authorize</span>
-              </a>
+              </button>
             </div>
 
           </div>
