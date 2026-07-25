@@ -239,8 +239,22 @@ export default function AddonSidebarPage() {
     const handleMessage = (event: MessageEvent) => {
       if (event.data === "dv_shopify_authorized") {
         setIsAuthorizing(false);
+
+        // Notify parent to open preview modal now that authorization succeeded
+        try {
+          window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStoreName }, "*");
+        } catch (err) {
+          console.error(err);
+        }
+
         if ((window as any).google?.script?.run?.showImportPreviewModal) {
           (window as any).google.script.run.showImportPreviewModal();
+        } else if (window.parent && window.parent !== window) {
+          try {
+            (window.parent as any).google?.script?.run?.showImportPreviewModal();
+          } catch (e) {
+            setShowPreviewModal(true);
+          }
         } else {
           setShowPreviewModal(true);
         }
@@ -250,8 +264,22 @@ export default function AddonSidebarPage() {
     const handleStorage = (event: StorageEvent) => {
       if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
         setIsAuthorizing(false);
+
+        // Notify parent to open preview modal now that authorization succeeded
+        try {
+          window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStoreName }, "*");
+        } catch (err) {
+          console.error(err);
+        }
+
         if ((window as any).google?.script?.run?.showImportPreviewModal) {
           (window as any).google.script.run.showImportPreviewModal();
+        } else if (window.parent && window.parent !== window) {
+          try {
+            (window.parent as any).google?.script?.run?.showImportPreviewModal();
+          } catch (e) {
+            setShowPreviewModal(true);
+          }
         } else {
           setShowPreviewModal(true);
         }
@@ -325,13 +353,6 @@ export default function AddonSidebarPage() {
     setTimeout(() => {
       setIsAuthorizing(true);
     }, 100);
-
-    // Send postMessage to parent Apps Script iframe wrapper
-    try {
-      window.parent.postMessage({ type: "dv_open_import_preview", shop: cleanStoreName }, "*");
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const handleConfirmImport = () => {
