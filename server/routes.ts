@@ -4239,24 +4239,30 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
       let userExists = await db.select().from(usersTable).where(eq(usersTable.id, userId)).limit(1);
       if (userExists.length === 0) {
         console.warn(`[OAuth Callback] User ID ${userId} not found in database. Inserting user record.`);
+        const randSuffix = Math.floor(Math.random() * 10000000);
         try {
           await db.insert(usersTable).values({
             id: userId,
-            email: `${userId}@example.com`,
+            email: `${userId}-${randSuffix}@example.com`,
             firstName: "Demo",
             lastName: "User"
           });
         } catch (err) {
           console.error("[OAuth Callback] Failed to insert user, falling back to admin-demo-id", err);
           userId = 'admin-demo-id';
-          const adminExists = await db.select().from(usersTable).where(eq(usersTable.id, 'admin-demo-id')).limit(1);
-          if (adminExists.length === 0) {
-            await db.insert(usersTable).values({
-              id: 'admin-demo-id',
-              email: 'admin@example.com',
-              firstName: 'Admin',
-              lastName: 'Demo'
-            });
+          try {
+            const adminExists = await db.select().from(usersTable).where(eq(usersTable.id, 'admin-demo-id')).limit(1);
+            if (adminExists.length === 0) {
+              const randSuffixFallback = Math.floor(Math.random() * 10000000);
+              await db.insert(usersTable).values({
+                id: 'admin-demo-id',
+                email: `admin-demo-id-${randSuffixFallback}@example.com`,
+                firstName: 'Admin',
+                lastName: 'Demo'
+              });
+            }
+          } catch (fallbackErr) {
+            console.error("[OAuth Callback] Fatal fallback user insert failure:", fallbackErr);
           }
         }
       }
