@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { 
   X, 
   Filter, 
@@ -476,6 +476,9 @@ export default function ImportPreviewPage() {
     "category", "combinedListing", "compareAtPriceRange", "featuredMedia", "options", "priceRangeV2", "seo", "variants", "amountSpent", "defaultAddress"
   ]);
 
+  const [isSyncing, setIsSyncing] = useState(false);
+  const syncCacheRef = useRef<Record<string, { schemaTree: FieldNode[], flatRows: any[], allKeys: string[] }>>({});
+
   // Coefficient postMessage Payload Protocol
   useEffect(() => {
     const messageId = Math.random().toString(36).substring(2, 9);
@@ -519,8 +522,20 @@ export default function ImportPreviewPage() {
   // Async Live Server Data Sync in Background
   useEffect(() => {
     let isMounted = true;
+    const controller = new AbortController();
+
+    const cacheKey = `${shopName}_${selectedObject}`;
+    if (syncCacheRef.current[cacheKey]) {
+      const cached = syncCacheRef.current[cacheKey];
+      setDynamicSchemaTree(cached.schemaTree);
+      setDynamicStoreRows(cached.flatRows);
+      setSelectedFieldIds(cached.allKeys);
+      setIsSyncing(false);
+      return;
+    }
 
     const fetchDynamicShopifyData = async () => {
+      setIsSyncing(true);
       try {
         const urlParams = new URLSearchParams(window.location.search);
         const shop = urlParams.get("shop") || shopName || "di-insights";
@@ -528,7 +543,8 @@ export default function ImportPreviewPage() {
         const dataRes = await fetch("/api/shopify/fetch-live-data", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ shop, object: selectedObject })
+          body: JSON.stringify({ shop, object: selectedObject }),
+          signal: controller.signal
         });
         const dataJson = await dataRes.json();
         const rawRecords = dataJson.data || [];
@@ -537,7 +553,8 @@ export default function ImportPreviewPage() {
           const inspectRes = await fetch("/api/shopify/inspect-dynamic-json", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ rawRecords })
+            body: JSON.stringify({ rawRecords }),
+            signal: controller.signal
           });
           const inspectJson = await inspectRes.json();
 
@@ -545,10 +562,23 @@ export default function ImportPreviewPage() {
             setDynamicSchemaTree(inspectJson.schemaTree);
             setDynamicStoreRows(inspectJson.flatRows);
             setSelectedFieldIds(inspectJson.allKeys);
+
+            // Cache the retrieved data dynamically to prevent duplicate calls
+            syncCacheRef.current[cacheKey] = {
+              schemaTree: inspectJson.schemaTree,
+              flatRows: inspectJson.flatRows,
+              allKeys: inspectJson.allKeys
+            };
           }
         }
-      } catch (e) {
-        console.error("Dynamic sync error:", e);
+      } catch (e: any) {
+        if (e.name !== "AbortError") {
+          console.error("Dynamic sync error:", e);
+        }
+      } finally {
+        if (isMounted) {
+          setIsSyncing(false);
+        }
       }
     };
 
@@ -556,6 +586,7 @@ export default function ImportPreviewPage() {
 
     return () => {
       isMounted = false;
+      controller.abort();
     };
   }, [selectedObject, shopName]);
 
@@ -715,6 +746,12 @@ export default function ImportPreviewPage() {
             <div className="flex items-center gap-2 pl-3 border-l border-[#e5e2db]">
               <OfficialBrandLogo id="shopify" />
               <span className="font-bold text-sm text-[#13322b]">Shopify</span>
+              {isSyncing && (
+                <div className="flex items-center gap-1.5 ml-2 text-xs font-semibold text-[#2563eb] bg-[#e8f0fe] px-2.5 py-1 rounded-full animate-pulse shrink-0">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>Syncing live data...</span>
+                </div>
+              )}
               <Info className="w-4 h-4 text-gray-400 cursor-pointer" />
             </div>
           </div>
