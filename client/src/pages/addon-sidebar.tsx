@@ -389,8 +389,6 @@ export default function AddonSidebarPage() {
       return;
     }
 
-    setIsAuthorizing(true);
-
     const getBackendBaseUrl = (): string => {
       if (import.meta.env.VITE_API_URL) {
         return import.meta.env.VITE_API_URL.replace(/\/$/, "");
@@ -407,19 +405,19 @@ export default function AddonSidebarPage() {
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    console.log("[DigitValues Dev] Authorize clicked. Delegating popup to parent window:", oauthUrl);
+    console.log("[DigitValues Dev] Opening Shopify auth popup directly:", oauthUrl);
 
-    // Delegate the window.open call to the parent window if inside an iframe, otherwise open directly (for standalone local/web testing)
+    // Open popup window directly to ensure direct user-initiated gesture is verified by browser
     try {
-      if (window.parent && window.parent !== window) {
-        window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
-      } else {
-        console.log("[DigitValues Dev] Standalone mode. Opening popup directly.");
-        window.open(oauthUrl, "_blank");
-      }
+      window.open(oauthUrl, "_blank");
     } catch (err) {
       console.error("[DigitValues Dev] Failed to open popup:", err);
     }
+
+    // Defer state change to ensure browser successfully opens target="_blank" tab first
+    setTimeout(() => {
+      setIsAuthorizing(true);
+    }, 300);
   };
 
   const handleConfirmImport = () => {
