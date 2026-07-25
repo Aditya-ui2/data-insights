@@ -357,6 +357,8 @@ export default function AddonSidebarPage() {
       return;
     }
 
+    console.log("[DigitValues Dev] Native anchor link clicked. target URL:", oauthUrl);
+
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
