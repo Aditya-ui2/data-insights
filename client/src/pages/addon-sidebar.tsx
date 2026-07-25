@@ -337,38 +337,31 @@ export default function AddonSidebarPage() {
     .replace(".myshopify.com", "")
     .split("/")[0];
 
-  const handleAuthorizeClick = () => {
+  const getBackendBaseUrl = (): string => {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+    }
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return "http://localhost:3000";
+    }
+    return "https://data-insights-backend-1node.onrender.com";
+  };
+
+  const backendBase = getBackendBaseUrl();
+  const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName || "sandbox")}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!storeNameInput.trim()) {
+      e.preventDefault();
       alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    setIsAuthorizing(true);
-
-    const getBackendBaseUrl = (): string => {
-      if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
-      }
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return "http://localhost:3000";
-      }
-      return "https://data-insights-backend-1node.onrender.com";
-    };
-
-    const backendBase = getBackendBaseUrl();
-    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
-
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    console.log("[DigitValues Dev] Authorize button clicked. Sending postMessage with URL:", oauthUrl);
-
-    // Delegate the window.open call to the parent window which runs in Google's native container privileges
-    try {
-      window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
-    } catch (err) {
-      console.error("[DigitValues Dev] Failed to notify parent:", err);
-    }
+    // Set isAuthorizing to true
+    setIsAuthorizing(true);
   };
 
   const handleConfirmImport = () => {
@@ -717,14 +710,16 @@ export default function AddonSidebarPage() {
                 <span>{selectedConnector.domainSuffix || ".com"}</span>
               </div>
 
-              {/* Authorize Action Button (notifies parent container to open target tab bypass sandboxing) */}
-              <button 
-                onClick={handleAuthorizeClick}
-                disabled={isAuthorizing}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+              {/* Authorize Action Link (immune to browser popup blockers) */}
+              <a 
+                href={oauthUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleLinkClick}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center"
               >
                 <span>Authorize</span>
-              </button>
+              </a>
             </div>
 
           </div>
