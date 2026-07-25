@@ -362,8 +362,10 @@ export default function AddonSidebarPage() {
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    // Set isAuthorizing to true
-    setIsAuthorizing(true);
+    // Defer state change to ensure browser successfully opens target="_blank" tab first
+    setTimeout(() => {
+      setIsAuthorizing(true);
+    }, 300);
   };
 
   const handleConfirmImport = () => {
