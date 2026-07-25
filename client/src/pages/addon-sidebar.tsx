@@ -383,36 +383,30 @@ export default function AddonSidebarPage() {
     .replace(".myshopify.com", "")
     .split("/")[0];
 
-  const handleAuthorizeClick = () => {
+  const getBackendBaseUrl = (): string => {
+    if (import.meta.env.VITE_API_URL) {
+      return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+    }
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return "http://localhost:3000";
+    }
+    return "https://data-insights-backend-1node.onrender.com";
+  };
+
+  const backendBase = getBackendBaseUrl();
+  const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
+
+  const handleAuthorizeLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (!storeNameInput.trim()) {
+      e.preventDefault();
       alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    const getBackendBaseUrl = (): string => {
-      if (import.meta.env.VITE_API_URL) {
-        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
-      }
-      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return "http://localhost:3000";
-      }
-      return "https://data-insights-backend-1node.onrender.com";
-    };
-
-    const backendBase = getBackendBaseUrl();
-    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
-
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    console.log("[DigitValues Dev] Opening Shopify auth popup directly:", oauthUrl);
-
-    // Open popup window directly to ensure direct user-initiated gesture is verified by browser
-    try {
-      window.open(oauthUrl, "_blank");
-    } catch (err) {
-      console.error("[DigitValues Dev] Failed to open popup:", err);
-    }
+    console.log("[DigitValues Dev] Opening Shopify auth popup via native link click:", oauthUrl);
 
     // Defer state change to ensure browser successfully opens target="_blank" tab first
     setTimeout(() => {
@@ -766,14 +760,16 @@ export default function AddonSidebarPage() {
                 <span>{selectedConnector.domainSuffix || ".com"}</span>
               </div>
 
-              {/* Authorize Action Button (redirects the sidebar itself to bypass popup blockers) */}
-              <button 
-                onClick={handleAuthorizeClick}
-                disabled={isAuthorizing}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
+              {/* Authorize Action Button (uses native anchor link to bypass popup blockers) */}
+              <a 
+                href={oauthUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleAuthorizeLinkClick}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center decoration-none"
               >
                 <span>Authorize</span>
-              </button>
+              </a>
             </div>
 
           </div>
