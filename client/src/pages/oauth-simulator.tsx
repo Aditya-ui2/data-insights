@@ -68,30 +68,46 @@ export default function OAuthSimulator() {
   useEffect(() => {
     // Parse query params
     const searchParams = new URLSearchParams(window.location.search);
-    setRedirectUri(searchParams.get('redirect_uri') || '');
-    setState(searchParams.get('state') || '');
+    const redirect = searchParams.get('redirect_uri') || '';
+    const st = searchParams.get('state') || '';
     const shop = searchParams.get('shopUrl') || '';
+    
+    setRedirectUri(redirect);
+    setState(st);
     setShopUrl(shop);
+
+    // Auto-verify and redirect immediately for seamless one-click OAuth flow
+    setLoading(true);
+    const timer = setTimeout(() => {
+      if (redirect) {
+        const code = `mock_code_${Math.floor(Math.random() * 900000) + 100000}`;
+        let finalUrl = `${redirect}?code=${code}&state=${encodeURIComponent(st)}`;
+        if (shop) {
+          finalUrl += `&shopUrl=${encodeURIComponent(shop)}`;
+        }
+        window.location.href = finalUrl;
+      }
+    }, 850);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const handleAuthorize = () => {
     setLoading(true);
-    setTimeout(() => {
-      if (redirectUri) {
-        let code = `mock_code_${Math.floor(Math.random() * 900000) + 100000}`;
-        if (realTokenVal.trim()) {
-          code = `real_token:${realTokenVal.trim()}`;
-        }
-        let finalUrl = `${redirectUri}?code=${code}&state=${encodeURIComponent(state)}`;
-        if (shopUrl) {
-          finalUrl += `&shopUrl=${encodeURIComponent(shopUrl)}`;
-        }
-        window.location.href = finalUrl;
-      } else {
-        alert('Missing redirect_uri parameter');
-        setLoading(false);
+    if (redirectUri) {
+      let code = `mock_code_${Math.floor(Math.random() * 900000) + 100000}`;
+      if (realTokenVal.trim()) {
+        code = `real_token:${realTokenVal.trim()}`;
       }
-    }, 1500);
+      let finalUrl = `${redirectUri}?code=${code}&state=${encodeURIComponent(state)}`;
+      if (shopUrl) {
+        finalUrl += `&shopUrl=${encodeURIComponent(shopUrl)}`;
+      }
+      window.location.href = finalUrl;
+    } else {
+      alert('Missing redirect_uri parameter');
+      setLoading(false);
+    }
   };
 
   const handleCancel = () => {
