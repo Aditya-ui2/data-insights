@@ -361,11 +361,13 @@ export default function AddonSidebarPage() {
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
+    console.log("[DigitValues Dev] Authorize button clicked. Sending postMessage with URL:", oauthUrl);
+
     // Delegate the window.open call to the parent window which runs in Google's native container privileges
     try {
       window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
     } catch (err) {
-      console.error("Failed to notify parent:", err);
+      console.error("[DigitValues Dev] Failed to notify parent:", err);
     }
   };
 
