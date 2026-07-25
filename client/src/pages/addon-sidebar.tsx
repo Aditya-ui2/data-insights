@@ -409,11 +409,16 @@ export default function AddonSidebarPage() {
 
     console.log("[DigitValues Dev] Authorize clicked. Delegating popup to parent window:", oauthUrl);
 
-    // Delegate the window.open call to the parent window which runs in Google's native container privileges
+    // Delegate the window.open call to the parent window if inside an iframe, otherwise open directly (for standalone local/web testing)
     try {
-      window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
+      if (window.parent && window.parent !== window) {
+        window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
+      } else {
+        console.log("[DigitValues Dev] Standalone mode. Opening popup directly.");
+        window.open(oauthUrl, "_blank");
+      }
     } catch (err) {
-      console.error("[DigitValues Dev] Failed to notify parent:", err);
+      console.error("[DigitValues Dev] Failed to open popup:", err);
     }
   };
 
