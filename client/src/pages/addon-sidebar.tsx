@@ -321,7 +321,10 @@ export default function AddonSidebarPage() {
       return;
     }
 
-    setIsAuthorizing(true);
+    // Defer state change to ensure the browser successfully opens the target="_blank" tab first
+    setTimeout(() => {
+      setIsAuthorizing(true);
+    }, 100);
 
     // Send postMessage to parent Apps Script iframe wrapper
     try {
@@ -685,14 +688,7 @@ export default function AddonSidebarPage() {
                 onClick={handleLinkClick}
                 className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center"
               >
-                {isAuthorizing ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin text-[#c59b43]" />
-                    <span>Authorizing {selectedConnector.name}...</span>
-                  </>
-                ) : (
-                  <span>Authorize</span>
-                )}
+                <span>Authorize</span>
               </a>
             </div>
 
