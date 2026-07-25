@@ -41,21 +41,34 @@ export default function PrivacyPolicy() {
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">3. Google API Scopes Disclosure</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">3. Google API Scopes Disclosure & Limited Use</h2>
             <p className="leading-relaxed">
               DigitValues' use and transfer to any other app of information received from Google APIs will adhere to <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Google API Services User Data Policy</a>, including the Limited Use requirements.
+            </p>
+            <p className="leading-relaxed mt-2 font-semibold text-gray-900 bg-gray-50 p-3 rounded-lg border border-gray-200">
+              The use of raw or derived user data received from Workspace APIs will adhere to the Google User Data Policy, including the Limited Use requirements.
             </p>
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">4. Security</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">4. AI/ML Integration & Data Isolation</h2>
+            <p className="leading-relaxed">
+              DigitValues does not transfer any raw, aggregated, or derived Google user data to third-party AI/ML models or services for the purpose of model training or improvement. 
+            </p>
+            <p className="leading-relaxed mt-2">
+              For functions utilizing AI (such as synchronization recommendations, query parsing, and formula drafting), data processing is handled under strictly isolated context parameters. We ensure that our contracts with external AI API providers (including Google Gemini and Groq) strictly prohibit using client prompt data for foundational model training.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">5. Security</h2>
             <p className="leading-relaxed">
               All data transfers between your Google Sheets™ spreadsheets, our backend synchronizers, and Shopify/Stripe/Salesforce endpoints are fully encrypted in transit using industry-standard TLS 1.3 encryption protocols.
             </p>
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">5. Contact Information</h2>
+            <h2 className="text-lg font-bold text-gray-900 mt-6 mb-3">6. Contact Information</h2>
             <p className="leading-relaxed">
               If you have any questions or require support regarding our privacy practices, please contact us at: privacy@digitvalues.com.
             </p>
