@@ -402,18 +402,18 @@ export default function AddonSidebarPage() {
     };
 
     const backendBase = getBackendBaseUrl();
-    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}&popup=false`;
+    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
 
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    console.log("[DigitValues Dev] Redirecting sidebar to oauthUrl:", oauthUrl);
+    console.log("[DigitValues Dev] Authorize clicked. Delegating popup to parent window:", oauthUrl);
 
-    // Redirect the sidebar iframe itself to bypass popup blockers
+    // Delegate the window.open call to the parent window which runs in Google's native container privileges
     try {
-      window.location.href = oauthUrl;
+      window.parent.postMessage({ type: "dv_open_oauth_popup", url: oauthUrl }, "*");
     } catch (err) {
-      console.error("[DigitValues Dev] Failed to navigate iframe:", err);
+      console.error("[DigitValues Dev] Failed to notify parent:", err);
     }
   };
 
