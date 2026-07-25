@@ -384,7 +384,7 @@ export default function AddonSidebarPage() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#faf9f6] text-[#13322b] font-sans flex flex-col justify-between select-none antialiased relative">
+    <div className="w-full h-screen max-h-screen overflow-hidden bg-[#faf9f6] text-[#13322b] font-sans flex flex-col justify-between select-none antialiased relative">
       
       {/* Top Header Bar */}
       <div className="bg-white/95 backdrop-blur-md border-b border-[#e5e2db] px-4 py-3 flex items-center justify-between sticky top-0 z-20 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
