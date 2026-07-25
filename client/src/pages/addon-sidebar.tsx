@@ -329,33 +329,47 @@ export default function AddonSidebarPage() {
     .replace(".myshopify.com", "")
     .split("/")[0];
 
-  const getBackendBaseUrl = (): string => {
-    if (import.meta.env.VITE_API_URL) {
-      return import.meta.env.VITE_API_URL.replace(/\/$/, "");
-    }
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-      return "http://localhost:3000";
-    }
-    return "https://data-insights-backend-1node.onrender.com";
-  };
-
-  const backendBase = getBackendBaseUrl();
-  const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName || "sandbox")}`;
-
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleAuthorizeClick = () => {
     if (!storeNameInput.trim()) {
-      e.preventDefault();
       alert("Please enter your Shopify store name (e.g. di-insights).");
       return;
     }
 
-    // Persist shop name to localStorage so siblings (e.g. import-preview modal) can access it
+    setIsAuthorizing(true);
+
+    const getBackendBaseUrl = (): string => {
+      if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL.replace(/\/$/, "");
+      }
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        return "http://localhost:3000";
+      }
+      return "https://data-insights-backend-1node.onrender.com";
+    };
+
+    const backendBase = getBackendBaseUrl();
+    const width = 600;
+    const height = 700;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}`;
+
+    // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
-    // Defer state change to ensure the browser successfully opens the target="_blank" tab first
-    setTimeout(() => {
-      setIsAuthorizing(true);
-    }, 100);
+    const popup = window.open(
+      oauthUrl,
+      `oauth_shopify`,
+      `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes`
+    );
+
+    // Periodically check if popup is closed to reset loading state
+    const checkPopupTimer = setInterval(() => {
+      if (!popup || popup.closed) {
+        clearInterval(checkPopupTimer);
+        setIsAuthorizing(false);
+      }
+    }, 1000);
   };
 
   const handleConfirmImport = () => {
@@ -704,16 +718,14 @@ export default function AddonSidebarPage() {
                 <span>{selectedConnector.domainSuffix || ".com"}</span>
               </div>
 
-              {/* Authorize Action Link (treated as user navigation, never blocked by sandbox) */}
-              <a 
-                href={oauthUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleLinkClick}
-                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer text-center"
+              {/* Authorize Action Button (uses absolute path window.open, compatible with spreadsheet sidebars) */}
+              <button 
+                onClick={handleAuthorizeClick}
+                disabled={isAuthorizing}
+                className="w-full py-3 bg-[#13322b] hover:bg-[#1a473d] active:bg-[#0d221e] text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
               >
                 <span>Authorize</span>
-              </a>
+              </button>
             </div>
 
           </div>
