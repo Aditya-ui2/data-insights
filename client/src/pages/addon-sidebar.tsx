@@ -407,8 +407,14 @@ export default function AddonSidebarPage() {
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);
 
+    console.log("[DigitValues Dev] Redirecting sidebar to oauthUrl:", oauthUrl);
+
     // Redirect the sidebar iframe itself to bypass popup blockers
-    window.location.href = oauthUrl;
+    try {
+      window.location.href = oauthUrl;
+    } catch (err) {
+      console.error("[DigitValues Dev] Failed to navigate iframe:", err);
+    }
   };
 
   const handleConfirmImport = () => {
