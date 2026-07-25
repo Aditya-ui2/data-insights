@@ -237,7 +237,11 @@ export default function AddonSidebarPage() {
   // Listen for OAuth completion signal from new tab -> LAUNCHES LARGE IMPORT PREVIEW MODAL
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      if (event.data === "dv_shopify_authorized") {
+      const isSuccess = 
+        event.data === "dv_shopify_authorized" || 
+        (event.data && event.data.type === "oauth_success" && event.data.provider === "shopify");
+
+      if (isSuccess) {
         setIsAuthorizing(false);
 
         // Notify parent to open preview modal now that authorization succeeded
@@ -262,7 +266,11 @@ export default function AddonSidebarPage() {
     };
 
     const handleStorage = (event: StorageEvent) => {
-      if (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) {
+      const isSuccess = 
+        (event.key === "dv_shopify_auth_status" && event.newValue?.startsWith("approved")) ||
+        (event.key === "oauth_success_shopify");
+
+      if (isSuccess) {
         setIsAuthorizing(false);
 
         // Notify parent to open preview modal now that authorization succeeded
@@ -352,7 +360,7 @@ export default function AddonSidebarPage() {
     const height = 700;
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
-    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}`;
+    const oauthUrl = `${backendBase}/api/oauth/shopify/authorize?shopUrl=${encodeURIComponent(cleanStoreName)}&frontendUrl=${encodeURIComponent(window.location.origin)}`;
 
     // Save shop name to localStorage for modal access
     localStorage.setItem("dv_shopify_shop", cleanStoreName);

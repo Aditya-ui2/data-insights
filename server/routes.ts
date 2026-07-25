@@ -4215,12 +4215,13 @@ Use exact integer revenue numbers in ${sym}. Base on trend. Set confidence based
     const provider = req.params.provider;
     const shopUrl = req.query.shopUrl || '';
     const userId = req.user?.claims?.sub || 'admin-demo-id';
+    const frontendUrl = (req.query.frontendUrl as string) || 'https://digitvalues.vercel.app';
 
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.get('host');
     const redirectUri = `${protocol}://${host}/api/oauth/${provider}/callback`;
 
-    const simulateUrl = `/oauth/simulate/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(userId)}&shopUrl=${encodeURIComponent(shopUrl)}`;
+    const simulateUrl = `${frontendUrl.replace(/\/$/, "")}/oauth/simulate/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}&state=${encodeURIComponent(userId)}&shopUrl=${encodeURIComponent(shopUrl)}`;
     res.redirect(simulateUrl);
   });
 
