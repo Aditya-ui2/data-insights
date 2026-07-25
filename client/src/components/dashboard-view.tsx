@@ -1808,7 +1808,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
         fill={chartPalette[index % chartPalette.length]} 
         radius={[0, 4, 4, 0]} 
         cursor="pointer"
-        onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+        onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
       />
     </BarChart>
   );
@@ -1839,7 +1839,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
         fill={chartPalette[index % chartPalette.length]} 
         radius={[4, 4, 0, 0]} 
         cursor="pointer"
-        onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+        onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
       />
     </BarChart>
   );
@@ -1855,7 +1855,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
         innerRadius={25}
         dataKey="value"
         paddingAngle={2}
-        onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+        onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
       >
         {chartData.map((_, i) => (
           <Cell key={i} fill={chartPalette[i % chartPalette.length]} style={{ cursor: 'pointer' }} />
@@ -1963,7 +1963,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
             stackId="a" 
             fill={chartPalette[i % chartPalette.length]} 
             cursor="pointer"
-            onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+            onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
           />
         ))
       ) : (
@@ -1972,7 +1972,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
           stackId="a" 
           fill={chartPalette[index % chartPalette.length]} 
           cursor="pointer"
-          onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+          onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
         />
       )}
     </BarChart>
@@ -2008,7 +2008,7 @@ function ChartCard({ config, data, index, hasActiveFilters, onChartClick }: { co
         fill={chartPalette[index % chartPalette.length]} 
         radius={[4, 4, 0, 0]} 
         cursor="pointer"
-        onClick={(item) => onChartClick(item, config.labelKey, config.title)}
+        onClick={(item) => onChartClick(item, config.labelKey || "", config.title || "")}
       />
       <Line 
         yAxisId="right" 

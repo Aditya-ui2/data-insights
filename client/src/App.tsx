@@ -171,7 +171,7 @@ function Router() {
         <Route path="/business/join/:code">
           {(params) => (
             auth.isLoading ? null : auth.isAuthenticated ? (
-              <BusinessJoin code={params.code} />
+              <BusinessJoin />
             ) : (
               <Redirect to={`/login?redirect=/business/join/${params.code}`} />
             )
@@ -179,11 +179,11 @@ function Router() {
         </Route>
 
         <Route path="/dashboard/share/:token">
-          {(params) => <SharedDashboard token={params.token} />}
+          {(params) => <SharedDashboard shareToken={params.token} />}
         </Route>
 
         <Route path="/report/share/:token">
-          {(params) => <SharedBusinessReport token={params.token} />}
+          {(params) => <SharedBusinessReport />}
         </Route>
 
         <Route path="/sheet/:id">
